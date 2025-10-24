@@ -115,3 +115,2435 @@ table.dataTable thead .sorting_desc {
 .form-check.is-invalid ~ .invalid-feedback {
     display: block;
 }
+
+/* Enhanced Validation Error Styling - Fix #3 */
+/* Top-level validation summary banner */
+.alert-warning.validation-summary {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-left: 4px solid #ffc107;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+}
+
+.alert-warning.validation-summary strong {
+    color: #856404;
+    font-size: 16px;
+}
+
+.alert-warning.validation-summary p {
+    color: #856404;
+    font-size: 14px;
+}
+
+.alert-warning.validation-summary i.fa-exclamation-triangle {
+    color: #ffc107;
+}
+
+/* Orange conflict banner for scheduling conflicts */
+.alert-conflict {
+    background: linear-gradient(135deg, #fff4e6 0%, #ffe0b2 100%);
+    border-left: 4px solid #ff9800;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+    color: #e65100;
+}
+
+.alert-conflict strong {
+    color: #e65100;
+    font-size: 16px;
+}
+
+.alert-conflict p {
+    color: #e65100;
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.alert-conflict i.fa-clock,
+.alert-conflict i.fa-calendar-alt {
+    color: #ff9800;
+    font-size: 24px;
+}
+
+/* Field-level validation errors - distinct red styling */
+.form-control.is-invalid,
+.select2-container--default .select2-selection--single.is-invalid {
+    border-color: #dc3545;
+    border-width: 2px;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+}
+
+.form-control.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.3rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: #f8d7da;
+    border-left: 3px solid #dc3545;
+    border-radius: 4px;
+}
+
+.invalid-feedback::before {
+    content: "\f06a";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 0.5rem;
+    color: #dc3545;
+}
+
+/* Modern Master Timetable Styling - Clean and User-Friendly Design */
+.timetable-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Master Timetable Grid Layout */
+.timetable-grid {
+    display: grid;
+    grid-template-columns: 100px repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: #e9ecef;
+    border: 1px solid #dee2e6;
+}
+
+/* Time Header Cell */
+.timetable-time-header {
+    background: #f8f9fa;
+    border-right: 2px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #495057;
+}
+
+.time-header-cell {
+    padding: 15px 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Room Header Cells */
+.timetable-room-header {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+    color: #495057;
+}
+
+.room-header-cell {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.room-header-cell strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #212529;
+}
+
+.room-header-cell .badge {
+    font-size: 10px;
+    padding: 2px 6px;
+}
+
+.room-header-cell small {
+    color: #6c757d;
+    font-size: 11px;
+}
+
+/* Time Cells */
+.timetable-time-cell {
+    background: #f8f9fa;
+    border-right: 2px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+}
+
+.time-cell-content {
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.3;
+    color: #495057;
+}
+
+.time-cell-content strong {
+    display: block;
+    font-weight: 600;
+    color: #212529;
+}
+
+.time-cell-content small {
+    color: #6c757d;
+    font-size: 10px;
+}
+
+/* Timetable Cells */
+.timetable-cell {
+    border-right: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    min-height: 60px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+/* Available/Empty Slots - Calm Green Highlighting */
+.timetable-cell:not(.lesson-slot) {
+    background: #e8f5e8 !important;
+    border: 1px solid #c3e6c3;
+}
+
+.timetable-cell:not(.lesson-slot):hover {
+    background: #d4edda !important;
+    border-color: #a9d4a9;
+}
+
+.empty-slot-content {
+    text-align: center;
+    color: #6c757d;
+    font-size: 11px;
+}
+
+.empty-slot-text {
+    opacity: 0.7;
+}
+
+.empty-slot-text i {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+/* Lesson Slots - Simple and Clear */
+.lesson-slot {
+    background: #28a745 !important;
+    color: white !important;
+    border: 1px solid #1e7e34;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 2px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+/* Class Box Styling - Simple and Clear */
+.class-box {
+    background: #28a745 !important;
+    color: white !important;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 2px;
+    border: 1px solid #1e7e34 !important;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.class-subject {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: white !important;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.class-time {
+    font-size: 11px;
+    opacity: 0.9;
+    margin-bottom: 3px;
+    text-align: center;
+    color: white !important;
+}
+
+.class-teacher {
+    font-size: 10px;
+    opacity: 0.8;
+    margin-bottom: 2px;
+    text-align: center;
+    color: white !important;
+}
+
+.class-class {
+    font-size: 10px;
+    opacity: 0.7;
+    text-align: center;
+    color: white !important;
+}
+
+/* Lab Lessons */
+.lab-lesson {
+    background: #17a2b8 !important;
+    border-color: #138496 !important;
+    color: white !important;
+}
+
+.lab-lesson .class-subject,
+.lab-lesson .class-time,
+.lab-lesson .class-teacher,
+.lab-lesson .class-class {
+    color: white !important;
+}
+
+/* Conflicted Lessons */
+.has-conflicts {
+    border: 2px solid #dc3545 !important;
+    background: #dc3545 !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+    color: white !important;
+}
+
+.has-conflicts .class-subject,
+.has-conflicts .class-time,
+.has-conflicts .class-teacher,
+.has-conflicts .class-class {
+    color: white !important;
+}
+
+/* Long Lessons - Light background with green text */
+.long-lesson {
+    background: #f8f9fa !important;
+    border: 1px solid #28a745 !important;
+    color: #28a745 !important;
+}
+
+.long-lesson .class-subject,
+.long-lesson .class-time,
+.long-lesson .class-teacher,
+.long-lesson .class-class {
+    color: #28a745 !important;
+}
+
+/* Short Lessons */
+.short-lesson {
+    background: #fd7e14 !important;
+    border-color: #e8650e !important;
+    color: white !important;
+}
+
+.short-lesson .class-subject,
+.short-lesson .class-time,
+.short-lesson .class-teacher,
+.short-lesson .class-class {
+    color: white !important;
+}
+
+/* Conflict Indicator */
+.lesson-conflict {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 10px;
+}
+
+.lesson-conflict i {
+    color: #ffc107 !important;
+    text-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+
+/* Responsive Design for Master Timetable */
+@media (max-width: 1200px) {
+    .timetable-grid {
+        grid-template-columns: 80px repeat(auto-fit, minmax(120px, 1fr));
+    }
+    
+    .time-cell-content {
+        font-size: 11px;
+    }
+    
+    .room-header-cell {
+        font-size: 12px;
+    }
+    
+    .lesson-content {
+        font-size: 10px;
+    }
+    
+    .lesson-subject {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 768px) {
+    .timetable-grid {
+        grid-template-columns: 70px repeat(auto-fit, minmax(100px, 1fr));
+    }
+    
+    .time-cell-content {
+        font-size: 10px;
+    }
+    
+    .room-header-cell {
+        font-size: 11px;
+    }
+    
+    .room-header-cell strong {
+        font-size: 11px;
+    }
+    
+    .lesson-content {
+        font-size: 9px;
+    }
+    
+    .lesson-subject {
+        font-size: 10px;
+    }
+    
+    .lesson-class,
+    .lesson-teacher {
+        font-size: 9px;
+    }
+    
+    .lesson-time {
+        font-size: 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .timetable-grid {
+        grid-template-columns: 60px repeat(auto-fit, minmax(80px, 1fr));
+    }
+    
+    .timetable-cell {
+        min-height: 50px;
+        padding: 4px;
+    }
+    
+    .time-cell-content {
+        font-size: 9px;
+    }
+    
+    .room-header-cell {
+        font-size: 10px;
+        padding: 10px 5px;
+    }
+    
+    .lesson-content {
+        font-size: 8px;
+        padding: 2px;
+    }
+    
+    .lesson-subject {
+        font-size: 9px;
+    }
+    
+    .lesson-class,
+    .lesson-teacher {
+        font-size: 8px;
+    }
+    
+    .lesson-time {
+        font-size: 7px;
+    }
+}
+
+/* Print Styles for Master Timetable */
+@media print {
+    .timetable-container {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+    }
+    
+    .timetable-grid {
+        grid-template-columns: 80px repeat(auto-fit, minmax(120px, 1fr)) !important;
+        border: 2px solid #000 !important;
+    }
+    
+    .timetable-cell:not(.lesson-slot) {
+        background: #f0f8f0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .lesson-slot {
+        background: #28a745 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .lab-lesson {
+        background: #17a2b8 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .has-conflicts {
+        background: #dc3545 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .short-lesson {
+        background: #fd7e14 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .long-lesson {
+        background: #f8f9fa !important;
+        color: #28a745 !important;
+        border: 1px solid #28a745 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .short-lesson {
+        background: #fd7e14 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+.timetable-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Room timetable header should use white background */
+.admin-room-timetable .timetable-header {
+    background: white;
+    color: #333;
+}
+
+/* Section timetable header should use white background */
+.timetable-container:not(.admin-room-timetable) .timetable-header {
+    background: white !important;
+    color: #333 !important;
+}
+
+/* Section timetable title styling */
+.timetable-container:not(.admin-room-timetable) .timetable-title,
+.timetable-container:not(.admin-room-timetable) .timetable-header h2 {
+    color: #28a745 !important;
+    font-weight: bold !important;
+    font-size: 24px !important;
+    margin: 0 0 10px 0 !important;
+}
+
+/* Section timetable info styling */
+.timetable-container:not(.admin-room-timetable) .timetable-info {
+    color: #495057 !important;
+    font-size: 14px !important;
+    margin: 0 !important;
+    font-weight: 500 !important;
+}
+
+/* Statistics cards styling */
+.statistics-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+.statistics-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.statistics-title {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.statistics-number {
+    color: #495057;
+    font-weight: bold;
+    font-size: 24px;
+    margin: 0;
+}
+
+
+/* Room timetable title styling */
+.admin-room-timetable .timetable-title {
+    color: #28a745 !important;
+    font-weight: bold !important;
+    font-size: 24px !important;
+    margin: 0 0 10px 0 !important;
+}
+
+/* Room timetable info styling */
+.admin-room-timetable .timetable-info {
+    color: #495057 !important;
+    font-size: 14px !important;
+    margin: 0 !important;
+    font-weight: 500 !important;
+}
+
+.timetable-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Override for room timetables */
+.admin-room-timetable .timetable-header h2 {
+    color: #28a745 !important;
+    font-weight: bold !important;
+    font-size: 24px !important;
+    margin: 0 0 10px 0 !important;
+}
+
+
+
+
+.timetable-grid {
+    display: grid;
+    grid-template-columns: 120px repeat(7, 1fr);
+    gap: 0;
+    border: 1px solid #e1e5e9;
+}
+
+.timetable-day-header {
+    background: #f8f9fa;
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    border-right: 1px solid #e1e5e9;
+}
+
+.timetable-day-header:first-child {
+    background: #e9ecef;
+    border-right: 2px solid #dee2e6;
+}
+
+.timetable-day-column {
+    min-height: 600px;
+    background: white;
+    border-right: 1px solid #e1e5e9;
+    padding: 10px;
+}
+
+.timetable-day-column:last-child {
+    border-right: none;
+}
+
+.timetable-day-column.weekend {
+    background: #f8f9fa;
+}
+
+/* Class Box Styling - Room Timetable Specific */
+.room-timetable .class-box,
+.admin-room-timetable .class-box {
+    background: white !important;
+    border: 1px solid #d1d3d4 !important;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+.room-timetable .class-box:hover,
+.admin-room-timetable .class-box:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+.room-timetable .class-subject,
+.admin-room-timetable .class-subject {
+    color: #28a745 !important;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.room-timetable .class-time,
+.admin-room-timetable .class-time {
+    color: #495057 !important;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+
+.room-timetable .class-instructor,
+.admin-room-timetable .class-instructor {
+    color: #6c757d !important;
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+
+.room-timetable .class-room,
+.admin-room-timetable .class-room {
+    color: #6c757d !important;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.not-scheduled-box {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    font-size: 14px;
+}
+
+/* Time column styling */
+.timetable-time-column {
+    background: #f8f9fa;
+    border-right: 2px solid #dee2e6;
+}
+
+.timetable-time-slot {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #e1e5e9;
+    font-weight: 500;
+    color: #495057;
+    font-size: 13px;
+}
+
+.timetable-time-slot:last-child {
+    border-bottom: none;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .timetable-grid {
+        grid-template-columns: 100px repeat(7, 1fr);
+    }
+    
+    .timetable-time-slot {
+        height: 50px;
+        font-size: 12px;
+    }
+    
+    .class-box {
+        padding: 10px;
+    }
+    
+    .class-subject {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .timetable-grid {
+        grid-template-columns: 80px repeat(7, 1fr);
+        font-size: 11px;
+    }
+    
+    .timetable-day-header {
+        padding: 10px 5px;
+        font-size: 12px;
+    }
+    
+    .timetable-time-slot {
+        height: 40px;
+        font-size: 10px;
+    }
+    
+    .class-box {
+        padding: 8px;
+        margin-bottom: 6px;
+    }
+    
+    .class-subject {
+        font-size: 12px;
+    }
+    
+    .class-time, .class-instructor, .class-room {
+        font-size: 10px;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .timetable-table {
+        font-size: 12px;
+    }
+    
+    .lesson-details {
+        font-size: 10px;
+    }
+    
+    .timetable-time-cell {
+        width: 80px;
+    }
+}
+
+/* Print Styles for Timetables */
+@media print {
+    /* Hide navigation and unnecessary elements */
+    .sidebar,
+    .navbar,
+    .btn,
+    .alert,
+    .card-header:not(.timetable-header),
+    .mb-3.p-3.bg-light,
+    .content .row .col-lg-12 > div:not(.timetable-container) {
+        display: none !important;
+    }
+    
+    /* Ensure full width for timetable */
+    .timetable-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+    }
+    
+    /* Timetable header styling for print */
+    .timetable-header {
+        background: #333 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color-adjust: exact;
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
+    
+    .timetable-header h2 {
+        font-size: 20px !important;
+        margin: 0 !important;
+        padding: 15px 0 !important;
+    }
+    
+    /* Timetable grid styling for print */
+    .timetable-grid {
+        display: grid !important;
+        grid-template-columns: 100px repeat(7, 1fr) !important;
+        gap: 1px !important;
+        border: 2px solid #333 !important;
+        width: 100% !important;
+        page-break-inside: avoid;
+    }
+    
+    /* Day headers for print */
+    .timetable-day-header {
+        background: #f5f5f5 !important;
+        color: #333 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color-adjust: exact;
+        padding: 10px 8px !important;
+        font-weight: bold !important;
+        font-size: 12px !important;
+        text-align: center !important;
+        border: 1px solid #333 !important;
+    }
+    
+    .timetable-day-header:first-child {
+        background: #e0e0e0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    /* Day columns for print */
+    .timetable-day-column {
+        min-height: 400px !important;
+        background: white !important;
+        border: 1px solid #333 !important;
+        padding: 8px !important;
+        page-break-inside: avoid;
+    }
+    
+    .timetable-day-column.weekend {
+        background: #f9f9f9 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    
+    /* Class boxes for print */
+    .class-box {
+        background: white !important;
+        border: 1px solid #666 !important;
+        border-radius: 3px !important;
+        padding: 8px !important;
+        margin-bottom: 6px !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        font-size: 11px !important;
+    }
+    
+    .class-subject {
+        color: #000 !important;
+        font-weight: bold !important;
+        font-size: 12px !important;
+        margin-bottom: 3px !important;
+        line-height: 1.2 !important;
+    }
+    
+    .class-time {
+        color: #333 !important;
+        font-size: 10px !important;
+        font-weight: 600 !important;
+        margin-bottom: 2px !important;
+    }
+    
+    .class-instructor,
+    .class-room {
+        color: #555 !important;
+        font-size: 9px !important;
+        margin-bottom: 1px !important;
+    }
+    
+    /* Not scheduled boxes for print */
+    .not-scheduled-box {
+        background: #f5f5f5 !important;
+        border: 1px solid #ccc !important;
+        border-radius: 3px !important;
+        padding: 15px !important;
+        text-align: center !important;
+        color: #666 !important;
+        font-style: italic !important;
+        font-size: 11px !important;
+    }
+    
+    /* Time column for print */
+    .timetable-time-column {
+        background: #f0f0f0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color-adjust: exact;
+        border: 1px solid #333 !important;
+    }
+    
+    /* Page setup */
+    @page {
+        margin: 1cm;
+        size: A4 landscape;
+    }
+    
+    body {
+        font-size: 12px !important;
+        line-height: 1.3 !important;
+        color: #000 !important;
+        background: white !important;
+    }
+    
+    /* Ensure proper page breaks */
+    .timetable-container {
+        page-break-after: always;
+    }
+    
+    /* Hide any remaining interactive elements */
+    a[href]:after {
+        content: none !important;
+    }
+    
+    /* Ensure text is readable */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+}
+
+/* Additional print styles for better control */
+body.printing {
+    overflow: visible !important;
+}
+
+body.printing .timetable-container {
+    position: relative !important;
+    z-index: 9999 !important;
+}
+
+/* Print button styling */
+.btn-print {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.btn-print:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    color: white;
+}
+
+/* Print-specific utilities */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .print-only {
+        display: block !important;
+    }
+}
+
+.print-only {
+    display: none;
+}
+
+/* Admin Dashboard - Modern Design */
+.dashboard-welcome {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.welcome-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Statistics Cards */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border-left: 4px solid;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.stat-card-primary {
+    border-left-color: #007bff;
+}
+
+.stat-card-success {
+    border-left-color: #28a745;
+}
+
+.stat-card-info {
+    border-left-color: #17a2b8;
+}
+
+.stat-card-warning {
+    border-left-color: #ffc107;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    flex-shrink: 0;
+}
+
+.stat-card-primary .stat-icon {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.stat-card-success .stat-icon {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.stat-card-info .stat-icon {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+}
+
+.stat-card-warning .stat-icon {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: #495057;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0.5rem 0 0 0;
+    font-weight: 500;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: none;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.dashboard-card .card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.header-content {
+    flex: 1;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: #495057;
+}
+
+.card-subtitle {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0;
+}
+
+.header-actions {
+    margin-left: 1rem;
+}
+
+/* Rooms Grid */
+.rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.room-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.room-item:hover {
+    border-color: #007bff;
+    box-shadow: 0 8px 25px rgba(0,123,255,0.15);
+    transform: translateY(-4px);
+}
+
+.room-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.room-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+}
+
+.classroom-icon {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.lab-icon {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+}
+
+.room-type {
+    margin-top: -0.25rem;
+}
+
+.room-content {
+    margin-bottom: 1rem;
+}
+
+.room-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    margin: 0 0 0.5rem 0;
+}
+
+.room-description {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+}
+
+.room-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-item {
+    font-size: 0.85rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detail-item i {
+    width: 16px;
+    color: #007bff;
+}
+
+.room-action {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    color: #6c757d;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.room-item:hover .room-action {
+    color: #007bff;
+    transform: translateX(4px);
+}
+
+/* Rooms Footer */
+.rooms-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.rooms-footer .alert {
+    border-radius: 8px;
+    border: none;
+    padding: 1rem 1.25rem;
+}
+
+.rooms-footer .alert-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.rooms-footer .alert-link:hover {
+    text-decoration: underline;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.quick-action-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.quick-action-item:hover {
+    background: white;
+    border-color: #e9ecef;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateX(4px);
+    text-decoration: none;
+    color: inherit;
+}
+
+.action-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+    flex-shrink: 0;
+}
+
+.action-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.action-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.action-info {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+}
+
+.action-warning {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+}
+
+.action-content h6 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: #495057;
+}
+
+.action-content small {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* System Stats */
+.system-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.system-stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.system-stat-item:hover {
+    background: #e9ecef;
+}
+
+.stat-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.stat-info i {
+    font-size: 16px;
+}
+
+.stat-info span {
+    font-size: 0.9rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 2rem;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .rooms-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .dashboard-card .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .header-actions {
+        margin-left: 0;
+        align-self: flex-end;
+    }
+}
+
+/* Room Timetables Index - Clean Design */
+/* Integrated Filter Section */
+.integrated-filter-section {
+    padding: 1.5rem 2rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.filter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 2rem;
+}
+
+.filter-column {
+    flex: 1;
+}
+
+.search-column {
+    flex: 0 0 300px;
+}
+
+.filter-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: #495057;
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #dee2e6;
+    background: white;
+    color: #495057;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    color: #495057;
+    text-decoration: none;
+}
+
+.filter-btn.active {
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.filter-btn.active:hover {
+    background: #218838;
+    border-color: #1e7e34;
+    color: white;
+}
+
+.filter-btn .badge {
+    margin-left: 0.25rem;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.search-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.search-label {
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.search-controls .input-group {
+    width: 100%;
+}
+
+.search-controls .form-control {
+    border-radius: 6px 0 0 6px;
+    border: 1px solid #dee2e6;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.search-controls .input-group-text {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    color: #6c757d;
+    padding: 0.5rem 0.75rem;
+}
+
+.search-controls .form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.search-controls .form-control:focus + .input-group-text {
+    border-color: #28a745;
+}
+
+/* Responsive Integrated Filter Section */
+@media (max-width: 992px) {
+    .integrated-filter-section {
+        padding: 1.5rem;
+    }
+    
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+    }
+    
+    .filter-column,
+    .search-column {
+        flex: none;
+        width: 100%;
+    }
+    
+    .filter-controls {
+        align-items: center;
+        text-align: center;
+    }
+    
+    .filter-buttons {
+        justify-content: center;
+    }
+    
+    .search-controls {
+        align-items: center;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .integrated-filter-section {
+        padding: 1rem;
+    }
+    
+    .filter-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .filter-btn {
+        width: 100%;
+        max-width: 200px;
+        justify-content: center;
+    }
+    
+    .search-controls .input-group {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+}
+.page-header {
+    background: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.header-content {
+    flex: 1;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #28a745;
+}
+
+.page-subtitle {
+    font-size: 1rem;
+    color: #495057;
+    margin: 0;
+}
+
+.header-actions {
+    margin-left: 2rem;
+}
+
+.rooms-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.room-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+    /* No hover effect on card as requested */
+}
+
+.room-header {
+    padding: 1rem 1.5rem 0.5rem 1.5rem;
+    text-align: right;
+}
+
+.room-type-badge .badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.room-content {
+    padding: 0 1.5rem 1rem 1.5rem;
+}
+
+.room-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+    color: #28a745;
+}
+
+.room-description {
+    font-size: 0.9rem;
+    color: #495057;
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+.room-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #495057;
+}
+
+.detail-item i {
+    width: 16px;
+    color: #6c757d;
+    text-align: center;
+}
+
+.room-footer {
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
+    border-top: 1px solid #f8f9fa;
+}
+
+.btn-view-timetable {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-view-timetable:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .header-actions {
+        margin-left: 0;
+        align-self: stretch;
+    }
+    
+    .header-actions .btn {
+        width: 100%;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .rooms-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+}
+
+/* School Classes Overview - Modern Design */
+/* Filter Section */
+.filter-section {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    color: #495057;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.filter-btn:hover {
+    background: #f8f9fa;
+    border-color: #adb5bd;
+    transform: translateY(-1px);
+}
+
+.filter-btn.active {
+    background: #007bff;
+    border-color: #007bff;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.filter-btn .badge {
+    margin-left: 0.5rem;
+    font-size: 0.7rem;
+}
+
+.filter-btn.active .badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.search-controls {
+    max-width: 300px;
+    margin-left: auto;
+}
+
+.search-controls .input-group-text {
+    background: white;
+    border-right: none;
+    color: #6c757d;
+}
+
+.search-controls .form-control {
+    border-left: none;
+    padding-left: 0;
+}
+
+.search-controls .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Responsive adjustments for filter section */
+@media (max-width: 768px) {
+    .filter-section .row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .filter-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .search-controls {
+        max-width: 100%;
+        margin-left: 0;
+    }
+    
+    .filter-buttons {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .filter-btn {
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+    }
+}
+.program-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+}
+
+.program-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+/* Senior High School Cards */
+.senior-high-card {
+    border-left: 4px solid #28a745;
+}
+
+.senior-high-icon {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+/* Diploma Program Cards */
+.diploma-card {
+    border-left: 4px solid #ffc107;
+}
+
+.diploma-icon {
+    background: linear-gradient(135deg, #ffc107, #ff9800);
+    color: white;
+}
+
+/* College Cards */
+.college-card {
+    border-left: 4px solid #007bff;
+}
+
+.college-icon {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+/* Program Header */
+.program-header {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.program-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.program-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.program-details {
+    flex: 1;
+}
+
+.program-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    color: #495057;
+}
+
+.program-type {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.program-stats {
+    text-align: center;
+    padding: 0.5rem 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.class-count {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #495057;
+    line-height: 1;
+}
+
+.program-stats small {
+    color: #6c757d;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Program Content */
+.program-content {
+    padding: 1.5rem;
+}
+
+.program-description {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.classes-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.class-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.class-item:hover {
+    background: #e9ecef;
+    transform: translateX(4px);
+}
+
+.class-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.class-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.class-name {
+    display: block;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.class-details {
+    font-size: 0.75rem;
+    color: #6c757d;
+    line-height: 1.3;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Program Footer */
+.program-footer {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.program-footer .btn {
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.program-footer .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* School Classes Program View - Compact Layout */
+.program-section {
+    border-left: 3px solid #007bff;
+    padding-left: 10px;
+}
+
+.grade-card {
+    transition: box-shadow 0.2s ease;
+    background: #f8f9fa;
+}
+
+.grade-card:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.class-item {
+    padding: 2px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.class-item:last-child {
+    border-bottom: none;
+}
+
+.class-name {
+    font-size: 0.85rem;
+}
+
+/* School Classes Grade View - Card Layout */
+.class-card {
+    transition: all 0.2s ease;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6 !important;
+}
+
+.class-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    border-color: #007bff !important;
+}
+
+.info-item {
+    padding: 8px 4px;
+}
+
+.info-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.info-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.class-actions .btn {
+    border-radius: 0;
+}
+
+.class-actions .btn:first-child {
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+.class-actions .btn:last-child {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+.empty-state {
+    padding: 2rem 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .grade-card {
+        margin-bottom: 10px;
+    }
+    
+    .class-card {
+        margin-bottom: 15px;
+    }
+    
+    .info-value {
+        font-size: 1.1rem;
+    }
+}
+
+/* Empty state styling */
+.school-classes-overview .empty-state {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.school-classes-overview .empty-state i {
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .school-classes-overview .col-lg-6 {
+        margin-bottom: 20px;
+    }
+    
+    .school-classes-overview .info-box {
+        margin-bottom: 10px;
+    }
+}
+
+/* ==============================================================================
+   SUBJECTS PAGES STYLING
+   ============================================================================== */
+
+/* Page Header Styling */
+.page-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid #28a745;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #495057;
+}
+
+.page-subtitle {
+    font-size: 1rem;
+    margin-bottom: 0;
+    color: #6c757d;
+}
+
+/* Info Item Styling */
+.info-item {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 0.75rem;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    color: #212529;
+    font-size: 1rem;
+}
+
+/* Statistics Styling */
+.stat-item {
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
+}
+
+/* Teacher Card Styling */
+.teacher-card {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.teacher-card:hover {
+    border-color: #28a745;
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.1);
+}
+
+.teacher-card .card-body {
+    padding: 1.25rem;
+}
+
+/* Avatar Styling */
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+}
+
+/* Badge Outline Styling */
+.badge-outline-primary {
+    color: #007bff;
+    border: 1px solid #007bff;
+    background-color: transparent;
+}
+
+.badge-outline-secondary {
+    color: #6c757d;
+    border: 1px solid #6c757d;
+    background-color: transparent;
+}
+
+/* Form Styling Enhancements */
+.form-group .help-block {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.form-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* Card Header Styling */
+.card-header h3 {
+    margin-bottom: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Table Enhancements */
+.table-hover tbody tr:hover {
+    background-color: rgba(40, 167, 69, 0.05);
+}
+
+.thead-light th {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Alert Enhancements */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Button Group Styling */
+.btn-group .btn {
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+/* Card Footer Styling */
+.card-footer.bg-light {
+    background-color: #f8f9fa !important;
+    border-top: 1px solid #e9ecef;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Breadcrumb Enhancements */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.breadcrumb-item a {
+    color: #28a745;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    color: #1e7e34;
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: #495057;
+}
+
+/* Responsive Adjustments for Subjects Pages */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 1rem;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.5rem;
+        margin-right: 0;
+    }
+    
+    .btn-group .btn:last-child {
+        margin-bottom: 0;
+    }
+}

@@ -49,8 +49,35 @@ class SchoolClassesApiController extends Controller
     {
         abort_if(Gate::denies('school_class_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $schoolClass->delete();
+        // Check if there are students enrolled in this class
+        $enrolledStudents = $schoolClass->classUsers()->where('is_student', true)->count();
+        if ($enrolledStudents > 0) {
+            return response()->json([
+                'message' => "Cannot delete class '{$schoolClass->name}' because it has {$enrolledStudents} enrolled student(s). Please reassign or remove the students first."
+            ], Response::HTTP_CONFLICT);
+        }
 
-        return response(null, Response::HTTP_NO_CONTENT);
+        // Check if there are active lessons for this class
+        $activeLessons = $schoolClass->lessons()->count();
+        if ($activeLessons > 0) {
+            return response()->json([
+                'message' => "Cannot delete class '{$schoolClass->name}' because it has {$activeLessons} scheduled lesson(s). Please remove the lessons first."
+            ], Response::HTTP_CONFLICT);
+        }
+
+        try {
+            // Hard delete the class - completely remove from database
+            $schoolClass->forceDelete();
+            return response(null, Response::HTTP_NO_CONTENT);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == '23000') {
+                return response()->json([
+                    'message' => "Cannot delete class '{$schoolClass->name}' because it has associated data. Please remove all related records first."
+                ], Response::HTTP_CONFLICT);
+            }
+            return response()->json([
+                'message' => 'An error occurred while deleting the class. Please try again.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

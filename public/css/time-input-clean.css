@@ -1,0 +1,25 @@
+.time-input-clean {
+    -webkit-calendar-picker-indicator: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.time-select {
+    background-color: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    width: 100%;
+}
+
+/* Hide native time picker popup */
+input[type="time"]::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+input[type="time"]::-webkit-inner-spin-button,
+input[type="time"]::-webkit-clear-button {
+    -webkit-appearance: none;
+    display: none;
+}

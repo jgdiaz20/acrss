@@ -21,16 +21,17 @@ class CalendarTest extends TestCase
     public function testCalendarPageIsLoadingForAdmin()
     {
         $role = Role::create([
-            'name' => 'Admin'
+            'title' => 'Admin'
         ]);
         $admin = User::create([
             'name' => 'Admin',
             'email' => 'admin@admin.com',
-            'password' => bcrypt('password')
+            'password' => bcrypt('password'),
+            'is_admin' => true
         ]);
         $admin->roles()->attach($role->id);
 
-        $response = $this->actingAs($admin)->get('/admin/calendar');
+        $response = $this->actingAs($admin)->get('/admin');
 
         $response->assertSuccessful();
     }
@@ -49,25 +50,40 @@ class CalendarTest extends TestCase
 
         // Create teacher
         $role = Role::create([
-            'name' => 'Teacher'
+            'title' => 'Teacher'
         ]);
+        
+        // Give teacher lesson access permission
+        $lessonPermission = \App\Permission::create([
+            'title' => 'lesson_access'
+        ]);
+        $role->permissions()->attach($lessonPermission->id);
+        
         $teacher = User::create([
             'name' => 'Teacher',
             'email' => 'teacher@teacher.com',
-            'password' => bcrypt('password')
+            'password' => bcrypt('password'),
+            'is_teacher' => true
         ]);
         $teacher->roles()->attach($role->id);
+
+        // Create room
+        $room = \App\Room::create([
+            'name' => 'Room 101',
+            'description' => 'Test Room'
+        ]);
 
         // Create lesson
         Lesson::create([
             'weekday' => 1,
-            'start_time' => '10:00',
-            'end_time' => '12:00',
+            'start_time' => '10:00 AM',
+            'end_time' => '12:00 PM',
             'teacher_id' => $teacher->id,
             'class_id' => $schoolClass->id,
+            'room_id' => $room->id,
         ]);
 
-        $response = $this->actingAs($teacher)->get('/admin/calendar');
+        $response = $this->actingAs($teacher)->get('/admin/lessons');
 
         $response->assertSuccessful();
         $response->assertSeeText($schoolClass->name);

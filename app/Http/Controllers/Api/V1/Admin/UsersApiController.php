@@ -51,8 +51,50 @@ class UsersApiController extends Controller
     {
         abort_if(Gate::denies('user_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $user->delete();
+        $userName = $user->name;
+        
+        // Check if teacher has assigned subjects
+        if ($user->is_teacher && $user->teacherSubjects()->where('is_active', true)->exists()) {
+            $assignedSubjects = $user->teacherSubjects()
+                ->with('subject')
+                ->where('is_active', true)
+                ->get()
+                ->pluck('subject.name')
+                ->implode(', ');
+            
+            return response()->json([
+                'message' => "Cannot delete teacher '{$userName}' because they are assigned to the following subjects: {$assignedSubjects}. Please remove the teacher from these subjects first."
+            ], Response::HTTP_CONFLICT);
+        }
+        
+        // Check if teacher has active lessons
+        if ($user->is_teacher && $user->teacherLessons()->exists()) {
+            return response()->json([
+                'message' => "Cannot delete teacher '{$userName}' because they have scheduled lessons. Please delete or reassign all their lessons first."
+            ], Response::HTTP_CONFLICT);
+        }
+        
+        // Check if student is enrolled in a class
+        if ($user->is_student && $user->class_id) {
+            return response()->json([
+                'message' => "Cannot delete student '{$userName}' because they are enrolled in a class. Please remove them from the class first."
+            ], Response::HTTP_CONFLICT);
+        }
 
-        return response(null, Response::HTTP_NO_CONTENT);
+        try {
+            $user->forceDelete();
+
+            return response(null, Response::HTTP_NO_CONTENT);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Handle foreign key constraint violations
+            if ($e->getCode() == '23000') {
+                return response()->json([
+                    'message' => "Cannot delete user '{$userName}' because they have related data (lessons, subject assignments, etc.). Please remove all related data first."
+                ], Response::HTTP_CONFLICT);
+            }
+            
+            // Re-throw other database exceptions
+            throw $e;
+        }
     }
 }

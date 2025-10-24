@@ -68,8 +68,8 @@ return [
         ],
     ],
     'lesson'         => [
-        'title'          => 'Lessons',
-        'title_singular' => 'Lesson',
+        'title'          => 'Class Schedules',
+        'title_singular' => 'Class Schedule',
         'fields'         => [
             'id'                => 'ID',
             'id_helper'         => '',

@@ -2,14 +2,34 @@
     <nav class="sidebar-nav">
 
         <ul class="nav">
-            <li class="nav-item">
-                <a href="{{ route("admin.home") }}" class="nav-link">
-                    <i class="nav-icon fas fa-fw fa-tachometer-alt">
+            @if(auth()->user()->is_admin)
+                <li class="nav-item">
+                    <a href="{{ route("admin.home") }}" class="nav-link">
+                        <i class="nav-icon fas fa-fw fa-tachometer-alt">
 
-                    </i>
-                    {{ trans('global.dashboard') }}
-                </a>
-            </li>
+                        </i>
+                        {{ trans('global.dashboard') }}
+                    </a>
+                </li>
+            @endif
+            @if(auth()->user()->is_teacher && !auth()->user()->is_admin)
+                <li class="nav-item">
+                    <a href="{{ route("teacher.dashboard") }}" class="nav-link {{ request()->is('teacher') || request()->is('teacher/') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-tachometer-alt nav-icon">
+                        </i>
+                        My Dashboard
+                    </a>
+                </li>
+            @endif
+            @if(auth()->user()->is_student)
+                <li class="nav-item">
+                    <a href="{{ route("student.calendar.index") }}" class="nav-link {{ request()->is('student/calendar') || request()->is('student/calendar/*') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-calendar nav-icon">
+                        </i>
+                        My Schedule
+                    </a>
+                </li>
+            @endif
             @can('user_management_access')
                 <li class="nav-item nav-dropdown">
                     <a class="nav-link  nav-dropdown-toggle" href="#">
@@ -20,14 +40,16 @@
                     </a>
                     <ul class="nav-dropdown-items">
                         @can('permission_access')
-                            <li class="nav-item">
-                                <a href="{{ route("admin.permissions.index") }}" class="nav-link {{ request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : '' }}">
-                                    <i class="fa-fw fas fa-unlock-alt nav-icon">
+                            @if(config('app.env') !== 'production')
+                                <li class="nav-item">
+                                    <a href="{{ route("admin.permissions.index") }}" class="nav-link {{ request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : '' }}">
+                                        <i class="fa-fw fas fa-unlock-alt nav-icon">
 
-                                    </i>
-                                    {{ trans('cruds.permission.title') }}
-                                </a>
-                            </li>
+                                        </i>
+                                        {{ trans('cruds.permission.title') }}
+                                    </a>
+                                </li>
+                            @endif
                         @endcan
                         @can('role_access')
                             <li class="nav-item">
@@ -69,12 +91,56 @@
                 </li>
             @endcan
             @can('school_class_access')
-                <li class="nav-item">
-                    <a href="{{ route("admin.school-classes.index") }}" class="nav-link {{ request()->is('admin/school-classes') || request()->is('admin/school-classes/*') ? 'active' : '' }}">
+                <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
                         <i class="fa-fw fas fa-school nav-icon">
 
                         </i>
                         {{ trans('cruds.schoolClass.title') }}
+                    </a>
+                    <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.school-classes.program', 'senior_high') }}" class="nav-link {{ request()->is('admin/school-classes/senior-high*') ? 'active' : '' }}">
+                                <i class="fa-fw fas fa-graduation-cap nav-icon">
+
+                                </i>
+                                Senior High School
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.school-classes.program', 'diploma') }}" class="nav-link {{ request()->is('admin/school-classes/diploma*') ? 'active' : '' }}">
+                                <i class="fa-fw fas fa-award nav-icon">
+
+                                </i>
+                                Diploma Program
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.school-classes.program', 'college') }}" class="nav-link {{ request()->is('admin/school-classes/college*') ? 'active' : '' }}">
+                                <i class="fa-fw fas fa-university nav-icon">
+
+                                </i>
+                                College
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.academic-programs.index') }}" class="nav-link {{ request()->is('admin/academic-programs*') ? 'active' : '' }}">
+                                <i class="fa-fw fas fa-cogs nav-icon">
+
+                                </i>
+                                Manage Programs
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endcan
+              @can('subject_access')
+                <li class="nav-item">
+                    <a href="{{ route("admin.subjects.index") }}" class="nav-link {{ request()->is('admin/subjects') || request()->is('admin/subjects/*') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-book nav-icon">
+
+                        </i>
+                        Subjects
                     </a>
                 </li>
             @endcan
@@ -88,22 +154,52 @@
                     </a>
                 </li>
             @endcan
-            <li class="nav-item">
-                <a href="{{ route("admin.calendar.index") }}" class="nav-link {{ request()->is('admin/calendar') || request()->is('admin/calendar/*') ? 'active' : '' }}">
-                    <i class="fa-fw fas fa-calendar nav-icon">
+           
+            @can('room_access')
+                <li class="nav-item nav-dropdown">
+                    <a class="nav-link nav-dropdown-toggle" href="#">
+                        <i class="fa-fw fas fa-building nav-icon">
 
-                    </i>
-                    Calendar
-                </a>
-            </li>
-            <li class="nav-item">
+                        </i>
+                        Room Management
+                    </a>
+                    <ul class="nav-dropdown-items">
+                        <li class="nav-item">
+                            <a href="{{ route("admin.room-management.rooms.index") }}" class="nav-link {{ request()->is('admin/room-management/rooms') || request()->is('admin/room-management/rooms/*') ? 'active' : '' }}">
+                                <i class="fa-fw fas fa-door-open nav-icon">
+
+                                </i>
+                                Rooms
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route("admin.room-management.room-timetables.index") }}" class="nav-link {{ request()->is('admin/room-management/room-timetables') || request()->is('admin/room-management/room-timetables/*') ? 'active' : '' }}">
+                                <i class="fa-fw fas fa-calendar-alt nav-icon">
+
+                                </i>
+                                Room Timetables
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route("admin.room-management.master-timetable.index") }}" class="nav-link {{ request()->is('admin/room-management/master-timetable') || request()->is('admin/room-management/master-timetable/*') ? 'active' : '' }}">
+                                <i class="fa-fw fas fa-th nav-icon">
+
+                                </i>
+                                Master Timetable
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endcan
+           
+           <!-- <li class="nav-item">
                 <a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('logoutform').submit();">
                     <i class="nav-icon fas fa-fw fa-sign-out-alt">
 
                     </i>
                     {{ trans('global.logout') }}
                 </a>
-            </li>
+            </li> -->
         </ul>
 
     </nav>

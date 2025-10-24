@@ -50,7 +50,17 @@
                     </div>
                 </li>
             @endif
-
+            
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-user"></i> {{ auth()->user()->name }}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logoutform').submit();">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </li>
 
         </ul>
     </header>
@@ -61,20 +71,44 @@
 
 
             <div style="padding-top: 20px" class="container-fluid">
-                @if(session('message'))
+                @if(session('success') || session('status') || session('message'))
                     <div class="row mb-2">
                         <div class="col-lg-12">
-                            <div class="alert alert-success" role="alert">{{ session('message') }}</div>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                {{ session('success') ?? session('status') ?? session('message') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+                @if(session('error') || session('warning'))
+                    <div class="row mb-2">
+                        <div class="col-lg-12">
+                            <div class="alert alert-{{ session('error') ? 'danger' : 'warning' }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{{ session('error') ? 'exclamation-circle' : 'exclamation-triangle' }} mr-2"></i>
+                                {{ session('error') ?? session('warning') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 @endif
                 @if($errors->count() > 0)
-                    <div class="alert alert-danger">
-                        <ul class="list-unstyled">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle fa-2x mr-3"></i>
+                            <div>
+                                <strong><i class="fas fa-info-circle"></i> Validation Error{{ $errors->count() > 1 ? 's' : '' }}</strong>
+                                <p class="mb-0">Please review the form below and correct {{ $errors->count() }} error{{ $errors->count() > 1 ? 's' : '' }} highlighted in red.</p>
+                            </div>
+                        </div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                 @endif
                 @yield('content')
@@ -84,20 +118,23 @@
 
         </main>
         <form id="logoutform" action="{{ route('logout') }}" method="POST" style="display: none;">
-            {{ csrf_field() }}
+            @csrf
         </form>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/@coreui/coreui@2.1.16/dist/js/coreui.min.js"></script>
     <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+    
+    {{-- Enhanced Validation Modal --}}
+    @include('components.validation-modal')
+    <script src="{{ asset('js/enhanced-validation-modal.js') }}"></script>
     <script src="//cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
     <script src="//cdn.datatables.net/buttons/1.2.4/js/buttons.flash.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.colVis.min.js"></script>
     <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
     <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
@@ -202,14 +239,6 @@
           columns: ':visible'
         }
       },
-      {
-        extend: 'colvis',
-        className: 'btn-default',
-        text: colvisButtonTrans,
-        exportOptions: {
-          columns: ':visible'
-        }
-      }
     ]
   });
 

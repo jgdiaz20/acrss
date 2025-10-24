@@ -41,10 +41,26 @@
                     </tr>
                     <tr>
                         <th>
+                            Subject
+                        </th>
+                        <td>
+                            {{ $lesson->subject->name ?? 'No Subject' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Room
+                        </th>
+                        <td>
+                            {{ $lesson->room->display_name ?? '' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
                             {{ trans('cruds.lesson.fields.weekday') }}
                         </th>
                         <td>
-                            {{ $lesson->weekday }}
+                            {{ \App\Lesson::WEEK_DAYS[$lesson->weekday] ?? '' }}
                         </td>
                     </tr>
                     <tr>
@@ -52,7 +68,7 @@
                             {{ trans('cruds.lesson.fields.start_time') }}
                         </th>
                         <td>
-                            {{ $lesson->start_time }}
+                            {{ \Carbon\Carbon::parse($lesson->start_time)->format('g:i A') }}
                         </td>
                     </tr>
                     <tr>
@@ -60,16 +76,11 @@
                             {{ trans('cruds.lesson.fields.end_time') }}
                         </th>
                         <td>
-                            {{ $lesson->end_time }}
+                            {{ \Carbon\Carbon::parse($lesson->end_time)->format('g:i A') }}
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <div class="form-group">
-                <a class="btn btn-default" href="{{ route('admin.lessons.index') }}">
-                    {{ trans('global.back_to_list') }}
-                </a>
-            </div>
         </div>
     </div>
 </div>

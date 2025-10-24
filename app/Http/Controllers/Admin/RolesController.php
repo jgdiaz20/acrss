@@ -72,15 +72,27 @@ class RolesController extends Controller
     {
         abort_if(Gate::denies('role_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $role->delete();
+        $roleTitle = $role->title; // Store title before deletion for message
+        
+        // Hard delete the role - completely remove from database
+        $role->forceDelete();
 
-        return back();
+        return back()->with('success', "Role '{$roleTitle}' has been successfully deleted!");
     }
 
     public function massDestroy(MassDestroyRoleRequest $request)
     {
-        Role::whereIn('id', request('ids'))->delete();
+        // Get role titles before deletion for message
+        $roleTitles = Role::whereIn('id', request('ids'))->pluck('title')->toArray();
+        $roleCount = count($roleTitles);
+        
+        // Hard delete multiple roles - completely remove from database
+        Role::whereIn('id', request('ids'))->forceDelete();
 
-        return response(null, Response::HTTP_NO_CONTENT);
+        if ($roleCount === 1) {
+            return response()->json(['message' => "Role '{$roleTitles[0]}' has been successfully deleted!"], Response::HTTP_OK);
+        } else {
+            return response()->json(['message' => "{$roleCount} roles have been successfully deleted!"], Response::HTTP_OK);
+        }
     }
 }

@@ -3,17 +3,17 @@
 namespace App;
 
 use Carbon\Carbon;
-use Hash;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use SoftDeletes, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens;
 
     public $table = 'users';
 
@@ -22,11 +22,13 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected $dates = [
-        'updated_at',
-        'created_at',
-        'deleted_at',
-        'email_verified_at',
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'is_admin' => 'boolean',
+        'is_teacher' => 'boolean',
+        'is_student' => 'boolean',
     ];
 
     protected $fillable = [
@@ -34,26 +36,29 @@ class User extends Authenticatable
         'email',
         'password',
         'class_id',
+        'is_admin',
+        'is_teacher',
+        'is_student',
         'created_at',
         'updated_at',
-        'deleted_at',
         'remember_token',
         'email_verified_at',
     ];
 
     public function getIsAdminAttribute()
     {
-        return $this->roles()->where('id', 1)->exists();
+        return $this->attributes['is_admin'] ?? false;
     }
 
     public function getIsTeacherAttribute()
     {
-        return $this->roles()->where('id', 3)->exists();
+        return $this->attributes['is_teacher'] ?? false;
     }
 
     public function getIsStudentAttribute()
     {
-        return $this->roles()->where('id', 4)->exists();
+        // Check if user has student role (role ID 4)
+        return $this->roles()->where('id', 4)->exists() || ($this->attributes['is_student'] ?? false);
     }
 
     public function teacherLessons()
@@ -74,7 +79,7 @@ class User extends Authenticatable
     public function setPasswordAttribute($input)
     {
         if ($input) {
-            $this->attributes['password'] = app('hash')->needsRehash($input) ? Hash::make($input) : $input;
+            $this->attributes['password'] = Hash::needsRehash($input) ? Hash::make($input) : $input;
         }
     }
 
@@ -88,8 +93,30 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
-    function class()
+    public function class()
     {
         return $this->belongsTo(SchoolClass::class, 'class_id');
+    }
+
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'teacher_subjects', 'teacher_id', 'subject_id')
+                    ->withPivot('is_primary', 'experience_years', 'notes', 'is_active')
+                    ->withTimestamps();
+    }
+
+    public function teacherSubjects()
+    {
+        return $this->hasMany(TeacherSubject::class, 'teacher_id', 'id');
+    }
+
+    public function getPrimarySubjectsAttribute()
+    {
+        return $this->subjects()->wherePivot('is_primary', true)->get();
+    }
+
+    public function getActiveSubjectsAttribute()
+    {
+        return $this->subjects()->wherePivot('is_active', true)->get();
     }
 }

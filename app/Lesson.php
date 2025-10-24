@@ -3,30 +3,30 @@
 namespace App;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lesson extends Model
 {
-    use SoftDeletes;
+    use HasFactory;
 
     public $table = 'lessons';
 
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'deleted_at',
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     protected $fillable = [
         'weekday',
         'class_id',
+        'room_id',
+        'subject_id',
         'end_time',
         'teacher_id',
         'start_time',
         'created_at',
         'updated_at',
-        'deleted_at',
     ];
 
     const WEEK_DAYS = [
@@ -46,27 +46,63 @@ class Lesson extends Model
 
     public function getStartTimeAttribute($value)
     {
-        return $value ? Carbon::createFromFormat('H:i:s', $value)->format(config('panel.lesson_time_format')) : null;
+        if (!$value) {
+            return null;
+        }
+        
+        try {
+            return Carbon::createFromFormat('H:i:s', $value)->format(config('panel.lesson_time_format', 'g:i A'));
+        } catch (\Exception $e) {
+            \Log::warning('Invalid start_time format in Lesson model', ['value' => $value, 'error' => $e->getMessage()]);
+            return $value;
+        }
     }
 
     public function setStartTimeAttribute($value)
     {
-        $this->attributes['start_time'] = $value ? Carbon::createFromFormat(config('panel.lesson_time_format'),
-            $value)->format('H:i:s') : null;
+        if (!$value) {
+            $this->attributes['start_time'] = null;
+            return;
+        }
+        
+        try {
+            $this->attributes['start_time'] = Carbon::createFromFormat(config('panel.lesson_time_format', 'g:i A'), $value)->format('H:i:s');
+        } catch (\Exception $e) {
+            \Log::warning('Invalid start_time format when setting Lesson model', ['value' => $value, 'error' => $e->getMessage()]);
+            $this->attributes['start_time'] = $value;
+        }
     }
 
     public function getEndTimeAttribute($value)
     {
-        return $value ? Carbon::createFromFormat('H:i:s', $value)->format(config('panel.lesson_time_format')) : null;
+        if (!$value) {
+            return null;
+        }
+        
+        try {
+            return Carbon::createFromFormat('H:i:s', $value)->format(config('panel.lesson_time_format', 'g:i A'));
+        } catch (\Exception $e) {
+            \Log::warning('Invalid end_time format in Lesson model', ['value' => $value, 'error' => $e->getMessage()]);
+            return $value;
+        }
     }
 
     public function setEndTimeAttribute($value)
     {
-        $this->attributes['end_time'] = $value ? Carbon::createFromFormat(config('panel.lesson_time_format'),
-            $value)->format('H:i:s') : null;
+        if (!$value) {
+            $this->attributes['end_time'] = null;
+            return;
+        }
+        
+        try {
+            $this->attributes['end_time'] = Carbon::createFromFormat(config('panel.lesson_time_format', 'g:i A'), $value)->format('H:i:s');
+        } catch (\Exception $e) {
+            \Log::warning('Invalid end_time format when setting Lesson model', ['value' => $value, 'error' => $e->getMessage()]);
+            $this->attributes['end_time'] = $value;
+        }
     }
 
-    function class()
+    public function class()
     {
         return $this->belongsTo(SchoolClass::class, 'class_id');
     }
@@ -76,23 +112,61 @@ class Lesson extends Model
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    public static function isTimeAvailable($weekday, $startTime, $endTime, $class, $teacher, $lesson)
+    public function room()
+    {
+        return $this->belongsTo(Room::class, 'room_id');
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public static function isTimeAvailable($weekday, $startTime, $endTime, $class, $teacher, $room, $lesson = null)
     {
         $lessons = self::where('weekday', $weekday)
             ->when($lesson, function ($query) use ($lesson) {
                 $query->where('id', '!=', $lesson);
             })
-            ->where(function ($query) use ($class, $teacher) {
+            ->where(function ($query) use ($class, $teacher, $room) {
                 $query->where('class_id', $class)
-                    ->orWhere('teacher_id', $teacher);
+                    ->orWhere('teacher_id', $teacher)
+                    ->orWhere('room_id', $room);
             })
-            ->where([
-                ['start_time', '<', $endTime],
-                ['end_time', '>', $startTime],
-            ])
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->where([
+                    ['start_time', '<', $endTime],
+                    ['end_time', '>', $startTime],
+                ]);
+            })
             ->count();
 
         return !$lessons;
+    }
+
+    /**
+     * Get detailed conflict information for this lesson
+     */
+    public function getConflicts($excludeId = null)
+    {
+        $conflictService = app(\App\Services\SchedulingConflictService::class);
+        return $conflictService->checkConflicts(
+            $this->weekday,
+            $this->getRawOriginal('start_time'),
+            $this->getRawOriginal('end_time'),
+            $this->class_id,
+            $this->teacher_id,
+            $this->room_id,
+            $excludeId
+        );
+    }
+
+    /**
+     * Check if this lesson has any conflicts
+     */
+    public function hasConflicts($excludeId = null)
+    {
+        return !empty($this->getConflicts($excludeId));
     }
 
     public function scopeCalendarByRoleOrClassId($query)

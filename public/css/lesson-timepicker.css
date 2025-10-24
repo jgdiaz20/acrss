@@ -1,0 +1,36 @@
+/* Clean time input styles */
+.lesson-timepicker {
+    /* Prevent browser suggestions */
+    -webkit-calendar-picker-indicator: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    background-color: #fff;
+}
+
+/* Maintain existing styles while removing browser defaults */
+.lesson-timepicker::-webkit-inner-spin-button,
+.lesson-timepicker::-webkit-calendar-picker-indicator,
+.lesson-timepicker::-webkit-clear-button {
+    display: none;
+    -webkit-appearance: none;
+}
+
+/* Make the field look interactive but prevent manual input */
+.lesson-timepicker[readonly] {
+    background-color: #fff;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+/* Keep the normal hover state */
+.lesson-timepicker[readonly]:hover {
+    background-color: #f8f9fa;
+}
+
+/* Keep focus styles */
+.lesson-timepicker[readonly]:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}

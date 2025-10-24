@@ -23,14 +23,25 @@ class StoreUserRequest extends FormRequest
                 'required'],
             'email'    => [
                 'required',
-                'unique:users'],
+                'email',
+                'regex:/^[\w\.-]+@[\w\.-]+\.edu\.ph$/i',
+                'unique:users,email'],
             'password' => [
-                'required'],
+                'required',
+                'min:8',
+                'confirmed'],
             'roles.*'  => [
                 'integer'],
             'roles'    => [
                 'required',
                 'array'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'email.regex' => 'Email must be a valid institutional email address ending with .edu.ph (e.g., user@school.edu.ph)',
         ];
     }
 }
