@@ -70,22 +70,6 @@
                 </tr>
                 <tr>
                     <th>
-                        Equipment Available
-                    </th>
-                    <td>
-                        @if($room->has_equipment)
-                            <span class="badge badge-success">
-                                <i class="fas fa-tools"></i> Yes - Specialized equipment available
-                            </span>
-                        @else
-                            <span class="badge badge-secondary">
-                                <i class="fas fa-times"></i> No - Basic room only
-                            </span>
-                        @endif
-                    </td>
-                </tr>
-                <tr>
-                    <th>
                         Timetable
                     </th>
                     <td>
@@ -101,7 +85,7 @@
 
 <div class="card">
     <div class="card-header">
-        Room Lessons
+        Room Schedules
     </div>
 
     <div class="card-body">

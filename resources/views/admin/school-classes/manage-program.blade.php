@@ -30,9 +30,6 @@
                     {{ $program->name }} Classes
                 </h3>
                 <div class="card-tools">
-                    <a href="{{ route('admin.school-classes.create', ['program_id' => $program->id]) }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus"></i> Add Class
-                    </a>
                     <a href="{{ route('admin.school-classes.index') }}" class="btn btn-secondary btn-sm">
                         <i class="fas fa-arrow-left"></i> Back to Programs
                     </a>
@@ -71,15 +68,12 @@
                                             @foreach($classesInGrade->take(3) as $class)
                                                 <div class="class-item mb-1">
                                                     <div class="d-flex justify-content-between align-items-center">
-                                                        <span class="class-name text-truncate" style="max-width: 120px;" title="{{ $class->name }}">
+                                                        <span class="class-name text-truncate" style="max-width: 200px;" title="{{ $class->name }}">
                                                             {{ $class->name }}
                                                             @if($class->section)
                                                                 <small class="text-muted">- {{ $class->section }}</small>
                                                             @endif
                                                         </span>
-                                                        <small class="badge badge-light">
-                                                            {{ $class->classUsers->count() }}/{{ $class->max_students ?? '∞' }}
-                                                        </small>
                                                     </div>
                                                 </div>
                                             @endforeach
@@ -93,14 +87,14 @@
                                         </div>
                                     @else
                                         <div class="text-center text-muted">
-                                            <small><i class="fas fa-exclamation-triangle"></i> No classes</small>
+                                            <small><i class="fas fa-exclamation-triangle"></i> No Sections</small>
                                         </div>
                                     @endif
                                     
                                     <div class="mt-2">
                                         <a href="{{ route('admin.school-classes.program.grade', [$program->type, $gradeLevel->id]) }}" 
                                            class="btn btn-sm btn-outline-info btn-block">
-                                            Manage Classes
+                                            Manage 
                                         </a>
                                     </div>
                                 </div>

@@ -37,11 +37,6 @@ class StoreSchoolClassRequest extends FormRequest
                 'string',
                 'max:50'
             ],
-            'max_students' => [
-                'nullable',
-                'integer',
-                'min:1'
-            ],
             'is_active' => [
                 'nullable',
                 'boolean'

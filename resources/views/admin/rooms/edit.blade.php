@@ -60,28 +60,6 @@
                 @endif
             </div>
             
-            <div class="form-group {{ $errors->has('has_equipment') ? 'has-error' : '' }}">
-                <label for="has_equipment">Equipment Available</label>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="has_equipment" id="has_equipment" value="1" {{ old('has_equipment', isset($room) ? $room->has_equipment : false) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="has_equipment">
-                        This room has specialized equipment (computers, projectors, lab equipment, etc.)
-                    </label>
-                </div>
-                @if($errors->has('has_equipment'))
-                    <em class="invalid-feedback">
-                        {{ $errors->first('has_equipment') }}
-                    </em>
-                @endif
-            </div>
-            
-            <div class="form-group">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Note:</strong> Laboratory rooms are required for subjects that need practical work. Equipment availability helps match subjects with appropriate rooms.
-                </div>
-            </div>
-            
             <div class="form-group">
                 <input class="btn btn-success" type="submit" value="Update Room">
                 <a href="{{ route('admin.room-management.rooms.index') }}" class="btn btn-secondary">Cancel</a>

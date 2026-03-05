@@ -15,7 +15,7 @@
                 <!-- Loading State -->
                 <div id="qrLoadingState" class="text-center py-4" style="display: none;">
                     <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                        <span class="visually-hidden"></span>
                     </div>
                     <p class="mt-2 text-muted">Generating QR Code...</p>
                 </div>
@@ -151,7 +151,7 @@
                 <!-- Loading State -->
                 <div id="allQRLoadingState" class="text-center py-4">
                     <div class="spinner-border text-success" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                        <span class="visually-hidden"></span>
                     </div>
                     <p class="mt-2 text-muted">Generating QR Codes for All Rooms...</p>
                 </div>
@@ -297,8 +297,13 @@ function fetchQRCodeData(url, retryCount) {
 
 function populateQRModal(data) {
     $('#qrRoomName').text(data.room.name);
-    $('#qrRoomType').text(data.room.type || 'Standard Room');
+    
+    // Determine room type based on is_lab field
+    const roomType = data.room.is_lab ? 'Laboratory' : 'Classroom';
+    $('#qrRoomType').text(roomType);
+    
     $('#qrRoomCapacity').text(data.room.capacity || 'Not specified');
+    
     $('#qrRoomDescription').text(data.room.description || 'No description');
     
     // Set QR code image with error handling
@@ -561,6 +566,9 @@ function populateAllQRCodes(qrCodesData) {
         grid.html('<div class="col-12 text-center text-muted"><p>No rooms found.</p></div>');
     } else {
     qrCodesData.forEach(function(qrData) {
+        // Determine room type based on is_lab field
+        const roomType = qrData.room.is_lab ? 'Laboratory' : 'Classroom';
+        
         const qrItem = `
                 <div class="col-md-4 col-lg-3 mb-3">
                 <div class="qr-code-item">
@@ -569,7 +577,7 @@ function populateAllQRCodes(qrCodesData) {
                              class="img-fluid"
                              onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm9yPC90ZXh0Pjwvc3ZnPg=='">
                     <h6>${qrData.room.name}</h6>
-                        <small>${qrData.room.type || 'Standard Room'} • ${qrData.room.capacity || 'N/A'} capacity</small>
+                        <small>${roomType} • ${qrData.room.capacity || 'N/A'} capacity</small>
                     </div>
             </div>
         `;

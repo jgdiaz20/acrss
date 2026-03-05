@@ -144,19 +144,104 @@ class LessonsController extends Controller
 
         $rooms = Room::all()->pluck('display_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $subjects = \App\Subject::where('is_active', true)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        // Get full subject objects for scheduling_mode access in JavaScript
+        $subjectsCollection = \App\Subject::where('is_active', true)->get();
+        $subjects = $subjectsCollection->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.lessons.create', compact('classes', 'teachers', 'rooms', 'subjects'));
+        return view('admin.lessons.create', compact('classes', 'teachers', 'rooms', 'subjects', 'subjectsCollection'));
     }
 
     public function store(StoreLessonRequest $request)
     {
-        $lesson = Lesson::create($request->all());
+        $data = $request->all();
+        
+        // Calculate duration from start and end time
+        $duration = Lesson::calculateDuration($data['start_time'], $data['end_time']);
+        $data['duration_hours'] = $duration;
+        
+        // Get subject and validate lesson type
+        $subject = \App\Subject::findOrFail($data['subject_id']);
+        $lessonType = $data['lesson_type'];
+        $classId = $data['class_id'];
+        
+        // STRICT VALIDATION: Lesson type must match subject mode
+        if ($subject->scheduling_mode === 'lab' && $lessonType !== 'laboratory') {
+            return back()->withErrors([
+                'lesson_type' => 'This subject is in Lab mode and only allows Laboratory lessons.'
+            ])->withInput();
+        }
+        
+        if ($subject->scheduling_mode === 'lecture' && $lessonType !== 'lecture') {
+            return back()->withErrors([
+                'lesson_type' => 'This subject is in Lecture mode and only allows Lecture lessons.'
+            ])->withInput();
+        }
+        
+        // STRICT VALIDATION: Duration enforcement
+        if ($lessonType === 'laboratory') {
+            if ($duration < 3.0) {
+                return back()->withErrors([
+                    'end_time' => 'Laboratory lessons must be at least 3 hours. Please adjust the end time.'
+                ])->withInput();
+            }
+            if ($duration > 5.0) {
+                return back()->withErrors([
+                    'end_time' => 'Laboratory lessons cannot exceed 5 hours. Please adjust the end time.'
+                ])->withInput();
+            }
+        }
+        
+        if ($lessonType === 'lecture') {
+            if ($duration < 1.0) {
+                return back()->withErrors([
+                    'end_time' => 'Lecture lessons must be at least 1 hour. Please adjust the end time.'
+                ])->withInput();
+            }
+            if ($duration > 3.0) {
+                return back()->withErrors([
+                    'end_time' => 'Lecture lessons cannot exceed 3 hours. Please adjust the end time.'
+                ])->withInput();
+            }
+        }
+        
+        // STRICT VALIDATION: Check if this would exceed total hours for this class
+        $scheduledHours = $subject->getScheduledHoursByClass($classId);
+        $totalRequired = $subject->total_hours;
+        
+        if (($scheduledHours + $duration) > $totalRequired) {
+            $remaining = $subject->getRemainingHoursByClass($classId);
+            return back()->withErrors([
+                'duration_hours' => "This lesson would exceed the total required hours for this subject and class. Remaining hours: {$remaining}h of {$totalRequired}h total."
+            ])->withInput();
+        }
+        
+        // STRICT VALIDATION: Check specific lesson type hours
+        if ($lessonType === 'lecture') {
+            $scheduledLectureHours = $subject->getScheduledLectureHoursByClass($classId);
+            if (($scheduledLectureHours + $duration) > $subject->total_lecture_hours) {
+                $remaining = $subject->getRemainingLectureHoursByClass($classId);
+                return back()->withErrors([
+                    'duration_hours' => "This would exceed the total lecture hours for this subject and class. Remaining lecture hours: {$remaining}h of {$subject->total_lecture_hours}h total."
+                ])->withInput();
+            }
+        }
+        
+        if ($lessonType === 'laboratory') {
+            $scheduledLabHours = $subject->getScheduledLabHoursByClass($classId);
+            if (($scheduledLabHours + $duration) > $subject->total_lab_hours) {
+                $remaining = $subject->getRemainingLabHoursByClass($classId);
+                return back()->withErrors([
+                    'duration_hours' => "This would exceed the total laboratory hours for this subject and class. Remaining lab hours: {$remaining}h of {$subject->total_lab_hours}h total."
+                ])->withInput();
+            }
+        }
+        
+        $lesson = Lesson::create($data);
         
         // Clear lesson-related caches after creating a new lesson
         CacheInvalidationService::clearLessonCaches();
 
-        return redirect()->route('admin.lessons.index');
+        return redirect()->route('admin.lessons.index')->with('success', 'Schedule created successfully!');
     }
 
     public function edit(Lesson $lesson)
@@ -180,12 +265,164 @@ class LessonsController extends Controller
 
     public function update(UpdateLessonRequest $request, Lesson $lesson)
     {
-        $lesson->update($request->all());
+        $data = $request->all();
+        
+        // Recalculate duration from start and end time
+        $duration = Lesson::calculateDuration($data['start_time'], $data['end_time']);
+        $data['duration_hours'] = $duration;
+        
+        // Get subject and validate lesson type
+        $subject = \App\Subject::findOrFail($data['subject_id']);
+        $lessonType = $data['lesson_type'];
+        $classId = $data['class_id'];
+        
+        // STRICT VALIDATION: Lesson type must match subject mode
+        if ($subject->scheduling_mode === 'lab' && $lessonType !== 'laboratory') {
+            return back()->withErrors([
+                'lesson_type' => 'This subject is in Lab mode and only allows Laboratory lessons.'
+            ])->withInput();
+        }
+        
+        if ($subject->scheduling_mode === 'lecture' && $lessonType !== 'lecture') {
+            return back()->withErrors([
+                'lesson_type' => 'This subject is in Lecture mode and only allows Lecture lessons.'
+            ])->withInput();
+        }
+        
+        // STRICT VALIDATION: Duration enforcement
+        if ($lessonType === 'laboratory') {
+            if ($duration < 3.0) {
+                return back()->withErrors([
+                    'end_time' => 'Laboratory lessons must be at least 3 hours. Please adjust the end time.'
+                ])->withInput();
+            }
+            if ($duration > 5.0) {
+                return back()->withErrors([
+                    'end_time' => 'Laboratory lessons cannot exceed 5 hours. Please adjust the end time.'
+                ])->withInput();
+            }
+        }
+        
+        if ($lessonType === 'lecture') {
+            if ($duration < 1.0) {
+                return back()->withErrors([
+                    'end_time' => 'Lecture lessons must be at least 1 hour. Please adjust the end time.'
+                ])->withInput();
+            }
+            if ($duration > 3.0) {
+                return back()->withErrors([
+                    'end_time' => 'Lecture lessons cannot exceed 3 hours. Please adjust the end time.'
+                ])->withInput();
+            }
+        }
+        
+        // STRICT VALIDATION: Check if this would exceed total hours for this class
+        // Exclude current lesson's hours from calculation
+        $scheduledHours = $subject->getScheduledHoursByClass($classId) - $lesson->duration_hours;
+        $totalRequired = $subject->total_hours;
+        
+        if (($scheduledHours + $duration) > $totalRequired) {
+            $remaining = max(0, $totalRequired - $scheduledHours);
+            return back()->withErrors([
+                'duration_hours' => "This lesson would exceed the total required hours for this subject and class. Remaining hours: {$remaining}h of {$totalRequired}h total."
+            ])->withInput();
+        }
+        
+        // STRICT VALIDATION: Check specific lesson type hours
+        if ($lessonType === 'lecture') {
+            $scheduledLectureHours = $subject->getScheduledLectureHoursByClass($classId);
+            // Exclude current lesson if it was a lecture
+            if ($lesson->lesson_type === 'lecture') {
+                $scheduledLectureHours -= $lesson->duration_hours;
+            }
+            
+            if (($scheduledLectureHours + $duration) > $subject->total_lecture_hours) {
+                $remaining = max(0, $subject->total_lecture_hours - $scheduledLectureHours);
+                return back()->withErrors([
+                    'duration_hours' => "This would exceed the total lecture hours for this subject and class. Remaining lecture hours: {$remaining}h of {$subject->total_lecture_hours}h total."
+                ])->withInput();
+            }
+        }
+        
+        if ($lessonType === 'laboratory') {
+            $scheduledLabHours = $subject->getScheduledLabHoursByClass($classId);
+            // Exclude current lesson if it was a laboratory
+            if ($lesson->lesson_type === 'laboratory') {
+                $scheduledLabHours -= $lesson->duration_hours;
+            }
+            
+            if (($scheduledLabHours + $duration) > $subject->total_lab_hours) {
+                $remaining = max(0, $subject->total_lab_hours - $scheduledLabHours);
+                return back()->withErrors([
+                    'duration_hours' => "This would exceed the total laboratory hours for this subject and class. Remaining lab hours: {$remaining}h of {$subject->total_lab_hours}h total."
+                ])->withInput();
+            }
+        }
+        
+        $lesson->update($data);
         
         // Clear lesson-related caches after updating a lesson
         CacheInvalidationService::clearLessonCaches();
 
-        return redirect()->route('admin.lessons.index')->with('success', 'Lesson has been successfully updated!');
+        return redirect()->route('admin.lessons.index')->with('success', 'Schedule updated successfully!');
+    }
+
+    /**
+     * Get class-specific hours tracking for a subject
+     */
+    public function getHoursTracking(Request $request)
+    {
+        try {
+            $subjectId = $request->input('subject_id');
+            $classId = $request->input('class_id');
+            $excludeLessonId = $request->input('exclude_lesson_id'); // For edit mode
+            
+            if (!$subjectId || !$classId) {
+                return response()->json(['success' => false, 'error' => 'Missing subject_id or class_id']);
+            }
+            
+            $subject = \App\Subject::find($subjectId);
+            if (!$subject) {
+                return response()->json(['success' => false, 'error' => 'Subject not found']);
+            }
+            
+            // Pass exclude_lesson_id to methods to exclude current lesson in edit mode
+            $scheduledHours = $subject->getScheduledHoursByClass($classId, $excludeLessonId);
+            $remainingHours = $subject->getRemainingHoursByClass($classId, $excludeLessonId);
+            $progress = $subject->getProgressPercentageByClass($classId, $excludeLessonId);
+            
+            $scheduledLectureHours = $subject->getScheduledLectureHoursByClass($classId, $excludeLessonId);
+            $scheduledLabHours = $subject->getScheduledLabHoursByClass($classId, $excludeLessonId);
+            $remainingLectureHours = $subject->getRemainingLectureHoursByClass($classId, $excludeLessonId);
+            $remainingLabHours = $subject->getRemainingLabHoursByClass($classId, $excludeLessonId);
+            
+            return response()->json([
+                'success' => true,
+                'total_hours' => $subject->total_hours,
+                'scheduled_hours' => $scheduledHours,
+                'remaining_hours' => $remainingHours,
+                'progress' => $progress,
+                'lecture_hours' => [
+                    'total' => $subject->total_lecture_hours,
+                    'scheduled' => $scheduledLectureHours,
+                    'remaining' => $remainingLectureHours
+                ],
+                'lab_hours' => [
+                    'total' => $subject->total_lab_hours,
+                    'scheduled' => $scheduledLabHours,
+                    'remaining' => $remainingLabHours
+                ],
+                'scheduling_mode' => $subject->scheduling_mode
+            ])->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+              ->header('Pragma', 'no-cache')
+              ->header('Expires', '0');
+        } catch (\Exception $e) {
+            \Log::error('Hours tracking error: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
+            return response()->json([
+                'success' => false,
+                'error' => 'Server error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show(Lesson $lesson)
@@ -211,7 +448,7 @@ class LessonsController extends Controller
         // Clear lesson-related caches after deleting a lesson
         CacheInvalidationService::clearLessonCaches();
 
-        return back()->with('success', "Lesson '{$lessonDetails}' ({$lessonTime}) has been successfully deleted!");
+        return back()->with('success', "{$lessonDetails} ({$lessonTime}) has been successfully deleted!");
     }
 
     public function massDestroy(MassDestroyLessonRequest $request)
@@ -226,9 +463,9 @@ class LessonsController extends Controller
         CacheInvalidationService::clearLessonCaches();
 
         if ($lessonCount === 1) {
-            return response()->json(['message' => "1 lesson has been successfully deleted!"], Response::HTTP_OK);
+            return response()->json(['message' => "1 schedule has been successfully deleted!"], Response::HTTP_OK);
         } else {
-            return response()->json(['message' => "{$lessonCount} lessons have been successfully deleted!"], Response::HTTP_OK);
+            return response()->json(['message' => "{$lessonCount} schedules have been successfully deleted!"], Response::HTTP_OK);
         }
     }
 

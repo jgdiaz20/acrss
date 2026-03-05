@@ -22,9 +22,6 @@
                 <i class="fas fa-plus"></i> <?php echo e(trans('global.add')); ?> <?php echo e(trans('cruds.user.title_singular')); ?>
 
             </a>
-            <a class="btn btn-primary" href="<?php echo e(route("admin.users.create-student")); ?>">
-                <i class="fas fa-user-graduate"></i> <?php echo e(trans('global.add')); ?> New Student
-            </a>
         </div>
     </div>
 <?php endif; ?>

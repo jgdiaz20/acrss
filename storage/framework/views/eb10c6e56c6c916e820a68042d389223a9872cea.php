@@ -51,8 +51,7 @@
                                 <th>Type</th>
                                 <th>Duration (Years)</th>
                                 <th>Grade Levels</th>
-                                <th>Status</th>
-                                <th>&nbsp;</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -79,13 +78,6 @@
                                         <span class="badge badge-secondary">
                                             <?php echo e($program->gradeLevels->count()); ?> levels
                                         </span>
-                                    </td>
-                                    <td>
-                                        <?php if($program->is_active): ?>
-                                            <span class="badge badge-success">Active</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-secondary">Inactive</span>
-                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('academic_program_show')): ?>

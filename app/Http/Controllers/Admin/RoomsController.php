@@ -29,11 +29,6 @@ class RoomsController extends Controller
             }
         }
 
-        // Filter by equipment
-        if ($request->filled('equipment')) {
-            $query->where('has_equipment', $request->equipment);
-        }
-
         // Filter by capacity range
         if ($request->filled('capacity_min')) {
             $query->where('capacity', '>=', $request->capacity_min);
@@ -70,7 +65,7 @@ class RoomsController extends Controller
         
         // Handle boolean fields properly
         $data['is_lab'] = $request->has('is_lab') ? (bool) $request->input('is_lab') : false;
-        $data['has_equipment'] = $request->has('has_equipment') ? (bool) $request->input('has_equipment') : false;
+        $data['has_equipment'] = false; // Equipment field removed from UI
         
         $room = Room::create($data);
 
@@ -91,7 +86,7 @@ class RoomsController extends Controller
         
         // Handle boolean fields properly
         $data['is_lab'] = $request->has('is_lab') ? (bool) $request->input('is_lab') : false;
-        $data['has_equipment'] = $request->has('has_equipment') ? (bool) $request->input('has_equipment') : false;
+        $data['has_equipment'] = false; // Equipment field removed from UI
         
         $room->update($data);
 

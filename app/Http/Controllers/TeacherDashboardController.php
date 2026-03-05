@@ -37,26 +37,18 @@ class TeacherDashboardController extends Controller
             ->orderBy('start_time')
             ->get();
         
-        // Get upcoming classes (next 3 days)
-        $upcomingClasses = collect();
-        for ($i = 1; $i <= 3; $i++) {
-            $day = $today + $i;
-            // Handle week rollover (if we go past Sunday=7, wrap to Monday=1)
-            if ($day > 7) {
-                $day = $day - 7;
-            }
-            
-            $classes = Lesson::with('class', 'room')
-                ->where('teacher_id', $teacher->id)
-                ->where('weekday', $day)
-                ->orderBy('start_time')
-                ->get();
-            
-            if ($classes->count() > 0) {
-                $upcomingClasses->put($weekDays[$day], $classes);
-            }
+        // Get tomorrow's classes
+        $tomorrow = $today + 1;
+        if ($tomorrow > 7) {
+            $tomorrow = 1; 
         }
 
-        return view('teacher.dashboard', compact('totalClasses', 'todayClasses', 'upcomingClasses', 'weekDays'));
+        $tomorrowClasses = Lesson::with('class', 'room')
+            ->where('teacher_id', $teacher->id)
+            ->where('weekday', $tomorrow)
+            ->orderBy('start_time')
+            ->get ();
+
+        return view('teacher.dashboard', compact('totalClasses', 'todayClasses', 'tomorrowClasses', 'weekDays'));
     }
 }

@@ -51,8 +51,7 @@
                                 <th>Type</th>
                                 <th>Duration (Years)</th>
                                 <th>Grade Levels</th>
-                                <th>Status</th>
-                                <th>&nbsp;</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -78,13 +77,6 @@
                                         <span class="badge badge-secondary">
                                             {{ $program->gradeLevels->count() }} levels
                                         </span>
-                                    </td>
-                                    <td>
-                                        @if($program->is_active)
-                                            <span class="badge badge-success">Active</span>
-                                        @else
-                                            <span class="badge badge-secondary">Inactive</span>
-                                        @endif
                                     </td>
                                     <td>
                                         @can('academic_program_show')

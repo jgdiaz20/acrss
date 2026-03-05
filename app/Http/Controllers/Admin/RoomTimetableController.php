@@ -26,9 +26,11 @@ class RoomTimetableController extends Controller
         abort_if(Gate::denies('room_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $weekDays = \App\Lesson::WEEK_DAYS;
-        $calendarData = $roomCalendarService->generateRoomCalendarData($room, $weekDays);
+        
+        // Generate time-based timetable matrix
+        $timetableData = $roomCalendarService->generateRoomTimetableMatrix($room, $weekDays);
 
-        return view('admin.room-timetable.show', compact('room', 'weekDays', 'calendarData'));
+        return view('admin.room-timetable.show', compact('room', 'weekDays', 'timetableData'));
     }
 
     /**

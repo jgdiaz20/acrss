@@ -105,24 +105,33 @@
                                     
                                     @if($program->schoolClasses->count() > 0)
                                         <div class="classes-grid">
-                                            @foreach($program->schoolClasses as $class)
+                                            @foreach($program->schoolClasses->take(5) as $class)
                                                 <div class="class-item">
                                                     <div class="class-icon {{ $program->type == 'senior_high' ? 'senior-high-icon' : ($program->type == 'diploma' ? 'diploma-icon' : 'college-icon') }}">
                                                         <i class="fas fa-chalkboard"></i>
                                                     </div>
                                                     <div class="class-info">
                                                         <span class="class-name">{{ $class->name }}</span>
-                                                        <span class="class-details">
-                                                            Section: {{ $class->section }} | Max: {{ $class->max_students }} students
-                                                        </span>
+                                                        @if($class->section)
+                                                            <span class="class-details">
+                                                                Section: {{ $class->section }}
+                                                            </span>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             @endforeach
+                                            @if($program->schoolClasses->count() > 5)
+                                                    <div class="text-center">
+                                                        <small class="text-muted">
+                                                            +{{ $program->schoolClasses->count() - 5 }} more sections
+                                                        </small>
+                                                    </div>
+                                                @endif
                                         </div>
                                     @else
                                         <div class="empty-state">
                                             <i class="fas fa-chalkboard"></i>
-                                            <p>No classes configured for this program yet.</p>
+                                            <p>No sections configured for this program yet.</p>
                                         </div>
                                     @endif
                                 </div>
@@ -130,7 +139,7 @@
                                 <div class="program-footer">
                                     <a href="{{ route('admin.school-classes.manage', $program->id) }}" class="btn btn-block {{ $program->type == 'senior_high' ? 'btn-success' : ($program->type == 'diploma' ? 'btn-warning' : 'btn-primary') }}">
                                         <i class="fas fa-eye mr-2"></i>
-                                        Manage {{ $program->name }} Classes
+                                        Manage {{ $program->name }} Sections
                                     </a>
                                 </div>
                             </div>

@@ -41,16 +41,6 @@
                                 <th>Duration</th>
                                 <td>{{ $academicProgram->duration_years }} years</td>
                             </tr>
-                            <tr>
-                                <th>Status</th>
-                                <td>
-                                    @if($academicProgram->is_active)
-                                        <span class="badge badge-success">Active</span>
-                                    @else
-                                        <span class="badge badge-secondary">Inactive</span>
-                                    @endif
-                                </td>
-                            </tr>
                         </table>
                     </div>
                     <div class="col-md-6">
@@ -78,9 +68,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>Level Name</th>
-                                                    <th>Description</th>
-                                                    <th>Order</th>
-                                                    <th>Status</th>
+                                                    <th>Description</th>              
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -88,14 +76,6 @@
                                                     <tr>
                                                         <td>{{ $gradeLevel->level_name }}</td>
                                                         <td>{{ $gradeLevel->description ?? 'N/A' }}</td>
-                                                        <td>{{ $gradeLevel->order }}</td>
-                                                        <td>
-                                                            @if($gradeLevel->is_active)
-                                                                <span class="badge badge-success">Active</span>
-                                                            @else
-                                                                <span class="badge badge-secondary">Inactive</span>
-                                                            @endif
-                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

@@ -31,7 +31,7 @@
             </div>
             <div class="stat-content">
                 <h3 class="stat-number"><?php echo e($totalLessons ?? 0); ?></h3>
-                <p class="stat-label">Scheduled Lessons</p>
+                <p class="stat-label">Class Schedules</p>
             </div>
         </div>
     </div>
@@ -163,8 +163,8 @@
                             <i class="fas fa-calendar-plus"></i>
                         </div>
                         <div class="action-content">
-                            <h6>Lessons</h6>
-                            <small>Schedule & manage lessons</small>
+                            <h6>Class Schedules</h6>
+                            <small>Manage Class Schedules</small>
                         </div>
                     </a>
                     <a href="<?php echo e(route('admin.room-management.rooms.index')); ?>" class="quick-action-item">
@@ -182,7 +182,7 @@
                         </div>
                         <div class="action-content">
                             <h6>Teachers</h6>
-                            <small>Manage staff & teachers</small>
+                            <small>Manage teachers</small>
                         </div>
                     </a>
                     <a href="<?php echo e(route('admin.room-management.master-timetable.index')); ?>" class="quick-action-item">

@@ -73,33 +73,10 @@
                                                     <small class="text-muted">- {{ $class->section }}</small>
                                                 @endif
                                             </h6>
-                                            <small class="text-muted">ID: {{ $class->id }}</small>
-                                        </div>
-                                        <div class="text-right">
-                                            @if($class->is_active)
-                                                <span class="badge badge-success badge-sm">Active</span>
-                                            @else
-                                                <span class="badge badge-secondary badge-sm">Inactive</span>
-                                            @endif
+                                            
                                         </div>
                                     </div>
                                     
-                                    <div class="class-info mb-3">
-                                        <div class="row text-center">
-                                            <div class="col-6">
-                                                <div class="info-item">
-                                                    <div class="info-value text-primary">{{ $class->classUsers->count() }}</div>
-                                                    <div class="info-label">Current</div>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="info-item">
-                                                    <div class="info-value text-info">{{ $class->max_students ?? '∞' }}</div>
-                                                    <div class="info-label">Max</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                     
                                     <div class="class-actions">
                                         <div class="btn-group w-100" role="group">
@@ -183,13 +160,12 @@ document.addEventListener('DOMContentLoaded', function() {
         </button>
       </div>
       <div class="modal-body">
-        <p>You're about to delete the following class/section:</p>
+        <p>You're about to delete the following section</p>
         <ul class="list-unstyled mb-0">
-          <li><strong>ID:</strong> <span id="classDeleteId"></span></li>
           <li><strong>Name:</strong> <span id="classDeleteName"></span></li>
         </ul>
         <div class="alert alert-warning mt-3">
-          <i class="fas fa-exclamation-triangle mr-1"></i> This action cannot be undone. If this class has enrolled students or scheduled lessons, deletion will be blocked with details.
+          <i class="fas fa-exclamation-triangle mr-1"></i> This action cannot be undone.
         </div>
       </div>
       <div class="modal-footer">

@@ -25,18 +25,6 @@ class SubjectsController extends Controller
             $query->where('type', $request->type);
         }
 
-        if ($request->filled('is_active')) {
-            $query->where('is_active', $request->is_active);
-        }
-
-        if ($request->filled('lab')) {
-            $query->where('requires_lab', $request->lab);
-        }
-
-        if ($request->filled('equipment')) {
-            $query->where('requires_equipment', $request->equipment);
-        }
-
         // Add search
         if ($request->filled('search')) {
             $searchTerm = $request->search;
@@ -47,7 +35,7 @@ class SubjectsController extends Controller
             });
         }
 
-        $perPage = $request->get('per_page', 20);
+        $perPage = $request->get('per_page', 10);
         $subjects = $query->withCount(['lessons', 'teachers'])
                  ->orderBy('name')
                  ->paginate($perPage);
@@ -73,10 +61,68 @@ class SubjectsController extends Controller
     {
         $data = $request->all();
         
-        // Handle checkbox fields - if not present, set to false
-        $data['requires_lab'] = $request->has('requires_lab');
-        $data['requires_equipment'] = $request->has('requires_equipment');
-        $data['is_active'] = $request->has('is_active');
+        // Handle credit system based on scheduling mode
+        if ($data['scheduling_mode'] === 'lab') {
+            // Lab mode: Pure laboratory (1 credit = 3 hours)
+            $credits = (int) $data['credits'];
+            
+            // Explicit validation: Credits must be between 1 and 3
+            if ($credits < 1 || $credits > 3) {
+                return back()->withErrors(['credits' => 'Credits must be between 1 and 3'])->withInput();
+            }
+            
+            $data['lecture_units'] = 0;
+            $data['lab_units'] = $credits;
+            $data['credits'] = $credits;
+        } elseif ($data['scheduling_mode'] === 'lecture') {
+            // Lecture mode: Pure lecture (1 credit = 1 hour)
+            $credits = (int) $data['credits'];
+            
+            // Explicit validation: Credits must be between 1 and 3
+            if ($credits < 1 || $credits > 3) {
+                return back()->withErrors(['credits' => 'Credits must be between 1 and 3'])->withInput();
+            }
+            
+            $data['lecture_units'] = $credits;
+            $data['lab_units'] = 0;
+            $data['credits'] = $credits;
+        } else {
+            // Flexible mode: Mixed lecture and laboratory
+            $lectureUnits = (int) $request->input('lecture_units', 0);
+            $labUnits = (int) $request->input('lab_units', 0);
+            
+            // Validation: Flexible mode requires at least 1 unit of EACH type
+            if ($lectureUnits < 1) {
+                return back()->withErrors([
+                    'lecture_units' => 'Flexible mode requires at least 1 lecture unit'
+                ])->withInput();
+            }
+            
+            if ($labUnits < 1) {
+                return back()->withErrors([
+                    'lab_units' => 'Flexible mode requires at least 1 lab unit'
+                ])->withInput();
+            }
+            
+            // Validation: Total credits cannot exceed 3
+            $totalCredits = $lectureUnits + $labUnits;
+            if ($totalCredits > 3) {
+                return back()->withErrors([
+                    'lecture_units' => 'Total credits (lecture + lab) cannot exceed 3',
+                    'lab_units' => 'Total credits (lecture + lab) cannot exceed 3'
+                ])->withInput();
+            }
+            
+            $data['lecture_units'] = $lectureUnits;
+            $data['lab_units'] = $labUnits;
+            $data['credits'] = $totalCredits;
+        }
+        
+        // Set default values for fields removed from UI
+        $data['requires_lab'] = false;
+        $data['requires_equipment'] = false;
+        $data['equipment_requirements'] = null;
+        $data['is_active'] = true; // Always set subjects as active
         
         $subject = Subject::create($data);
 
@@ -96,10 +142,98 @@ class SubjectsController extends Controller
         try {
             $data = $request->all();
             
-            // Handle checkbox fields - if not present, set to false
-            $data['requires_lab'] = $request->has('requires_lab');
-            $data['requires_equipment'] = $request->has('requires_equipment');
-            $data['is_active'] = $request->has('is_active');
+            // BACKEND VALIDATION: Prevent scheduling mode change if lessons exist
+            if ($subject->lessons()->count() > 0 && $data['scheduling_mode'] !== $subject->scheduling_mode) {
+                return back()->withErrors([
+                    'scheduling_mode' => 'Cannot change scheduling mode when this subject has existing lessons. Please delete all lessons first.'
+                ])->withInput();
+            }
+            
+            // BACKEND VALIDATION: Prevent reducing total hours if lessons exist
+            if ($subject->lessons()->count() > 0) {
+                $currentTotalHours = $subject->total_hours;
+                $newTotalHours = 0;
+                
+                // Calculate new total hours based on mode
+                if ($data['scheduling_mode'] === 'lab') {
+                    $newTotalHours = (int)$data['credits'] * 3;
+                } elseif ($data['scheduling_mode'] === 'lecture') {
+                    $newTotalHours = (int)$data['credits'] * 1;
+                } else { // flexible
+                    $lectureUnits = (int)$request->input('lecture_units', 0);
+                    $labUnits = (int)$request->input('lab_units', 0);
+                    $newTotalHours = ($lectureUnits * 1) + ($labUnits * 3);
+                }
+                
+                if ($newTotalHours < $currentTotalHours) {
+                    return back()->withErrors([
+                        'credits' => "Cannot reduce total hours from {$currentTotalHours}h to {$newTotalHours}h when this subject has existing lessons. Current lessons may exceed the new limit."
+                    ])->withInput();
+                }
+            }
+            
+            // Handle credit system based on scheduling mode
+            if ($data['scheduling_mode'] === 'lab') {
+                // Lab mode: Pure laboratory (1 credit = 3 hours)
+                $credits = (int) $data['credits'];
+                
+                // Explicit validation: Credits must be between 1 and 3
+                if ($credits < 1 || $credits > 3) {
+                    return back()->withErrors(['credits' => 'Credits must be between 1 and 3'])->withInput();
+                }
+                
+                $data['lecture_units'] = 0;
+                $data['lab_units'] = $credits;
+                $data['credits'] = $credits;
+            } elseif ($data['scheduling_mode'] === 'lecture') {
+                // Lecture mode: Pure lecture (1 credit = 1 hour)
+                $credits = (int) $data['credits'];
+                
+                // Explicit validation: Credits must be between 1 and 3
+                if ($credits < 1 || $credits > 3) {
+                    return back()->withErrors(['credits' => 'Credits must be between 1 and 3'])->withInput();
+                }
+                
+                $data['lecture_units'] = $credits;
+                $data['lab_units'] = 0;
+                $data['credits'] = $credits;
+            } else {
+                // Flexible mode: Mixed lecture and laboratory
+                $lectureUnits = (int) $request->input('lecture_units', 0);
+                $labUnits = (int) $request->input('lab_units', 0);
+                
+                // Validation: Flexible mode requires at least 1 unit of EACH type
+                if ($lectureUnits < 1) {
+                    return back()->withErrors([
+                        'lecture_units' => 'Flexible mode requires at least 1 lecture unit'
+                    ])->withInput();
+                }
+                
+                if ($labUnits < 1) {
+                    return back()->withErrors([
+                        'lab_units' => 'Flexible mode requires at least 1 lab unit'
+                    ])->withInput();
+                }
+                
+                // Validation: Total credits cannot exceed 3
+                $totalCredits = $lectureUnits + $labUnits;
+                if ($totalCredits > 3) {
+                    return back()->withErrors([
+                        'lecture_units' => 'Total credits (lecture + lab) cannot exceed 3',
+                        'lab_units' => 'Total credits (lecture + lab) cannot exceed 3'
+                    ])->withInput();
+                }
+                
+                $data['lecture_units'] = $lectureUnits;
+                $data['lab_units'] = $labUnits;
+                $data['credits'] = $totalCredits;
+            }
+            
+            // Set default values for fields removed from UI
+            $data['requires_lab'] = false;
+            $data['requires_equipment'] = false;
+            $data['equipment_requirements'] = null;
+            $data['is_active'] = true; // Always keep subjects as active
             
             $subject->update($data);
 
@@ -109,8 +243,8 @@ class SubjectsController extends Controller
             \Log::error('Error updating subject: ' . $e->getMessage());
             
             return redirect()->back()
-                            ->with('error', 'An error occurred while updating the subject. Please try again.')
-                            ->withInput();
+                            ->withInput()
+                            ->with('error', 'An error occurred while updating the subject. Please try again.');
         }
     }
 
@@ -120,6 +254,27 @@ class SubjectsController extends Controller
 
         // Load fresh data from database (bypass any potential caching)
         $subject->load(['lessons.class', 'lessons.teacher', 'lessons.room', 'teachers']);
+
+        // Return JSON for AJAX requests
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'subject' => [
+                    'id' => $subject->id,
+                    'name' => $subject->name,
+                    'code' => $subject->code,
+                    'credits' => $subject->credits,
+                    'scheduling_mode' => $subject->scheduling_mode,
+                    'lecture_units' => $subject->lecture_units,
+                    'lab_units' => $subject->lab_units,
+                    'total_hours' => $subject->total_hours,
+                    'total_lecture_hours' => $subject->total_lecture_hours,
+                    'total_lab_hours' => $subject->total_lab_hours,
+                    'scheduled_hours' => $subject->scheduled_hours,
+                    'remaining_hours' => $subject->remaining_hours,
+                    'scheduling_progress' => $subject->scheduling_progress,
+                ]
+            ]);
+        }
 
         // Get statistics with fresh queries
         $stats = [
@@ -248,8 +403,16 @@ class SubjectsController extends Controller
         // Load existing teacher assignments for this subject (fresh from database)
         $subject->load('teachers');
 
+        // Add lesson count for each teacher for this subject
+        $teacherLessonCounts = [];
+        foreach ($teachers as $teacher) {
+            $teacherLessonCounts[$teacher->id] = \App\Lesson::where('teacher_id', $teacher->id)
+                ->where('subject_id', $subject->id)
+                ->count();
+        }
+
         // Add cache-busting headers to prevent browser caching
-        $response = response()->view('admin.subjects.assign-teachers', compact('subject', 'teachers'));
+        $response = response()->view('admin.subjects.assign-teachers', compact('subject', 'teachers', 'teacherLessonCounts'));
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');
@@ -303,9 +466,6 @@ class SubjectsController extends Controller
                 $request->validate([
                     'teachers' => 'array',
                     'teachers.*.teacher_id' => 'required|integer|exists:users,id',
-                    'teachers.*.is_primary' => 'boolean',
-                    'teachers.*.experience_years' => 'integer|min:0',
-                    'teachers.*.notes' => 'nullable|string|max:500',
                 ]);
             }
 
@@ -325,9 +485,6 @@ class SubjectsController extends Controller
             foreach ($teachersData as $teacherData) {
                 try {
                     $subject->teachers()->attach($teacherData['teacher_id'], [
-                        'is_primary' => $teacherData['is_primary'] ?? false,
-                        'experience_years' => $teacherData['experience_years'] ?? 0,
-                        'notes' => $teacherData['notes'] ?? null,
                         'is_active' => true,
                     ]);
                     \Log::info('Successfully attached teacher to subject', [
@@ -344,9 +501,6 @@ class SubjectsController extends Controller
                         
                         // Update the existing relationship instead
                         $subject->teachers()->updateExistingPivot($teacherData['teacher_id'], [
-                            'is_primary' => $teacherData['is_primary'] ?? false,
-                            'experience_years' => $teacherData['experience_years'] ?? 0,
-                            'notes' => $teacherData['notes'] ?? null,
                             'is_active' => true,
                         ]);
                     } else {

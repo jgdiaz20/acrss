@@ -1,170 +1,560 @@
 <?php $__env->startSection('content'); ?>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3>Welcome, <?php echo e(auth()->user()->name); ?></h3>
-                    <p class="text-muted">Your teaching schedule and upcoming classes</p>
-                </div>
 
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card bg-primary text-white">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Classes This Week</h5>
-                                    <h2 class="card-text"><?php echo e($totalClasses); ?></h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-success text-white">
-                                <div class="card-body">
-                                    <h5 class="card-title">Today's Classes</h5>
-                                    <h2 class="card-text"><?php echo e($todayClasses->count()); ?></h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-info text-white">
-                                <div class="card-body">
-                                    <h5 class="card-title">Upcoming Classes</h5>
-                                    <h2 class="card-text"><?php echo e($upcomingClasses->flatten()->count()); ?></h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<!-- Welcome Section -->
+<div class="dashboard-welcome">
+    <div class="welcome-content">
+        <h1 class="welcome-title">
+            <i class="fas fa-user-graduate"></i>
+            Welcome, <?php echo e(auth()->user()->name); ?>
 
-                    <div class="row mt-4">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Today's Schedule</h5>
-                                </div>
-                                <div class="card-body">
-                                    <?php if($todayClasses->count() > 0): ?>
-                                        <?php $__currentLoopData = $todayClasses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lesson): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <div class="alert alert-info">
-                                                <strong><?php echo e($lesson->class->name); ?></strong><br>
-                                                <small>
-                                                    Time: <?php echo e(\Carbon\Carbon::parse($lesson->start_time)->format('g:i A')); ?> - <?php echo e(\Carbon\Carbon::parse($lesson->end_time)->format('g:i A')); ?><br>
-                                                    Room: <?php echo e($lesson->room->display_name ?? 'N/A'); ?>
+        </h1>
+        <p class="welcome-subtitle">Your weekly teaching schedule made easy.                                                                                            </p>
+    </div>
+</div>
 
-                                                </small>
-                                            </div>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    <?php else: ?>
-                                        <p class="text-muted">No classes scheduled for today.</p>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Upcoming Classes</h5>
-                                </div>
-                                <div class="card-body">
-                                    <?php if($upcomingClasses->count() > 0): ?>
-                                        <?php $__currentLoopData = $upcomingClasses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day => $classes): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <h6 class="text-primary"><?php echo e($day); ?></h6>
-                                            <?php $__currentLoopData = $classes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lesson): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                <div class="alert alert-light">
-                                                    <strong><?php echo e($lesson->class->name); ?></strong><br>
-                                                    <small>
-                                                        Time: <?php echo e(\Carbon\Carbon::parse($lesson->start_time)->format('g:i A')); ?> - <?php echo e(\Carbon\Carbon::parse($lesson->end_time)->format('g:i A')); ?><br>
-                                                        Room: <?php echo e($lesson->room->display_name ?? 'N/A'); ?>
-
-                                                    </small>
-                                                </div>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    <?php else: ?>
-                                        <p class="text-muted">No upcoming classes scheduled.</p>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Embedded Timetable -->
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="timetable-container">
-                                <div class="timetable-header">
-                                    <h2>My Weekly Schedule</h2>
-                                    <p style="margin: 10px 0 0 0; opacity: 0.9;">Your complete teaching timetable</p>
-                                </div>
-
-                                <div class="timetable-grid">
-                                    <!-- Day headers -->
-                                    <div class="timetable-day-header"></div>
-                                    <?php $__currentLoopData = $weekDays; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <div class="timetable-day-header"><?php echo e($day); ?></div>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-
-                                    <!-- Day columns with lessons -->
-                                    <div class="timetable-time-column">
-                                        <!-- This column will be empty in the new design -->
-                                    </div>
-                                    
-                                    <?php
-                                        // Generate timetable data for the dashboard
-                                        $teacher = auth()->user();
-                                        $teacherLessons = App\Lesson::with(['class', 'room', 'subject'])
-                                            ->where('teacher_id', $teacher->id)
-                                            ->get();
-                                        
-                                        $dashboardCalendarData = [];
-                                        foreach ($weekDays as $index => $day) {
-                                            $dayLessons = $teacherLessons->where('weekday', $index)->sortBy(function($lesson) {
-                                                return \Carbon\Carbon::createFromFormat('H:i:s', $lesson->getRawOriginal('start_time'));
-                                            });
-                                            
-                                            if ($dayLessons->count() > 0) {
-                                                $dashboardCalendarData[$index] = $dayLessons->map(function($lesson) {
-                                                    return [
-                                                        'class_name' => $lesson->class->name ?? 'Unknown Class',
-                                                        'room_name' => $lesson->room->display_name ?? $lesson->room->name ?? 'No Room',
-                                                        'subject_name' => $lesson->subject->name ?? 'No Subject',
-                                                        'start_time' => $lesson->start_time,
-                                                        'end_time' => $lesson->end_time,
-                                                        'lesson_id' => $lesson->id
-                                                    ];
-                                                })->values();
-                                            } else {
-                                                $dashboardCalendarData[$index] = [];
-                                            }
-                                        }
-                                    ?>
-                                    
-                                    <?php $__currentLoopData = $weekDays; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $day): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <div class="timetable-day-column <?php echo e(($index == 6 || $index == 7) ? 'weekend' : ''); ?>">
-                                            <?php if(isset($dashboardCalendarData[$index]) && count($dashboardCalendarData[$index]) > 0): ?>
-                                                <?php $__currentLoopData = $dashboardCalendarData[$index]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lesson): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <div class="class-box">
-                                                        <div class="class-subject"><?php echo e($lesson['subject_name']); ?></div>
-                                                        <div class="class-time"><?php echo e($lesson['start_time']); ?> - <?php echo e($lesson['end_time']); ?></div>
-                                                        <div class="class-instructor"><?php echo e($lesson['class_name']); ?></div>
-                                                        <div class="class-room"><?php echo e($lesson['room_name']); ?></div>
-                                                    </div>
-                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                            <?php else: ?>
-                                                <div class="not-scheduled-box">
-                                                    <?php echo e(($index == 6 || $index == 7) ? 'Not Scheduled' : 'No Classes'); ?>
-
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Statistics Overview -->
+<div class="row mb-3 justify-content-center">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card-improved stat-card-primary">
+            <div class="stat-content-improved">
+                <div class="stat-number-improved"><?php echo e($totalClasses); ?></div>
+                <div class="stat-label-improved">Total Classes This Week</div>
             </div>
         </div>
     </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card-improved stat-card-success">
+            <div class="stat-content-improved">
+                <div class="stat-number-improved"><?php echo e($todayClasses->count()); ?></div>
+                <div class="stat-label-improved">Today's Classes</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card-improved stat-card-info">
+            <div class="stat-content-improved">
+                <div class="stat-number-improved"><?php echo e($tomorrowClasses->count()); ?></div>
+                <div class="stat-label-improved">Tomorrow's Classes</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="row">
+    <!-- Today's Schedule -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="header-content">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Today's Schedule
+                    </h3>
+                    <p class="card-subtitle"><?php echo e(now()->format('l, F j, Y')); ?></p>
+                </div>
+            </div>
+            <div class="card-body">
+                <?php if($todayClasses->count() > 0): ?>
+                    <div class="schedule-list">
+                        <?php $__currentLoopData = $todayClasses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lesson): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="schedule-item">
+                                <div class="schedule-time">
+                                    <i class="fas fa-clock"></i>
+                                    <?php echo e(\Carbon\Carbon::parse($lesson->start_time)->format('g:i A')); ?>
+
+                                </div>
+                                <div class="schedule-details">
+                                    <h5 class="schedule-class"><?php echo e($lesson->class->name); ?></h5>
+                                    <p class="schedule-info">
+                                        <span><i class="fas fa-book"></i> <?php echo e($lesson->subject->code ?? 'N/A'); ?></span>
+                                        <span><i class="fas fa-door-open"></i> <?php echo e($lesson->room->display_name ?? 'N/A'); ?></span>
+                                    </p>
+                                    <p class="schedule-duration">
+                                        <?php echo e(\Carbon\Carbon::parse($lesson->start_time)->format('g:i A')); ?> - <?php echo e(\Carbon\Carbon::parse($lesson->end_time)->format('g:i A')); ?>
+
+                                    </p>
+                                </div>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>No classes scheduled for today</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+    <!-- Tomorrow's Classes -->
+     <div class="col-lg-6 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="header-content">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-day"></i>
+                        Tomorrow's Classes
+                    </h3>
+                    <p class="card-subtitle"><?php echo e(now()->addDay()->format('l, F j, Y')); ?></p>
+                </div>
+            </div>
+            <div class="card-body">
+                <?php if($tomorrowClasses->count() > 0): ?>
+                    <div class="schedule-list">
+                        <?php $__currentLoopData = $tomorrowClasses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lesson): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="schedule-item">
+                                <div class="schedule-time">
+                                    <i class="fas fa-clock"></i>
+                                    <?php echo e(\Carbon\Carbon::parse($lesson->start_time)->format('g:i A')); ?>
+
+                                </div>
+                                <div class="schedule-details">
+                                    <h5 class="schedule-class"><?php echo e($lesson->class->name); ?></h5>
+                                    <p class="schedule-info">
+                                        <span><i class="fas fa-book"></i> <?php echo e($lesson->subject->code ?? 'N/A'); ?></span>
+                                        <span><i class="fas fa-door-open"></i> <?php echo e($lesson->room->display_name ?? 'N/A'); ?></span>
+                                    </p>
+                                    <p class="schedule-duration">
+                                        <?php echo e(\Carbon\Carbon::parse($lesson->start_time)->format('g:i A')); ?> - <?php echo e(\Carbon\Carbon::parse($lesson->end_time)->format('g:i A')); ?>
+
+                                    </p>                
+                                </div>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>No classes scheduled for tomorrow</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('styles'); ?>
+<style>
+/* Teacher Dashboard Specific Styles */
+
+/* Improved Statistics Cards - No Icons */
+.stat-card-improved {
+    background: white;
+    border-radius: 12px;
+    padding: 1.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border-left: 4px solid;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-improved::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    opacity: 0.1;
+    border-radius: 50%;
+    transform: translate(20px, -20px);
+}
+
+.stat-card-improved:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.stat-card-improved.stat-card-primary {
+    border-left-color: #007bff;
+}
+
+.stat-card-improved.stat-card-primary::before {
+    background: #007bff;
+}
+
+.stat-card-improved.stat-card-success {
+    border-left-color: #28a745;
+}
+
+.stat-card-improved.stat-card-success::before {
+    background: #28a745;
+}
+
+.stat-card-improved.stat-card-info {
+    border-left-color: #17a2b8;
+}
+
+.stat-card-improved.stat-card-info::before {
+    background: #17a2b8;
+}
+
+.stat-card-improved.stat-card-warning {
+    border-left-color: #ffc107;
+}
+
+.stat-card-improved.stat-card-warning::before {
+    background: #ffc107;
+}
+
+.stat-content-improved {
+    text-align: center;
+    width: 100%;
+    z-index: 1;
+    position: relative;
+}
+
+.stat-number-improved {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: #495057;
+    line-height: 1;
+    letter-spacing: -0.5px;
+}
+
+.stat-label-improved {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin: 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+}
+
+/* Schedule List Styles */
+.schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.schedule-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+    transition: all 0.2s ease;
+}
+
+.schedule-item:hover {
+    background: #e9ecef;
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.schedule-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #28a745;
+    font-size: 0.95rem;
+    min-width: 80px;
+}
+
+.schedule-time i {
+    font-size: 0.9rem;
+}
+
+.schedule-details {
+    flex: 1;
+}
+
+.schedule-class {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    margin: 0 0 0.5rem 0;
+}
+
+.schedule-info {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin: 0 0 0.25rem 0;
+}
+
+.schedule-info span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.schedule-info i {
+    font-size: 0.8rem;
+    color: #28a745;
+}
+
+.schedule-duration {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin: 0;
+}
+
+/* Compact Schedule Items for Upcoming */
+.upcoming-day-group {
+    margin-bottom: 1.5rem;
+}
+
+.upcoming-day-group:last-child {
+    margin-bottom: 0;
+}
+
+.upcoming-day-header {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #28a745;
+    margin: 0 0 0.75rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.schedule-item-compact {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-left-width: 3px;
+}
+
+.schedule-time-compact {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #28a745;
+    font-size: 0.85rem;
+    min-width: 70px;
+}
+
+.schedule-time-compact i {
+    font-size: 0.8rem;
+}
+
+.schedule-details-compact {
+    flex: 1;
+}
+
+.schedule-class-compact {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #495057;
+    margin: 0 0 0.25rem 0;
+}
+
+.schedule-info-compact {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin: 0;
+}
+
+.schedule-info-compact span {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.schedule-info-compact i {
+    font-size: 0.75rem;
+    color: #28a745;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Timetable Scroll Wrapper - Fixed width, horizontal scroll */
+.timetable-scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.timetable-container-fixed {
+    min-width: 1000px; /* Fixed minimum width to force horizontal scroll on mobile */
+    width: 100%;
+}
+
+/* Teacher Timetable Class Box Styling - Fixed Dimensions for Consistency */
+.teacher-timetable-class-box {
+    background: white !important;
+    border: 1px solid #d1d3d4 !important;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    width: 140px;
+    height: 85px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.teacher-timetable-class-box .class-subject {
+    color: #28a745 !important;
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 3px;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.teacher-timetable-class-box .class-time {
+    color: #495057 !important;
+    font-size: 11px;
+    font-weight: 500;
+    margin-bottom: 2px;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.teacher-timetable-class-box .class-instructor {
+    color: #6c757d !important;
+    font-size: 10px;
+    margin-bottom: 2px;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.teacher-timetable-class-box .class-room {
+    color: #6c757d !important;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Scrollbar Styling */
+.timetable-scroll-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.timetable-scroll-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.timetable-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: #28a745;
+    border-radius: 4px;
+}
+
+.timetable-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #218838;
+}
+
+.schedule-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.schedule-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.schedule-list::-webkit-scrollbar-thumb {
+    background: #28a745;
+    border-radius: 3px;
+}
+
+.schedule-list::-webkit-scrollbar-thumb:hover {
+    background: #218838;
+}
+
+/* Mobile Responsiveness - Keep timetable scrollable */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .schedule-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .schedule-info-compact {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    /* Timetable remains fixed width and scrollable */
+    .timetable-container-fixed {
+        min-width: 1000px; /* Maintain fixed width on mobile */
+    }
+    
+    .dashboard-card .card-header {
+        padding: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .card-subtitle {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .welcome-title {
+        font-size: 1.75rem;
+    }
+    
+    .welcome-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .stat-number {
+        font-size: 1.75rem;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+    }
+}
+</style>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\jimbo\Desktop\Laravel_Timetable\Laravel-School-Timetable-Calendar\resources\views/teacher/dashboard.blade.php ENDPATH**/ ?>

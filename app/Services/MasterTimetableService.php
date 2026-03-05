@@ -23,33 +23,19 @@ class MasterTimetableService
     /**
      * Generate master timetable data for a specific day
      */
-    public function generateMasterTimetableData($weekday, $filters = [])
+    public function generateMasterTimetableData($weekday)
     {
-        // Get rooms with optional filtering
-        $roomsQuery = Room::query();
-        if (!empty($filters['room'])) {
-            $roomsQuery->where('id', $filters['room']);
-        }
-        $rooms = $roomsQuery->orderBy('name')->get();
+        // Get all rooms
+        $rooms = Room::orderBy('name')->get();
         
         // Generate time slots (7 AM to 9 PM with 30-minute intervals)
         $timeSlots = $this->timeService->generateTimeRange();
         
-        // Get lessons for the specific weekday with optional filtering
-        $lessonsQuery = Lesson::with(['class', 'teacher', 'room', 'subject'])
-            ->where('weekday', $weekday);
-            
-        if (!empty($filters['subject'])) {
-            $lessonsQuery->where('subject_id', $filters['subject']);
-        }
-        if (!empty($filters['teacher'])) {
-            $lessonsQuery->where('teacher_id', $filters['teacher']);
-        }
-        if (!empty($filters['class'])) {
-            $lessonsQuery->where('class_id', $filters['class']);
-        }
-        
-        $lessons = $lessonsQuery->get()->groupBy('room_id');
+        // Get lessons for the specific weekday
+        $lessons = Lesson::with(['class', 'teacher', 'room', 'subject'])
+            ->where('weekday', $weekday)
+            ->get()
+            ->groupBy('room_id');
 
         // Create the master timetable matrix
         $timetableMatrix = [];
@@ -94,12 +80,19 @@ class MasterTimetableService
             $timetableMatrix[] = $row;
         }
 
+        // Calculate available hours for each room
+        $roomHoursAvailable = [];
+        foreach ($rooms as $room) {
+            $roomHoursAvailable[$room->id] = $this->calculateRoomAvailableHours($room->id, $weekday, $timeSlots);
+        }
+
         return [
             'weekday' => $weekday,
             'weekday_name' => Lesson::WEEK_DAYS[$weekday] ?? 'Unknown',
             'rooms' => $rooms,
             'time_slots' => $timeSlots,
             'timetable_matrix' => $timetableMatrix,
+            'room_hours_available' => $roomHoursAvailable,
             'statistics' => $this->generateStatistics($rooms, $lessons, $timeSlots)
         ];
     }
@@ -329,5 +322,40 @@ class MasterTimetableService
         }
         
         return $multiSlotLessons;
+    }
+
+    /**
+     * Calculate available hours for a specific room on a given day
+     */
+    private function calculateRoomAvailableHours($roomId, $weekday, $timeSlots)
+    {
+        $lessons = Lesson::where('weekday', $weekday)
+            ->where('room_id', $roomId)
+            ->get();
+
+        $totalMinutesAvailable = 0;
+        
+        foreach ($timeSlots as $timeSlot) {
+            $slotStart = Carbon::createFromFormat('H:i', $timeSlot['start']);
+            $slotEnd = Carbon::createFromFormat('H:i', $timeSlot['end']);
+            
+            // Check if this slot is occupied
+            $isOccupied = false;
+            foreach ($lessons as $lesson) {
+                $lessonStart = Carbon::createFromFormat('H:i:s', $lesson->getRawOriginal('start_time'));
+                $lessonEnd = Carbon::createFromFormat('H:i:s', $lesson->getRawOriginal('end_time'));
+                
+                if ($lessonStart->lt($slotEnd) && $lessonEnd->gt($slotStart)) {
+                    $isOccupied = true;
+                    break;
+                }
+            }
+            
+            if (!$isOccupied) {
+                $totalMinutesAvailable += 30; // Each slot is 30 minutes
+            }
+        }
+        
+        return round($totalMinutesAvailable / 60, 1); // Convert to hours with 1 decimal place
     }
 }

@@ -104,7 +104,7 @@
                         <?php if($room->capacity): ?>
                             <div class="detail-item">
                                 <i class="fas fa-users"></i>
-                                <span><?php echo e($room->capacity); ?> students</span>
+                                <span><?php echo e($room->capacity); ?> capacity</span>
                             </div>
                         <?php endif; ?>
                         

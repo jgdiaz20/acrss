@@ -40,7 +40,7 @@
                                 @endforeach
                             @else
                                 <div class="not-scheduled-box">
-                                    {{ ($index == 6 || $index == 7) ? 'Not Scheduled' : 'No Classes' }}
+                                    Available
                                 </div>
                             @endif
                         </div>

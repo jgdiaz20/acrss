@@ -48,28 +48,7 @@
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-control form-control-sm" id="lab-filter">
-                        <option value="">Lab/Non-Lab</option>
-                        <option value="1" <?php echo e(request('lab') == '1' ? 'selected' : ''); ?>>Lab Required</option>
-                        <option value="0" <?php echo e(request('lab') == '0' ? 'selected' : ''); ?>>No Lab</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-control form-control-sm" id="equipment-filter">
-                        <option value="">Equipment</option>
-                        <option value="1" <?php echo e(request('equipment') == '1' ? 'selected' : ''); ?>>Equipment Required</option>
-                        <option value="0" <?php echo e(request('equipment') == '0' ? 'selected' : ''); ?>>No Equipment</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-control form-control-sm" id="status-filter">
-                        <option value="">All Status</option>
-                        <option value="1" <?php echo e(request('is_active') == '1' ? 'selected' : ''); ?>>Active</option>
-                        <option value="0" <?php echo e(request('is_active') == '0' ? 'selected' : ''); ?>>Inactive</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="input-group input-group-sm">
                         <input type="text" class="form-control" id="search-input" placeholder="Search subjects..." value="<?php echo e(request('search')); ?>">
                         <div class="input-group-append">
@@ -79,7 +58,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-2">
                     <button class="btn btn-primary btn-sm btn-block" type="button" onclick="filterTable()">
                         <i class="fas fa-filter"></i> Apply
                     </button>
@@ -118,30 +97,6 @@
                                 <?php $__currentLoopData = \App\Subject::SUBJECT_TYPES; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <option value="<?php echo e($key); ?>" <?php echo e(request('type') == $key ? 'selected' : ''); ?>><?php echo e($type); ?></option>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Lab Requirement</label>
-                            <select class="form-control form-control-sm" id="lab-filter-mobile">
-                                <option value="">All Subjects</option>
-                                <option value="1" <?php echo e(request('lab') == '1' ? 'selected' : ''); ?>>Lab Required</option>
-                                <option value="0" <?php echo e(request('lab') == '0' ? 'selected' : ''); ?>>No Lab Required</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Equipment Requirement</label>
-                            <select class="form-control form-control-sm" id="equipment-filter-mobile">
-                                <option value="">All Subjects</option>
-                                <option value="1" <?php echo e(request('equipment') == '1' ? 'selected' : ''); ?>>Equipment Required</option>
-                                <option value="0" <?php echo e(request('equipment') == '0' ? 'selected' : ''); ?>>No Equipment Required</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Status</label>
-                            <select class="form-control form-control-sm" id="status-filter-mobile">
-                                <option value="">All Status</option>
-                                <option value="1" <?php echo e(request('is_active') == '1' ? 'selected' : ''); ?>>Active</option>
-                                <option value="0" <?php echo e(request('is_active') == '0' ? 'selected' : ''); ?>>Inactive</option>
                             </select>
                         </div>
                         <button class="btn btn-primary btn-sm btn-block" onclick="filterTable()">
@@ -189,11 +144,9 @@
                         <th>Code</th>
                         <th>Type</th>
                         <th>Credits</th>
-                        <th>Requirements</th>
-                        <th>Lessons</th>
+                        <th>Schedules</th>
                         <th>Teachers</th>
-                        <th>Status</th>
-                        <th>&nbsp;</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -203,7 +156,12 @@
 
                             </td>
                             <td><span class="badge badge-secondary"><?php echo e($subject->id); ?></span></td>
-                            <td><?php echo e($subject->name); ?></td>
+                            <td>
+                                <?php echo e($subject->name); ?>
+
+                                <?php echo $subject->mode_badge; ?>
+
+                            </td>
                             <td><span class="badge badge-info"><?php echo e($subject->code); ?></span></td>
                             <td>
                                 <span class="badge badge-<?php echo e($subject->type === 'core' ? 'primary' : 'secondary'); ?>">
@@ -211,23 +169,14 @@
 
                                 </span>
                             </td>
-                            <td><?php echo e($subject->credits); ?></td>
                             <td>
-                                <?php if($subject->requires_lab): ?>
-                                    <span class="badge badge-warning">Lab</span>
-                                <?php endif; ?>
-                                <?php if($subject->requires_equipment): ?>
-                                    <span class="badge badge-info">Equipment</span>
-                                <?php endif; ?>
+                                <span data-toggle="tooltip" data-html="true" 
+                                      title="<strong>Total:</strong> <?php echo e($subject->total_hours); ?>h<br><strong>Lecture:</strong> <?php echo e($subject->lecture_units); ?>u (<?php echo e($subject->total_lecture_hours); ?>h)<br><strong>Lab:</strong> <?php echo e($subject->lab_units); ?>u (<?php echo e($subject->total_lab_hours); ?>h)">
+                                    <?php echo e($subject->credits); ?> 
+                                </span>
                             </td>
                             <td><?php echo e($subject->lessons_count); ?></td>
                             <td><?php echo e($subject->teachers_count); ?></td>
-                            <td>
-                                <span class="badge badge-<?php echo e($subject->is_active ? 'success' : 'danger'); ?>">
-                                    <?php echo e($subject->is_active ? 'Active' : 'Inactive'); ?>
-
-                                </span>
-                            </td>
                             <td>
                                 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('subject_show')): ?>
                                     <a class="btn btn-xs btn-primary" href="<?php echo e(route('admin.subjects.show', $subject->id)); ?>">
@@ -255,18 +204,18 @@
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
-                            <td colspan="11" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-search fa-3x text-muted mb-3"></i>
                                     <h5 class="text-muted">No subjects found</h5>
                                     <p class="text-muted">
-                                        <?php if(request()->hasAny(['type', 'lab', 'equipment', 'is_active', 'search'])): ?>
+                                        <?php if(request()->hasAny(['type', 'search'])): ?>
                                             No subjects found matching your filters. Try adjusting your search criteria.
                                         <?php else: ?>
                                             No subjects have been created yet. Click "Add Subject" to create your first subject.
                                         <?php endif; ?>
                                     </p>
-                                    <?php if(request()->hasAny(['type', 'lab', 'equipment', 'is_active', 'search'])): ?>
+                                    <?php if(request()->hasAny(['type', 'search'])): ?>
                                         <a href="<?php echo e(route('admin.subjects.index')); ?>" class="btn btn-primary mt-2">
                                             </i> Clear All Filters
                                         </a>
@@ -278,10 +227,12 @@
                 </tbody>
             </table>
         </div>
+        <?php if($subjects->hasPages()): ?>
+            <div class="d-flex justify-content-center mt-3">
+            <?php echo e($subjects->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4')); ?>
 
-        <?php echo e($subjects->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4')); ?>
-
-    </div>
+            </div>
+        <?php endif; ?>
 </div>
 
 
@@ -318,7 +269,7 @@
         border-right: 1px solid #dee2e6;
     }
 
-    /* Pagination uses Bootstrap 4 template; no overrides needed */
+    
 </style>
 <?php $__env->stopSection(); ?>
 
@@ -337,7 +288,15 @@ $(function () {
       $('.card').first().before(alertHtml);
       localStorage.removeItem('flash_success');
   }
-
+  // Pagination
+  //pagination
+    function changePerPage() {
+    const perPage = document.getElementById('per-page-selector').value;
+    const url = new URL(window.location);
+    url.searchParams.set('per_page', perPage);
+    url.searchParams.delete('page'); // Reset to first page
+    window.location.href = url.toString();
+    }
   // Initialize DataTable with select-checkbox first column
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 
@@ -411,9 +370,6 @@ $(function () {
 function filterTable() {
     const isMobile = window.innerWidth < 768;
     const typeFilter = isMobile ? document.getElementById('type-filter-mobile').value : document.getElementById('type-filter').value;
-    const labFilter = isMobile ? document.getElementById('lab-filter-mobile').value : document.getElementById('lab-filter').value;
-    const equipmentFilter = isMobile ? document.getElementById('equipment-filter-mobile').value : document.getElementById('equipment-filter').value;
-    const statusFilter = isMobile ? document.getElementById('status-filter-mobile').value : document.getElementById('status-filter').value;
     const searchInput = isMobile ? document.getElementById('search-input-mobile').value : document.getElementById('search-input').value;
     
     const url = new URL(window.location);
@@ -423,27 +379,6 @@ function filterTable() {
         url.searchParams.set('type', typeFilter);
     } else {
         url.searchParams.delete('type');
-    }
-    
-    // Lab filter
-    if (labFilter) {
-        url.searchParams.set('lab', labFilter);
-    } else {
-        url.searchParams.delete('lab');
-    }
-    
-    // Equipment filter
-    if (equipmentFilter) {
-        url.searchParams.set('equipment', equipmentFilter);
-    } else {
-        url.searchParams.delete('equipment');
-    }
-    
-    // Status filter
-    if (statusFilter) {
-        url.searchParams.set('is_active', statusFilter);
-    } else {
-        url.searchParams.delete('is_active');
     }
     
     // Search
@@ -477,29 +412,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const labFilter = document.getElementById('lab-filter');
-    const labFilterMobile = document.getElementById('lab-filter-mobile');
-    if (labFilter && labFilterMobile) {
-        labFilter.addEventListener('change', function() {
-            labFilterMobile.value = this.value;
-        });
-    }
-
-    const equipmentFilter = document.getElementById('equipment-filter');
-    const equipmentFilterMobile = document.getElementById('equipment-filter-mobile');
-    if (equipmentFilter && equipmentFilterMobile) {
-        equipmentFilter.addEventListener('change', function() {
-            equipmentFilterMobile.value = this.value;
-        });
-    }
-
-    const statusFilter = document.getElementById('status-filter');
-    const statusFilterMobile = document.getElementById('status-filter-mobile');
-    if (statusFilter && statusFilterMobile) {
-        statusFilter.addEventListener('change', function() {
-            statusFilterMobile.value = this.value;
-        });
-    }
 });
 
 function massDestroy() {
@@ -579,6 +491,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize highlighting for already checked boxes
         toggleRowHighlight(checkbox);
     });
+
+    // Initialize tooltips for credit breakdown
+    $('[data-toggle="tooltip"]').tooltip();
 });
 
 function toggleRowHighlight(checkbox) {

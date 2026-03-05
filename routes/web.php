@@ -9,14 +9,13 @@ Route::get('/home', function () {
         return redirect()->route('login')->with('error', 'Please log in to access this page.');
     }
 
-    if ($user->is_teacher) {
-        $routeName = 'teacher.dashboard';
-    } elseif ($user->is_student) {
-        $routeName = 'student.calendar.index';
-    } elseif ($user->is_admin) {
+    // Admin takes priority, then teacher
+    if ($user->is_admin) {
         $routeName = 'admin.home';
+    } elseif ($user->is_teacher) {
+        $routeName = 'teacher.dashboard';
     } else {
-        // Default fallback - redirect to login if no valid role
+        // No valid role assigned
         abort(403, 'Access denied. No valid role assigned.');
     }
     
@@ -27,7 +26,23 @@ Route::get('/home', function () {
     return redirect()->route($routeName);
 });
 
-Auth::routes(['register' => false]);
+// Authentication routes (register, reset, verify, confirm disabled)
+Auth::routes([
+    'register' => false,
+    'reset' => false,      // Disable password reset
+    'verify' => false,     // Disable email verification
+    'confirm' => false     // Disable password confirmation
+]);
+
+// Override login route with rate limiting (5 attempts per minute)
+Route::post('login', 'Auth\LoginController@login')
+    ->middleware('throttle:5,1')
+    ->name('login');
+
+// Override logout route to handle expired sessions gracefully
+Route::post('logout', 'Auth\LoginController@logout')
+    ->name('logout')
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
 // Admin
 
@@ -51,7 +66,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Users
     Route::delete('users/destroy', 'UsersController@massDestroy')->name('users.massDestroy');
-    Route::get('users/create-student', 'UsersController@createStudent')->name('users.create-student');
     Route::resource('users', 'UsersController');
 
     // Lesson Inline Editing (must be before resource routes to avoid conflicts)
@@ -66,6 +80,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('lessons/destroy', 'LessonsController@massDestroy')->name('lessons.massDestroy');
     Route::get('lessons/get-teachers-for-subject', 'LessonsController@getTeachersForSubject')->name('lessons.get-teachers-for-subject');
     Route::get('lessons/get-rooms-for-subject', 'LessonsController@getRoomsForSubject')->name('lessons.get-rooms-for-subject');
+    Route::get('lessons/hours-tracking', 'LessonsController@getHoursTracking')->name('lessons.hours-tracking');
     Route::get('lessons/{lesson}/info', 'LessonsController@getInfo')->name('lessons.info');
     Route::resource('lessons', 'LessonsController');
 
@@ -139,11 +154,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 Route::group(['prefix' => 'teacher', 'as' => 'teacher.', 'middleware' => ['auth', 'role:teacher']], function () {
     Route::get('/', 'TeacherDashboardController@index')->name('dashboard');
     Route::get('calendar', 'TeacherCalendarController@index')->name('calendar.index');
-});
-
-// Student Routes
-Route::group(['prefix' => 'student', 'as' => 'student.', 'middleware' => ['auth', 'role:student']], function () {
-    Route::get('calendar', 'StudentCalendarController@index')->name('calendar.index');
 });
 
 // Public Routes (No Authentication Required)

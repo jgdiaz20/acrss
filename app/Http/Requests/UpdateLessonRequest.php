@@ -53,25 +53,16 @@ class UpdateLessonRequest extends FormRequest
                 'required',
                 'integer',
                 'exists:subjects,id'],
+            'lesson_type' => [
+                'required',
+                'string',
+                'in:lecture,laboratory'],
             'weekday'    => [
                 'required',
                 'integer',
                 'min:1',
                 'max:7',
-                function ($attribute, $value, $fail) {
-                    // Weekend validation: Only diploma programs can have Saturday/Sunday classes
-                    if (in_array($value, [6, 7])) {
-                        $class = \App\SchoolClass::find($this->input('class_id'));
-                        if ($class && $class->program) {
-                            if ($class->program->type !== 'diploma') {
-                                $programTypeName = $class->program->type === 'senior_high' 
-                                    ? 'Senior High School' 
-                                    : ucfirst(str_replace('_', ' ', $class->program->type));
-                                $fail('Weekend classes (Saturday/Sunday) are only available for Diploma Programs. This class belongs to ' . $programTypeName . ' program.');
-                            }
-                        }
-                    }
-                }],
+            ],
             'start_time' => [
                 'required',
                 new SchoolHoursRule(),

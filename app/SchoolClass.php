@@ -22,7 +22,6 @@ class SchoolClass extends Model
         'program_id',
         'grade_level_id', // Keep for backward compatibility but make optional
         'section',
-        'max_students',
         'is_active',
         'created_at',
         'updated_at',

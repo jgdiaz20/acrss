@@ -21,9 +21,6 @@
             <a class="btn btn-success" href="{{ route("admin.users.create") }}">
                 <i class="fas fa-plus"></i> {{ trans('global.add') }} {{ trans('cruds.user.title_singular') }}
             </a>
-            <a class="btn btn-primary" href="{{ route("admin.users.create-student") }}">
-                <i class="fas fa-user-graduate"></i> {{ trans('global.add') }} New Student
-            </a>
         </div>
     </div>
 @endcan

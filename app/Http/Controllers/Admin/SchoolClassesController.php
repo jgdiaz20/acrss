@@ -234,8 +234,8 @@ class SchoolClassesController extends Controller
             }
         }
         
-        // Ensure required fields have default values
-        $data['is_active'] = $data['is_active'] ?? true;
+        // Ensure all sections are created as active
+        $data['is_active'] = true;
         
         try {
             $schoolClass = SchoolClass::create($data);
@@ -327,8 +327,8 @@ class SchoolClassesController extends Controller
             }
         }
         
-        // Ensure required fields have default values
-        $data['is_active'] = $data['is_active'] ?? true;
+        // Ensure all sections remain active (cannot be changed to inactive)
+        $data['is_active'] = true;
         
         try {
             $schoolClass->update($data);
@@ -363,7 +363,7 @@ class SchoolClassesController extends Controller
     {
         abort_if(Gate::denies('school_class_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $schoolClass->load('classLessons', 'classUsers');
+        $schoolClass->load('classLessons');
         
         // Get lessons for this specific class
         $lessons = \App\Lesson::with(['teacher', 'room', 'subject'])
@@ -401,14 +401,6 @@ class SchoolClassesController extends Controller
     {
         abort_if(Gate::denies('school_class_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        // Check if there are students enrolled in this class
-        $enrolledStudents = $schoolClass->classUsers()->where('is_student', true)->count();
-        if ($enrolledStudents > 0) {
-            return back()->withErrors([
-                'error' => "Cannot delete class '{$schoolClass->name}' because it has {$enrolledStudents} enrolled student(s). Please reassign or remove the students first."
-            ]);
-        }
-
         // Check if there are active lessons for this class
         $activeLessons = $schoolClass->lessons()->count();
         if ($activeLessons > 0) {
@@ -442,13 +434,6 @@ class SchoolClassesController extends Controller
         foreach ($classIds as $classId) {
             $schoolClass = SchoolClass::find($classId);
             if (!$schoolClass) {
-                continue;
-            }
-
-            // Check if there are students enrolled in this class
-            $enrolledStudents = $schoolClass->classUsers()->where('is_student', true)->count();
-            if ($enrolledStudents > 0) {
-                $errors[] = "Cannot delete class '{$schoolClass->name}' because it has {$enrolledStudents} enrolled student(s).";
                 continue;
             }
 

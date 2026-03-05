@@ -73,35 +73,15 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="required" for="program_id">Academic Program</label>
-                        <?php if($preSelectedProgramId): ?>
-                            <!-- Show current program as read-only when creating from specific program context -->
-                            <?php
-                                $selectedProgram = $academicPrograms->where('id', $preSelectedProgramId)->first();
-                            ?>
-                            <input type="text" class="form-control" value="<?php echo e($selectedProgram->name ?? 'Unknown Program'); ?>" readonly>
-                            <input type="hidden" name="program_id" value="<?php echo e($preSelectedProgramId); ?>">
-                            <small class="form-text text-muted">
-                                <i class="fas fa-lock mr-1"></i>
-                                Program is locked because you're creating within the program context.
-                            </small>
-                        <?php else: ?>
-                            <!-- Allow program selection when creating from general context -->
-                            <select class="form-control <?php echo e($errors->has('program_id') ? 'is-invalid' : ''); ?>" name="program_id" id="program_id" required>
-                                <option value="">Select Program</option>
-                                <?php $__currentLoopData = $academicPrograms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $program): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <option value="<?php echo e($program->id); ?>" <?php echo e((old('program_id', $preSelectedProgramId) == $program->id) ? 'selected' : ''); ?>>
-                                        <?php echo e($program->name); ?>
-
-                                    </option>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </select>
-                            <?php if($errors->has('program_id')): ?>
-                                <div class="invalid-feedback">
-                                    <?php echo e($errors->first('program_id')); ?>
-
-                                </div>
-                            <?php endif; ?>
-                        <?php endif; ?>
+                        <?php
+                            $selectedProgram = $academicPrograms->where('id', $preSelectedProgramId)->first();
+                        ?>
+                        <input type="text" class="form-control" value="<?php echo e($selectedProgram->name ?? 'Unknown Program'); ?>" readonly>
+                        <input type="hidden" name="program_id" value="<?php echo e($preSelectedProgramId); ?>">
+                        <small class="form-text text-muted">
+                            <i class="fas fa-lock mr-1"></i>
+                            Program is locked.
+                        </small>
                     </div>
                 </div>
                 
@@ -130,7 +110,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="required" for="name">Class Name</label>
+                        <label class="required" for="name">Section Name</label>
                         <input class="form-control <?php echo e($errors->has('name') ? 'is-invalid' : ''); ?>" type="text" name="name" id="name" value="<?php echo e(old('name', '')); ?>" required>
                         <?php if($errors->has('name')): ?>
                             <div class="invalid-feedback">
@@ -138,55 +118,13 @@
 
                             </div>
                         <?php endif; ?>
-                        <span class="help-block">e.g., STEM, ABM, Computer Engineering</span>
-                    </div>
-                </div>
-                
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="section">Section</label>
-                        <input class="form-control <?php echo e($errors->has('section') ? 'is-invalid' : ''); ?>" type="text" name="section" id="section" value="<?php echo e(old('section', '')); ?>">
-                        <?php if($errors->has('section')): ?>
-                            <div class="invalid-feedback">
-                                <?php echo e($errors->first('section')); ?>
-
-                            </div>
-                        <?php endif; ?>
-                        <span class="help-block">e.g., A, B, C or Alpha, Beta</span>
+                        <span class="help-block">e.g., STEM-A, ABM-B, Computer Engineering 1-A</span>
                     </div>
                 </div>
             </div>
             
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="max_students">Maximum Students</label>
-                        <input class="form-control <?php echo e($errors->has('max_students') ? 'is-invalid' : ''); ?>" type="number" name="max_students" id="max_students" value="<?php echo e(old('max_students', '')); ?>" min="1">
-                        <?php if($errors->has('max_students')): ?>
-                            <div class="invalid-feedback">
-                                <?php echo e($errors->first('max_students')); ?>
-
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="is_active">Status</label>
-                        <select class="form-control <?php echo e($errors->has('is_active') ? 'is-invalid' : ''); ?>" name="is_active" id="is_active">
-                            <option value="1" <?php echo e(old('is_active', '1') == '1' ? 'selected' : ''); ?>>Active</option>
-                            <option value="0" <?php echo e(old('is_active') == '0' ? 'selected' : ''); ?>>Inactive</option>
-                        </select>
-                        <?php if($errors->has('is_active')): ?>
-                            <div class="invalid-feedback">
-                                <?php echo e($errors->first('is_active')); ?>
-
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
+            <!-- Hidden fields -->
+            <input type="hidden" name="is_active" value="1">
             
             <div class="form-group">
                 <button class="btn btn-success" type="submit">

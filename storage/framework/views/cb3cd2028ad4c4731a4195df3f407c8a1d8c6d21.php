@@ -95,17 +95,13 @@
                                                 <?php $__currentLoopData = $classesInGrade->take(3); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <div class="class-item mb-2">
                                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                                            <span class="class-name text-truncate" style="max-width: 120px;" title="<?php echo e($class->name); ?>">
+                                                            <span class="class-name text-truncate" style="max-width: 200px;" title="<?php echo e($class->name); ?>">
                                                                 <?php echo e($class->name); ?>
 
                                                                 <?php if($class->section): ?>
                                                                     <small class="text-muted">- <?php echo e($class->section); ?></small>
                                                                 <?php endif; ?>
                                                             </span>
-                                                            <small class="badge badge-light">
-                                                                <?php echo e($class->classUsers->count()); ?>/<?php echo e($class->max_students ?? '∞'); ?>
-
-                                                            </small>
                                                         </div>
                                                         
                                                     </div>
@@ -113,21 +109,21 @@
                                                 <?php if($classesInGrade->count() > 3): ?>
                                                     <div class="text-center">
                                                         <small class="text-muted">
-                                                            +<?php echo e($classesInGrade->count() - 3); ?> more classes
+                                                            +<?php echo e($classesInGrade->count() - 3); ?> more sections
                                                         </small>
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
                                         <?php else: ?>
                                             <div class="text-center text-muted">
-                                                <small><i class="fas fa-exclamation-triangle"></i> No classes</small>
+                                                <small><i class="fas fa-exclamation-triangle"></i> No sections available</small>
                                             </div>
                                         <?php endif; ?>
                                         
                                         <div class="mt-2">
                                             <a href="<?php echo e(route('admin.school-classes.program.grade', [$programType, $gradeLevel->id])); ?>" 
                                                class="btn btn-sm btn-outline-info btn-block">
-                                                Manage Classes
+                                                Manage
                                             </a>
                                         </div>
                                     </div>

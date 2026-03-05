@@ -19,12 +19,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        // Exclude testing routes from CSRF verification
-        'admin/lessons/*',
-        'admin/users/*',
-        'admin/school-classes/*',
-        'admin/rooms/*',
-        'admin/subjects/*',
-        'admin/academic-programs/*',
+        // All routes now properly use CSRF tokens
+        // No exemptions needed - removed for security
     ];
 }

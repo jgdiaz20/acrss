@@ -49,7 +49,7 @@
                 <div class="info-box">
                     <span class="info-box-icon bg-success"><i class="fas fa-chalkboard-teacher"></i></span>
                     <div class="info-box-content">
-                        <span class="info-box-text">Total Lessons</span>
+                        <span class="info-box-text">Total Class Schedules</span>
                         <span class="info-box-number" id="totalLessons">{{ $totalLessons }}</span>
                     </div>
                 </div>

@@ -42,18 +42,6 @@ class UsersController extends Controller
         return view('admin.users.create', compact('roles', 'classes'));
     }
 
-    public function createStudent()
-    {
-        abort_if(Gate::denies('user_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        // Only show Student role for student creation
-        $roles = Role::whereIn('id', [4])->pluck('title', 'id');
-
-        $classes = SchoolClass::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        return view('admin.users.create-student', compact('roles', 'classes'));
-    }
-
     public function store(StoreUserRequest $request)
     {
         $userData = $request->all();

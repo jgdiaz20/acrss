@@ -105,24 +105,34 @@
                                     
                                     <?php if($program->schoolClasses->count() > 0): ?>
                                         <div class="classes-grid">
-                                            <?php $__currentLoopData = $program->schoolClasses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php $__currentLoopData = $program->schoolClasses->take(5); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <div class="class-item">
                                                     <div class="class-icon <?php echo e($program->type == 'senior_high' ? 'senior-high-icon' : ($program->type == 'diploma' ? 'diploma-icon' : 'college-icon')); ?>">
                                                         <i class="fas fa-chalkboard"></i>
                                                     </div>
                                                     <div class="class-info">
                                                         <span class="class-name"><?php echo e($class->name); ?></span>
-                                                        <span class="class-details">
-                                                            Section: <?php echo e($class->section); ?> | Max: <?php echo e($class->max_students); ?> students
-                                                        </span>
+                                                        <?php if($class->section): ?>
+                                                            <span class="class-details">
+                                                                Section: <?php echo e($class->section); ?>
+
+                                                            </span>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </div>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if($program->schoolClasses->count() > 5): ?>
+                                                    <div class="text-center">
+                                                        <small class="text-muted">
+                                                            +<?php echo e($program->schoolClasses->count() - 5); ?> more sections
+                                                        </small>
+                                                    </div>
+                                                <?php endif; ?>
                                         </div>
                                     <?php else: ?>
                                         <div class="empty-state">
                                             <i class="fas fa-chalkboard"></i>
-                                            <p>No classes configured for this program yet.</p>
+                                            <p>No sections configured for this program yet.</p>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -130,7 +140,7 @@
                                 <div class="program-footer">
                                     <a href="<?php echo e(route('admin.school-classes.manage', $program->id)); ?>" class="btn btn-block <?php echo e($program->type == 'senior_high' ? 'btn-success' : ($program->type == 'diploma' ? 'btn-warning' : 'btn-primary')); ?>">
                                         <i class="fas fa-eye mr-2"></i>
-                                        Manage <?php echo e($program->name); ?> Classes
+                                        Manage <?php echo e($program->name); ?> Sections
                                     </a>
                                 </div>
                             </div>

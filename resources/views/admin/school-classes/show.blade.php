@@ -48,12 +48,6 @@
                             @if($schoolClass->section)
                                 (Section {{ $schoolClass->section }})
                             @endif
-                            @if($schoolClass->max_students)
-                                | Max Students: {{ $schoolClass->max_students }}
-                            @endif
-                            @if($schoolClass->classUsers->count() > 0)
-                                | Current Students: {{ $schoolClass->classUsers->count() }}
-                            @endif
                         </p>
                     </div>
                     <div class="text-center">
@@ -99,7 +93,7 @@
                                 @endforeach
                             @else
                                 <div class="not-scheduled-box">
-                                    {{ ($index == 6 || $index == 7) ? 'Not Scheduled' : 'No Classes' }}
+                                    Available
                                 </div>
                             @endif
                         </div>

@@ -20,14 +20,10 @@
                         </i>
                         My Dashboard
                     </a>
-                </li>
-            <?php endif; ?>
-            <?php if(auth()->user()->is_student): ?>
-                <li class="nav-item">
-                    <a href="<?php echo e(route("student.calendar.index")); ?>" class="nav-link <?php echo e(request()->is('student/calendar') || request()->is('student/calendar/*') ? 'active' : ''); ?>">
-                        <i class="fa-fw fas fa-calendar nav-icon">
+                    <a href="<?php echo e(route("teacher.calendar.index")); ?>" class="nav-link <?php echo e(request()->is('teacher') || request()->is('teacher/calendar/*') ? 'active' : ''); ?>">
+                        <i class="fa-fw fas fa-calendar-alt nav-icon">
                         </i>
-                        My Schedule
+                        My Timetable
                     </a>
                 </li>
             <?php endif; ?>
@@ -41,7 +37,7 @@
 
                     </a>
                     <ul class="nav-dropdown-items">
-                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('permission_access')): ?>
+                      <!--  <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('permission_access')): ?>
                             <?php if(config('app.env') !== 'production'): ?>
                                 <li class="nav-item">
                                     <a href="<?php echo e(route("admin.permissions.index")); ?>" class="nav-link <?php echo e(request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : ''); ?>">
@@ -53,7 +49,7 @@
                                     </a>
                                 </li>
                             <?php endif; ?>
-                        <?php endif; ?>
+                        <?php endif; ?> 
                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('role_access')): ?>
                             <li class="nav-item">
                                 <a href="<?php echo e(route("admin.roles.index")); ?>" class="nav-link <?php echo e(request()->is('admin/roles') || request()->is('admin/roles/*') ? 'active' : ''); ?>">
@@ -64,7 +60,7 @@
 
                                 </a>
                             </li>
-                        <?php endif; ?>
+                        <?php endif; ?>-->
                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('user_access')): ?>
                             <li class="nav-item">
                                 <a href="<?php echo e(route("admin.users.index")); ?>" class="nav-link <?php echo e(request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : ''); ?>">
@@ -83,14 +79,6 @@
                                     Teachers
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="<?php echo e(route("admin.users.index")); ?>?role=4" class="nav-link <?php echo e(request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : ''); ?>">
-                                    <i class="fa-fw fas fa-user nav-icon">
-
-                                    </i>
-                                    Students
-                                </a>
-                            </li>
                         <?php endif; ?>
                     </ul>
                 </li>
@@ -99,10 +87,8 @@
                 <li class="nav-item nav-dropdown">
                     <a class="nav-link nav-dropdown-toggle" href="#">
                         <i class="fa-fw fas fa-school nav-icon">
-
                         </i>
-                        <?php echo e(trans('cruds.schoolClass.title')); ?>
-
+                        Programs
                     </a>
                     <ul class="nav-dropdown-items">
                         <li class="nav-item">
@@ -127,6 +113,14 @@
 
                                 </i>
                                 College
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?php echo e(route('admin.school-classes.index', )); ?>" class="nav-link <?php echo e(request()->is('admin/school-classes*') ? 'active' : ''); ?>">
+                                <i class="fa-fw fas fa-layer-group nav-icon">
+
+                                </i>
+                                All Programs
                             </a>
                         </li>
                         <li class="nav-item">

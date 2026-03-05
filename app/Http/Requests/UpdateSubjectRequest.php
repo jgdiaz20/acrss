@@ -23,12 +23,14 @@ class UpdateSubjectRequest extends FormRequest
                 'string',
                 'max:255',
                 Rule::unique('subjects', 'name')->ignore($this->subject->id),
+                'regex:/^[a-zA-Z0-9\s\-\(\)]+$/',
             ],
             'code' => [
                 'required',
                 'string',
                 'max:20',
                 Rule::unique('subjects', 'code')->ignore($this->subject->id),
+                'regex:/^[A-Z0-9\-]+$/',
             ],
             'description' => [
                 'nullable',
@@ -39,6 +41,23 @@ class UpdateSubjectRequest extends FormRequest
                 'required',
                 'integer',
                 'min:1',
+                'max:3',
+            ],
+            'scheduling_mode' => [
+                'required',
+                'string',
+                'in:lab,lecture,flexible',
+            ],
+            'lecture_units' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:10',
+            ],
+            'lab_units' => [
+                'nullable',
+                'integer',
+                'min:0',
                 'max:10',
             ],
             'type' => [
@@ -60,6 +79,14 @@ class UpdateSubjectRequest extends FormRequest
             'is_active' => [
                 'boolean',
             ],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'name.regex' => 'Subject name may only contain letters, numbers, spaces, hyphens, and parentheses.',
+            'code.regex' => 'Subject code must be uppercase letters, numbers, and hyphens only (e.g., CS-101, MATH-201).',
         ];
     }
 }

@@ -53,21 +53,11 @@ class MasterTimetableController extends Controller
             }
         }
 
-        // Get data for filters
-        $rooms = Room::orderBy('name')->get();
-        $subjects = Subject::where('is_active', true)->orderBy('name')->get();
-        $teachers = User::where('is_teacher', true)->orderBy('name')->get();
-        $classes = SchoolClass::where('is_active', true)->orderBy('name')->get();
-
         return view('admin.room-management.master-timetable.index', compact(
             'totalRooms',
             'totalLessons', 
             'activeTeachers',
-            'totalConflicts',
-            'rooms',
-            'subjects',
-            'teachers',
-            'classes'
+            'totalConflicts'
         ));
     }
 
@@ -84,24 +74,15 @@ class MasterTimetableController extends Controller
         }
 
         $weekDays = Lesson::WEEK_DAYS;
-        $weekdayOptions = $weekDays; // Show all 7 days including weekends
+        $weekdayOptions = $weekDays; // Show all 7 days
 
-        // Get filters from request
-        $filters = [
-            'room' => $request->get('room'),
-            'subject' => $request->get('subject'),
-            'teacher' => $request->get('teacher'),
-            'class' => $request->get('class')
-        ];
-
-        // Generate master timetable data for the specific day with filters
-        $timetableData = $this->masterTimetableService->generateMasterTimetableData($weekday, $filters);
+        // Generate master timetable data for the specific day
+        $timetableData = $this->masterTimetableService->generateMasterTimetableData($weekday);
 
         return view('admin.room-management.master-timetable.show', compact(
             'timetableData',
             'weekDays',
-            'weekdayOptions',
-            'filters'
+            'weekdayOptions'
         ));
     }
 
@@ -419,7 +400,6 @@ class MasterTimetableController extends Controller
                 'Subject Code',
                 'Subject Type',
                 'Class Name',
-                'Class Capacity',
                 'Teacher Name',
                 'Teacher Email',
                 'Room Name',
@@ -445,7 +425,6 @@ class MasterTimetableController extends Controller
                     $lesson->subject->code ?? '',
                     ($lesson->subject->requires_lab ?? false) ? 'Laboratory' : 'Regular',
                     $lesson->class->display_name ?? $lesson->class->name ?? 'No Class',
-                    $lesson->class->max_students ?? 'Not Specified',
                     $lesson->teacher->name ?? 'No Teacher',
                     $lesson->teacher->email ?? 'Not Available',
                     $lesson->room->display_name ?? $lesson->room->name ?? 'No Room',
@@ -497,7 +476,6 @@ class MasterTimetableController extends Controller
                     'id' => $lesson->class->id ?? null,
                     'name' => $lesson->class->name ?? 'No Class',
                     'display_name' => $lesson->class->display_name ?? $lesson->class->name ?? 'No Class',
-                    'max_students' => $lesson->class->max_students ?? null,
                     'is_active' => $lesson->class->is_active ?? true
                 ],
                 'teacher' => [
@@ -570,8 +548,7 @@ class MasterTimetableController extends Controller
                     'type' => ($lesson['subject']['requires_lab'] ?? false) ? 'Laboratory' : 'Regular'
                 ],
                 'class' => [
-                    'name' => $lesson['class']['display_name'] ?? $lesson['class']['name'] ?? 'No Class',
-                    'capacity' => $lesson['class']['max_students'] ?? 'Not Specified'
+                    'name' => $lesson['class']['display_name'] ?? $lesson['class']['name'] ?? 'No Class'
                 ],
                 'teacher' => [
                     'name' => $lesson['teacher']['name'] ?? 'No Teacher',
@@ -655,7 +632,6 @@ class MasterTimetableController extends Controller
                 'Subject Code',
                 'Subject Type',
                 'Class Name',
-                'Class Capacity',
                 'Teacher Name',
                 'Teacher Email',
                 'Room Name',
@@ -675,7 +651,6 @@ class MasterTimetableController extends Controller
                     $lesson['subject']['code'] ?? '',
                     ($lesson['subject']['requires_lab'] ?? false) ? 'Laboratory' : 'Regular',
                     $lesson['class']['display_name'] ?? $lesson['class']['name'] ?? 'No Class',
-                    $lesson['class']['max_students'] ?? 'Not Specified',
                     $lesson['teacher']['name'] ?? 'No Teacher',
                     $lesson['teacher']['email'] ?? 'Not Available',
                     $lesson['room']['display_name'] ?? $lesson['room']['name'] ?? 'No Room',

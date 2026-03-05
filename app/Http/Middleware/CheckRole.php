@@ -31,11 +31,6 @@ class CheckRole
                     abort(403, 'Access denied. Admin role required.');
                 }
                 break;
-            case 'student':
-                if (!$user->is_student) {
-                    abort(403, 'Access denied. Student role required.');
-                }
-                break;
             default:
                 abort(403, 'Invalid role specified.');
         }

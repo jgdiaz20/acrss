@@ -9,7 +9,7 @@
             </a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-            <i class="fas fa-clock"></i> Lessons Management
+            <i class="fas fa-clock"></i> Manage Class Schedules
         </li>
     </ol>
 </nav>
@@ -20,9 +20,13 @@
             <a class="btn btn-success" href="<?php echo e(route("admin.lessons.create")); ?>">
                 <i class="fas fa-plus"></i> Add Class Schedule
             </a>
+            <a href="<?php echo e(route('admin.room-management.master-timetable.show', request('weekday', 1))); ?>" class="btn btn-light">
+                <i class="fas fa-th"></i> Master Timetable
+            </a>
         </div>
     </div>
 <?php endif; ?>
+
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">
@@ -31,7 +35,7 @@
 
         </h3>
         <div class="card-tools">
-            <span class="badge badge-primary mr-2">Total: <?php echo e($lessons->total()); ?> lessons</span>
+            <span class="badge badge-primary mr-2">Total: <?php echo e($lessons->total()); ?> Schedules</span>
             <div class="dropdown d-inline-block">
                 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="columnToggleBtn">
                     <i class="fas fa-columns"></i> Show/Hide Columns
@@ -104,7 +108,7 @@
             <div class="row d-none d-md-flex">
                 <div class="col-md-2">
                     <select class="form-control form-control-sm" id="class-filter">
-                        <option value="">All Classes</option>
+                        <option value="">All Sections</option>
                         <?php $__currentLoopData = $classes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $id => $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($id); ?>" <?php echo e((isset($filters['class_id']) && $filters['class_id'] == $id) ? 'selected' : ''); ?>>
                                 <?php echo e($name); ?>
@@ -191,7 +195,7 @@
                         <div class="form-group">
                             <label>Class</label>
                             <select class="form-control form-control-sm" id="class-filter-mobile">
-                                <option value="">All Classes</option>
+                                <option value="">All Sections</option>
                                 <?php $__currentLoopData = $classes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $id => $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <option value="<?php echo e($id); ?>" <?php echo e((isset($filters['class_id']) && $filters['class_id'] == $id) ? 'selected' : ''); ?>>
                                         <?php echo e($name); ?>
@@ -280,7 +284,7 @@
 
                         </th>
                         <th>
-                            <?php echo e(trans('cruds.lesson.fields.class')); ?>
+                            <?php echo e(trans('cruds.lesson.fields.section')); ?>
 
                         </th>
                         <th>
@@ -289,6 +293,9 @@
                         </th>
                         <th>
                             Subject
+                        </th>
+                        <th>
+                            Type
                         </th>
                         <th>
                             Room
@@ -306,7 +313,7 @@
 
                         </th>
                         <th>
-                            &nbsp;
+                            Actions
                         </th>
                     </tr>
                 </thead>
@@ -331,6 +338,13 @@
                             <td>
                                 <?php echo e($lesson->subject->name ?? 'No Subject'); ?>
 
+                            </td>
+                            <td>
+                                <?php if($lesson->lesson_type === 'laboratory'): ?>
+                                    <span class="badge badge-info"><i class="fas fa-flask"></i> Laboratory</span>
+                                <?php else: ?>
+                                    <span class="badge badge-primary"><i class="fas fa-chalkboard-teacher"></i> Lecture</span>
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <?php echo e($lesson->room->display_name ?? ''); ?>
@@ -518,6 +532,25 @@
         $('#weekday-filter-mobile').val($(this).val());
     });
 
+    // Display mass delete success message if present
+    $(document).ready(function() {
+        const massDeleteMsg = sessionStorage.getItem('massDeleteSuccess');
+        if (massDeleteMsg) {
+            // Create and show success alert
+            const alertHtml = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> ${massDeleteMsg}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            `;
+            $('nav[aria-label="breadcrumb"]').after(alertHtml);
+            // Clear the message
+            sessionStorage.removeItem('massDeleteSuccess');
+        }
+    });
+
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('lesson_delete')): ?>
@@ -542,7 +575,13 @@
           method: 'POST',
           url: config.url,
           data: { ids: ids, _method: 'DELETE' }})
-          .done(function () { location.reload() })
+          .done(function (response) { 
+            // Store success message in sessionStorage before reload
+            if (response.message) {
+              sessionStorage.setItem('massDeleteSuccess', response.message);
+            }
+            location.reload();
+          })
       }
     }
   }

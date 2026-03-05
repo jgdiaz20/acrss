@@ -73,13 +73,7 @@
                     </div>
                     <div class="dropdown-item">
                         <div class="form-check">
-                            <input class="form-check-input column-toggle" data-column="6" type="checkbox" checked>
-                            <label class="form-check-label">Equipment</label>
-                        </div>
-                    </div>
-                    <div class="dropdown-item">
-                        <div class="form-check">
-                            <input class="form-check-input column-toggle" data-column="7" type="checkbox" checked>
+                                                        <input class="form-check-input column-toggle" data-column="6" type="checkbox" checked>
                             <label class="form-check-label">Timetable</label>
                         </div>
                     </div>
@@ -106,14 +100,7 @@
                         <option value="classroom" <?php echo e(request('type') == 'classroom' ? 'selected' : ''); ?>>Classroom</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-control form-control-sm" id="equipment-filter">
-                        <option value="">Equipment</option>
-                        <option value="1" <?php echo e(request('equipment') == '1' ? 'selected' : ''); ?>>Available</option>
-                        <option value="0" <?php echo e(request('equipment') == '0' ? 'selected' : ''); ?>>Not Available</option>
-                    </select>
-                </div>
-                <div class="col-md-1">
+                <div class="col-md-3">
                     <input type="number" class="form-control form-control-sm" id="capacity-min" placeholder="Min" value="<?php echo e(request('capacity_min')); ?>">
                 </div>
                 <div class="col-md-1">
@@ -167,14 +154,6 @@
                                 <option value="">All Types</option>
                                 <option value="lab" <?php echo e(request('type') == 'lab' ? 'selected' : ''); ?>>Laboratory</option>
                                 <option value="classroom" <?php echo e(request('type') == 'classroom' ? 'selected' : ''); ?>>Classroom</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Equipment</label>
-                            <select class="form-control form-control-sm" id="equipment-filter-mobile">
-                                <option value="">All Rooms</option>
-                                <option value="1" <?php echo e(request('equipment') == '1' ? 'selected' : ''); ?>>Equipment Available</option>
-                                <option value="0" <?php echo e(request('equipment') == '0' ? 'selected' : ''); ?>>No Equipment</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -243,13 +222,11 @@
                             Type
                         </th>
                         <th>
-                            Equipment
-                        </th>
-                        <th>
                             Timetable
                         </th>
+                        
                         <th>
-                            &nbsp;
+                            Actions
                         </th>
                     </tr>
                 </thead>
@@ -283,17 +260,6 @@
                                 <?php else: ?>
                                     <span class="badge badge-primary">
                                         <i class="fas fa-chalkboard"></i> Classroom
-                                    </span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <?php if($room->has_equipment): ?>
-                                    <span class="badge badge-success">
-                                        <i class="fas fa-tools"></i> Available
-                                    </span>
-                                <?php else: ?>
-                                    <span class="badge badge-secondary">
-                                        <i class="fas fa-times"></i> Not Available
                                     </span>
                                 <?php endif; ?>
                             </td>
@@ -334,18 +300,18 @@
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
-                            <td colspan="9" class="text-center py-5">
+                            <td colspan="8" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-search fa-3x text-muted mb-3"></i>
                                     <h5 class="text-muted">No rooms found</h5>
                                     <p class="text-muted">
-                                        <?php if(request()->hasAny(['type', 'equipment', 'capacity_min', 'capacity_max', 'search'])): ?>
+                                        <?php if(request()->hasAny(['type', 'capacity_min', 'capacity_max', 'search'])): ?>
                                             No rooms found matching your filters. Try adjusting your search criteria.
                                         <?php else: ?>
                                             No rooms have been created yet. Click "Add Room" to create your first room.
                                         <?php endif; ?>
                                     </p>
-                                    <?php if(request()->hasAny(['type', 'equipment', 'capacity_min', 'capacity_max', 'search'])): ?>
+                                    <?php if(request()->hasAny(['type', 'capacity_min', 'capacity_max', 'search'])): ?>
                                         <a href="<?php echo e(route('admin.room-management.rooms.index')); ?>" class="btn btn-primary mt-2">
                                              Clear All Filters
                                         </a>
@@ -553,7 +519,6 @@
 function applyFilters() {
     const isMobile = window.innerWidth < 768;
     const typeFilter = isMobile ? document.getElementById('type-filter-mobile').value : document.getElementById('type-filter').value;
-    const equipmentFilter = isMobile ? document.getElementById('equipment-filter-mobile').value : document.getElementById('equipment-filter').value;
     const capacityMin = isMobile ? document.getElementById('capacity-min-mobile').value : document.getElementById('capacity-min').value;
     const capacityMax = isMobile ? document.getElementById('capacity-max-mobile').value : document.getElementById('capacity-max').value;
     const searchInput = isMobile ? document.getElementById('search-input-mobile').value : document.getElementById('search-input').value;
@@ -567,12 +532,6 @@ function applyFilters() {
         url.searchParams.delete('type');
     }
     
-    // Equipment filter
-    if (equipmentFilter) {
-        url.searchParams.set('equipment', equipmentFilter);
-    } else {
-        url.searchParams.delete('equipment');
-    }
     
     // Capacity min
     if (capacityMin) {
@@ -619,13 +578,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const equipmentFilter = document.getElementById('equipment-filter');
-    const equipmentFilterMobile = document.getElementById('equipment-filter-mobile');
-    if (equipmentFilter && equipmentFilterMobile) {
-        equipmentFilter.addEventListener('change', function() {
-            equipmentFilterMobile.value = this.value;
-        });
-    }
 });
 
 function changePerPage() {

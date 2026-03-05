@@ -1,6 +1,446 @@
 @extends('layouts.admin')
 @section('styles')
     <link href="{{ asset('css/lesson-timepicker.css') }}" rel="stylesheet">
+    <style>
+/* CRITICAL: Room Timetable CSS - Must load in HEAD to prevent flash */
+/* Timetable Header Styling */
+.timetable-header {
+    background: white;
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.timetable-title {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 24px;
+    margin: 0 0 10px 0;
+}
+
+.timetable-info {
+    color: #495057;
+    font-size: 14px;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Timetable Grid Layout */
+.timetable-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.timetable-grid {
+    display: grid;
+    grid-template-columns: 120px repeat(7, 150px);
+    grid-auto-flow: row;
+    min-width: 1170px;
+    border: 1px solid #dee2e6;
+}
+
+/* Time Column Header */
+.timetable-time-header {
+    background-color: #f8f9fa;
+    border-right: 2px solid #dee2e6;
+    border-bottom: 2px solid #dee2e6;
+    position: sticky;
+    left: 0;
+    z-index: 20;
+}
+
+.time-header-cell {
+    font-weight: bold;
+    padding: 8px;
+    text-align: center;
+}
+
+.time-header-sub {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    font-size: 10px;
+    color: #6c757d;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.time-header-sub .sub-label {
+    padding-top: 5px;
+    display: block;
+}
+
+/* Day Headers */
+.timetable-day-header {
+    background-color: #e9ecef;
+    border-bottom: 2px solid #dee2e6;
+    border-right: 1px solid #dee2e6;
+    text-align: center;
+    padding: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.timetable-day-header.weekend {
+    background-color: #e9ecef;
+}
+
+/* Time Cells */
+.timetable-time-cell {
+    background-color: #f8f9fa;
+    border-right: 2px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    padding: 8px;
+    text-align: center;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.time-cell-content {
+    font-size: 11px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+}
+
+/* Timetable Cells */
+.timetable-cell {
+    border-right: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    min-height: 60px;
+    padding: 4px;
+    position: relative;
+}
+
+/* Only apply transition to available slots, not lesson cells */
+.timetable-cell.available-for-scheduling {
+    transition: background-color 0.3s ease;
+}
+
+.timetable-cell.weekend {
+    background-color: #fffef5;
+}
+
+/* Zebra striping */
+.zebra-row {
+    background-color: #fcfcfd;
+}
+
+.timetable-cell.weekend.zebra-row {
+    background-color: #fffdf0;
+}
+
+/* Lesson Cell Styling - Multi-hour merging */
+/* All lesson cells must have consistent styling applied immediately */
+#roomTimetableGrid .timetable-cell.lesson-start,
+#roomTimetableGrid .timetable-cell.lesson-middle,
+#roomTimetableGrid .timetable-cell.lesson-end {
+    background: #ffffff !important;
+    border: none !important;
+    border-left: 1px solid #dee2e6 !important;
+    border-right: 1px solid #dee2e6 !important;
+    padding: 0 !important;
+    min-height: 60px !important;
+}
+
+/* Specific borders for start cell */
+#roomTimetableGrid .timetable-cell.lesson-start {
+    border-top: 1px solid #dee2e6 !important;
+}
+
+/* Specific borders for end cell */
+#roomTimetableGrid .timetable-cell.lesson-end {
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Lesson Content Styling - Override ALL global styles */
+/* CRITICAL: Must override custom.css global styles to prevent card appearance and red borders */
+#roomTimetableGrid .lesson-slot,
+#roomTimetableGrid .class-box,
+#roomTimetableGrid .class-box.has-conflicts,
+.admin-room-timetable .class-box,
+.room-timetable .class-box {
+    background: none !important;
+    color: #28a745 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 8px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Disable hover effects from global styles */
+#roomTimetableGrid .class-box:hover,
+.admin-room-timetable .class-box:hover,
+.room-timetable .class-box:hover {
+    background: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    border: none !important;
+}
+
+/* All text inside lesson boxes should be green */
+#roomTimetableGrid .class-box .class-subject,
+#roomTimetableGrid .class-box .class-time,
+#roomTimetableGrid .class-box .class-teacher,
+#roomTimetableGrid .class-box .class-class {
+    color: #28a745 !important;
+}
+
+#roomTimetableGrid .class-box i {
+    color: #28a745 !important;
+}
+
+/* Continuation cells - white background to blend */
+#roomTimetableGrid .lesson-continued-slot {
+    background: #ffffff !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100%;
+}
+
+/* Empty Slot Styling */
+.empty-slot-content {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.empty-slot-text {
+    text-align: center;
+    color: #6c757d;
+}
+
+/* Available slots - light green by default, not hoverable */
+.timetable-cell.available-for-scheduling {
+    background: #e8f5e9 !important;
+    cursor: default;
+}
+
+/* Edit Mode Styling - Brighter green for available slots */
+.timetable-cell.available-for-scheduling.edit-mode-active {
+    background: #a5d6a7 !important;
+    cursor: pointer;
+}
+
+.timetable-cell.available-for-scheduling.edit-mode-active:hover {
+    background: #81c784 !important;
+}
+
+.timetable-cell.available-for-scheduling.edit-mode-active .empty-slot-content {
+    opacity: 1;
+}
+
+/* Editable lessons in edit mode */
+.editable-lesson.edit-mode-active {
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.editable-lesson.edit-mode-active:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+/* Lesson Actions Container - Enhanced with smooth transitions */
+.lesson-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    padding: 4px 6px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Show actions on lesson hover with smooth animation */
+.editable-lesson.edit-mode-active:hover .lesson-actions {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* Enhanced Button Styling */
+.lesson-actions .btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    border-width: 1.5px;
+    font-weight: 500;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Edit Button - Primary Blue */
+.lesson-actions .btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+    background: white;
+}
+
+.lesson-actions .btn-outline-primary:hover {
+    color: white;
+    background: #007bff;
+    border-color: #0056b3;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+    transform: translateY(-2px) scale(1.05);
+}
+
+.lesson-actions .btn-outline-primary:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+}
+
+/* Delete Button - Danger Red */
+.lesson-actions .btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+    background: white;
+}
+
+.lesson-actions .btn-outline-danger:hover {
+    color: white;
+    background: #dc3545;
+    border-color: #bd2130;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    transform: translateY(-2px) scale(1.05);
+}
+
+.lesson-actions .btn-outline-danger:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
+/* Button Icons */
+.lesson-actions .btn i {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lesson-actions .btn:hover i {
+    transform: scale(1.1);
+}
+
+/* Staggered animation for buttons */
+.lesson-actions .btn:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.lesson-actions .btn:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+/* Ripple effect on click */
+.lesson-actions .btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.lesson-actions .btn:active::before {
+    width: 120%;
+    height: 120%;
+}
+
+/* Responsive - Horizontal scroll at 768px */
+@media (max-width: 768px) {
+    .timetable-grid {
+        grid-template-columns: 100px repeat(7, 130px);
+        min-width: 1010px;
+    }
+    
+    .class-subject,
+    .class-teacher,
+    .class-class {
+        font-size: 10px !important;
+    }
+    
+    .class-time {
+        font-size: 9px !important;
+    }
+    
+    /* On small screens, show action buttons persistently in edit mode (no hover needed) */
+    .editable-lesson.edit-mode-active .lesson-actions {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0) scale(1) !important;
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        padding: 2px 4px;
+        gap: 4px;
+        z-index: 100 !important;
+    }
+    
+    .lesson-actions .btn {
+        padding: 2px 6px;
+        font-size: 10px;
+    }
+}
+
+/* Additional responsive handling for very narrow viewports (DevTools open) */
+@media (max-width: 1200px) {
+    /* Ensure lesson cells don't clip action buttons */
+    #roomTimetableGrid .lesson-slot,
+    #roomTimetableGrid .class-box {
+        position: relative;
+        overflow: visible !important; /* Prevent clipping */
+    }
+    
+    /* Show buttons persistently on narrow viewports (no hover) */
+    .editable-lesson.edit-mode-active .lesson-actions {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+        z-index: 50;
+        white-space: nowrap;
+    }
+}
+    </style>
 @endsection
 
 @section('content')
@@ -16,7 +456,7 @@
                     <div class="print-only" style="margin-top: 10px; font-size: 12px; opacity: 0.8;">
                         <p>Printed on: {{ date('F j, Y \a\t g:i A') }}</p>
                         @if($room->capacity)
-                            <p>Capacity: {{ $room->capacity }} students</p>
+                            <p>Capacity: {{ $room->capacity }}</p>
                         @endif
                     </div>
                 </div>
@@ -27,16 +467,13 @@
                     </div>
                 @endif
 
-                <div class="mb-3 p-3 bg-light no-print">
+                <div class="mb-3 p-3 bg-light">
                     <a href="{{ route('admin.room-management.room-timetables.index') }}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Room List
                     </a>
                     <a href="{{ route('admin.room-management.rooms.show', $room->id) }}" class="btn btn-info">
                         <i class="fas fa-info-circle"></i> Room Details
                     </a>
-                    <button onclick="printTimetable()" class="btn btn-success btn-print">
-                        <i class="fas fa-print"></i> Print Timetable
-                    </button>
                     <div class="btn-group ml-2" role="group">
                         <button type="button" class="btn btn-primary" id="editModeToggle">
                             <i class="fas fa-edit"></i> <span id="editModeText">Enable Edit Mode</span>
@@ -47,70 +484,103 @@
                     </div>
                 </div>
 
-                <div class="timetable-grid">
-                    <!-- Day headers -->
-                    <div class="timetable-day-header"></div>
-                    @foreach($weekDays as $day)
-                        <div class="timetable-day-header">{{ $day }}</div>
-                    @endforeach
+                <!-- Timetable Grid -->
+                <div class="timetable-wrapper">
+                    <div class="timetable-grid" id="roomTimetableGrid">
+                        <!-- Time Column Header -->
+                        <div class="timetable-time-header">
+                            <div class="time-header-cell">
+                                <div>Time</div>
+                                <div class="time-header-sub">
+                                    <span class="sub-label">From</span>
+                                    <span class="sub-label">To</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Day Headers -->
+                        @foreach($weekDays as $dayNumber => $dayName)
+                            <div class="timetable-day-header {{ ($dayNumber == 6 || $dayNumber == 7) ? 'weekend' : '' }}">
+                                <strong>{{ $dayName }}</strong>
+                            </div>
+                        @endforeach
 
-                    <!-- Day columns with lessons -->
-                    <div class="timetable-time-column">
-                        <!-- This column will be empty in the new design -->
-                    </div>
-                    
-                    @foreach($weekDays as $dayNumber => $dayName)
-                        <div class="timetable-day-column {{ ($dayNumber == 6 || $dayNumber == 7) ? 'weekend' : '' }}" data-day="{{ $dayNumber }}">
-                            @if(isset($calendarData[$dayNumber]) && count($calendarData[$dayNumber]) > 0)
-                                @foreach($calendarData[$dayNumber] as $lessonIndex => $lesson)
-                                    <div class="lesson-container">
-                                        <div class="class-box editable-lesson" 
-                                             data-lesson-id="{{ $lesson['id'] ?? '' }}"
-                                             data-action="edit"
-                                             title="Click to view details, double-click to edit">
-                                            <div class="class-subject">{{ $lesson['subject_name'] }}</div>
-                                            <div class="class-time">{{ $lesson['start_time'] }} - {{ $lesson['end_time'] }}</div>
-                                            <div class="class-instructor">{{ $lesson['teacher_name'] }}</div>
-                                            <div class="class-room">{{ $lesson['class_name'] }}</div>
-                                            <div class="lesson-actions" style="display: none;">
-                                                <button class="btn btn-sm btn-outline-primary edit-lesson" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger delete-lesson" title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
+                        <!-- Timetable Rows -->
+                        @foreach($timetableData['timetable_matrix'] as $rowIndex => $row)
+                            <!-- Time Slot Cell -->
+                            <div class="timetable-time-cell {{ $rowIndex % 2 === 0 ? 'zebra-row' : '' }}" data-time-slot="{{ $row['time_slot']['start'] }}">
+                                <div class="time-cell-content">
+                                    <span class="time-from">{{ $row['time_slot']['start_formatted'] }}</span>
+                                    <span class="time-to">{{ $row['time_slot']['end_formatted'] }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Day Cells -->
+                            @foreach($row['days'] as $dayIndex => $dayData)
+                                @php
+                                    $dayNumber = array_keys($weekDays)[$dayIndex];
+                                    $isLesson = $dayData['type'] === 'lesson';
+                                    $lesson = $isLesson ? $dayData['lesson'] : null;
+                                    $isStartSlot = $isLesson && (\Carbon\Carbon::createFromFormat('H:i:s', $lesson->getRawOriginal('start_time'))->format('H:i') === $row['time_slot']['start']);
+                                    $isEndSlot = $isLesson && (\Carbon\Carbon::createFromFormat('H:i:s', $lesson->getRawOriginal('end_time'))->format('H:i') === $row['time_slot']['end']);
+                                    $isMiddleSlot = $isLesson && !$isStartSlot && !$isEndSlot;
+
+                                    $lessonClass = '';
+                                    if ($isStartSlot) {
+                                        $lessonClass = 'lesson-start';
+                                    } elseif ($isMiddleSlot) {
+                                        $lessonClass = 'lesson-middle';
+                                    } elseif ($isEndSlot) {
+                                        $lessonClass = 'lesson-end';
+                                    }
+                                @endphp
+                                <div class="timetable-cell {{ $rowIndex % 2 === 0 ? 'zebra-row' : '' }} {{ $isLesson ? 'lesson-cell ' . $lessonClass . ' ' . $dayData['css_class'] : $dayData['css_class'] }} {{ ($dayNumber == 6 || $dayNumber == 7) ? 'weekend' : '' }}" 
+                                     data-room-id="{{ $room->id }}"
+                                     data-weekday="{{ $dayNumber }}"
+                                     data-time-start="{{ $row['time_slot']['start'] }}"
+                                     data-time-end="{{ $row['time_slot']['end'] }}"
+                                     data-time-start-formatted="{{ $row['time_slot']['start_formatted'] }}"
+                                     data-time-end-formatted="{{ $row['time_slot']['end_formatted'] }}"
+                                     @if(!$isLesson) title="Enable edit mode to schedule lesson" @endif>
+                                    @if($isLesson)
+                                        @if($isStartSlot)
+                                            <div class="class-box lesson-slot editable-lesson {{ str_replace(['has-conflicts','long-lesson','short-lesson'], '', $dayData['css_class']) }}" 
+                                                 data-lesson-id="{{ $lesson->id }}"
+                                                 title="Subject: {{ $lesson->subject->name ?? 'No Subject' }} ({{ $lesson->subject->code ?? 'N/A' }}) | Type: {{ ucfirst($lesson->lesson_type) }} | Class: {{ $lesson->class->display_name ?? 'No Class' }} | Teacher: {{ $lesson->teacher->name ?? 'No Teacher' }} | Time: {{ $lesson->start_time }} - {{ $lesson->end_time }}">
+                                                <div class="class-subject">
+                                                    {{ $lesson->subject->code ?? 'No Code' }}
+                                                    @if($lesson->lesson_type === 'laboratory')
+                                                        <i class="fas fa-flask ml-1" title="Laboratory"></i>
+                                                    @else
+                                                        <i class="fas fa-chalkboard-teacher ml-1" title="Lecture"></i>
+                                                    @endif
+                                                </div>
+                                                <div class="class-time">{{ $lesson->start_time }} - {{ $lesson->end_time }}</div>
+                                                <div class="class-teacher">{{ $lesson->teacher->name ?? 'No Teacher' }}</div>
+                                                <div class="class-class">{{ $lesson->class->display_name ?? 'No Class' }}</div>
+                                                <div class="lesson-actions">
+                                                    <button class="btn btn-sm btn-outline-primary edit-lesson" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger delete-lesson" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="lesson-continued-slot" aria-hidden="true"></div>
+                                        @endif
+                                    @else
+                                        <div class="empty-slot-content">
+                                            <div class="empty-slot-text">
+                                                <small>Available</small>
                                             </div>
                                         </div>
-                                    </div>
-                                @endforeach
-                                
-                                <!-- Add + button at the end of the day's lessons (only in edit mode) -->
-                                <div class="add-lesson-btn add-at-end" 
-                                     data-room-id="{{ $room->id }}"
-                                     data-day="{{ $dayNumber }}"
-                                     title="Add lesson for this day"
-                                     style="display: none;">
-                                    <button class="btn btn-sm btn-success add-lesson-button">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                                    @endif
                                 </div>
-                            @else
-                                <div class="not-scheduled-box editable-cell" 
-                                     data-action="create"
-                                     data-room-id="{{ $room->id }}"
-                                     data-day="{{ $dayNumber }}"
-                                     title="Enable edit mode to add lessons">
-                                    {{ ($dayNumber == 6 || $dayNumber == 7) ? 'Not Scheduled' : 'Available' }}
-                                </div>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-                
-                <!-- Print-only footer -->
-                <div class="print-only" style="margin-top: 20px; padding: 10px; text-align: center; font-size: 10px; color: #666; border-top: 1px solid #ccc;">
-                    <p>{{ $room->name }} Timetable - Generated by Laravel School Timetable Calendar</p>
-                    <p>For more information, contact the school administration</p>
+                            @endforeach
+                        @endforeach
+                    </div>
                 </div>
 
             </div>
@@ -124,76 +594,18 @@
 @endsection
 @section('scripts')
 @parent
+<!-- Include Timepicker JavaScript -->
+<script src="{{ asset('js/room-timetable-timepicker.js') }}"></script>
 <!-- Include Inline Editing JavaScript -->
 <script src="{{ asset('js/inline-editing.js') }}"></script>
 
 <script>
-// Global function for handling + button clicks (defined outside DOMContentLoaded)
-window.handleAddLessonClick = function(e, $btn) {
-    e.stopPropagation();
-    e.preventDefault();
-    console.log('+ button clicked!');
-    console.log('Event target:', e.target);
-    console.log('Event currentTarget:', e.currentTarget);
-    
-    const $container = $btn.closest('.add-lesson-btn');
-    const dayNumber = parseInt($container.data('day'));
-    const roomId = parseInt($container.data('room-id'));
-    
-    console.log('Day:', dayNumber, 'Room:', roomId, 'Day type:', typeof dayNumber);
-    console.log('Container data:', $container.data());
-    
-    if (typeof inlineEditing !== 'undefined' && inlineEditing !== null) {
-        // Prevent duplicate calls
-        if (inlineEditing.isEditing) {
-            console.log('Already editing, ignoring duplicate call');
-            return;
-        }
-        
-        console.log('Calling showCreateModal...');
-        try {
-            inlineEditing.showCreateModal(dayNumber, roomId);
-            console.log('showCreateModal called successfully');
-        } catch (error) {
-            console.error('Error calling showCreateModal:', error);
-        }
-    } else {
-        console.error('Inline editing system not available');
-    }
-};
-
-// Enhanced print functionality
-function printTimetable() {
-    // Add a temporary class to indicate printing
-    document.body.classList.add('printing');
-    
-    // Trigger print dialog
-    window.print();
-    
-    // Remove the class after printing
-    setTimeout(() => {
-        document.body.classList.remove('printing');
-    }, 1000);
-}
-
 // Edit mode toggle functionality
 let editMode = false;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Add a print-friendly title to the page
-    const timetableTitle = '{{ $room->name }} Timetable - {{ date("Y-m-d") }}';
-    document.title = timetableTitle;
-    
-    // Add a print event listener
-    window.addEventListener('beforeprint', function() {
-        // Update page title for print
-        document.title = timetableTitle;
-    });
-    
-    window.addEventListener('afterprint', function() {
-        // Restore original title
-        document.title = '{{ $room->name }} Timetable';
-    });
+    // Set page title
+    document.title = '{{ $room->name }} Timetable';
     
     // Edit mode toggle
     $('#editModeToggle').click(function() {
@@ -211,83 +623,104 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.reload();
     });
     
-    
-    
-    // Initialize Select2 for modals
-    $('.select2').select2({
-        dropdownParent: $('#lessonModal')
+    // Handle empty cell clicks (only in edit mode)
+    $(document).on('click', '.timetable-cell.available-for-scheduling', function(e) {
+        if (!editMode) {
+            return; // Do nothing if edit mode is not enabled
+        }
+        
+        e.stopPropagation();
+        
+        const roomId = $(this).data('room-id');
+        const weekday = $(this).data('weekday');
+        const startTime = $(this).data('time-start');
+        
+        console.log('Empty cell clicked - Room:', roomId, 'Day:', weekday, 'Start Time:', startTime);
+        
+        if (typeof inlineEditing !== 'undefined') {
+            // Call with prefilled start_time
+            inlineEditing.showCreateModal(weekday, roomId, startTime);
+        }
     });
     
-    // Initialize time pickers
-    $('.lesson-timepicker').timepicker({
-        timeFormat: 'h:mm p',
-        interval: 30,
-        minTime: '7:00am',
-        maxTime: '9:00pm',
-        defaultTime: '8:00am',
-        startTime: '7:00am',
-        dynamic: false,
-        dropdown: true,
-        scrollbar: true
+    // Handle lesson clicks (view details on single click)
+    $(document).on('click', '.editable-lesson', function(e) {
+        // Check if clicking edit/delete buttons or their children
+        if ($(e.target).closest('.lesson-actions').length > 0 || 
+            $(e.target).closest('.btn').length > 0) {
+            return;
+        }
+        
+        e.stopPropagation();
+        const lessonId = $(this).data('lesson-id');
+        
+        if (lessonId && typeof inlineEditing !== 'undefined') {
+            // On smaller screens in edit mode, don't show details modal
+            // (buttons are always visible, user should click edit button)
+            if (editMode && window.innerWidth <= 1200) {
+                console.log('Lesson click ignored in edit mode on small screen - use action buttons');
+                return;
+            }
+            
+            // Single click shows details
+            clearTimeout(window.lessonClickTimeout);
+            window.lessonClickTimeout = setTimeout(() => {
+                inlineEditing.showLessonDetails(lessonId);
+            }, 250);
+        }
     });
     
+    // Handle lesson double-click (edit in edit mode)
+    $(document).on('dblclick', '.editable-lesson', function(e) {
+        if (!editMode) {
+            return;
+        }
+        
+        clearTimeout(window.lessonClickTimeout);
+        e.stopPropagation();
+        
+        const lessonId = $(this).data('lesson-id');
+        
+        if (lessonId && typeof inlineEditing !== 'undefined') {
+            inlineEditing.showEditModal(lessonId);
+        }
+    });
 });
 
 function enableEditMode() {
     editMode = true;
     $('#editModeText').text('Disable Edit Mode');
-    $('#editModeToggle').removeClass('btn-primary').addClass('btn-warning');
+    $('#editModeToggle').removeClass('btn-primary').addClass('btn-info');
     $('#refreshTimetable').show();
     
-    // Add edit mode styling - lesson actions will show on hover via CSS
-    $('.timetable-day-column').addClass('edit-mode editable-cell');
-    $('.editable-cell').addClass('edit-mode-active');
+    // Add visual feedback to available slots
+    $('.timetable-cell.available-for-scheduling').addClass('edit-mode-active');
     $('.editable-lesson').addClass('edit-mode-active');
     
-    // Show + buttons for adding lessons
-    console.log('Found add-lesson-btn elements:', $('.add-lesson-btn').length);
-    $('.add-lesson-btn').each(function(index) {
-        console.log('Button', index, ':', this, 'Current display:', $(this).css('display'));
-    });
-    $('.add-lesson-btn').show();
-    console.log('Add lesson buttons should now be visible');
-    
-    // Attach event handlers to + buttons now that they're visible
-    console.log('Attaching + button click handlers in edit mode');
-    console.log('Number of .add-lesson-button elements:', $('.add-lesson-button').length);
-    console.log('Number of .add-lesson-btn elements:', $('.add-lesson-btn').length);
-    
-    // Remove any existing handlers to prevent duplicates
-    $('.add-lesson-button').off('click');
-    
-    // Attach new handlers
-    $('.add-lesson-button').on('click', function(e) {
-        console.log('+ button clicked via direct binding in edit mode!');
-        window.handleAddLessonClick(e, $(this));
-    });
-    
-    // Also attach document delegation as backup
-    $(document).off('click', '.add-lesson-button').on('click', '.add-lesson-button', function(e) {
-        console.log('+ button clicked via document delegation in edit mode!');
-        window.handleAddLessonClick(e, $(this));
-    });
-    
-    // Double-check visibility after show()
-    setTimeout(() => {
-        $('.add-lesson-btn').each(function(index) {
-            console.log('Button', index, 'after show():', $(this).css('display'));
-        });
-    }, 100);
-    
-    // Show tooltips
-    $('.editable-cell').attr('title', 'Click to add new lesson');
+    // Update tooltips
+    $('.timetable-cell.available-for-scheduling').attr('title', 'Click to schedule lesson at this time');
     $('.editable-lesson').attr('title', 'Click to view details, double-click to edit');
     
-    // Reinitialize the inline editing system
-    if (typeof inlineEditing !== 'undefined') {
-        inlineEditing.initializeTimetable();
-        console.log('Reinitialized inline editing for edit mode');
-    }
+    console.log('Edit mode enabled');
+}
+
+function disableEditMode() {
+    editMode = false;
+    $('#editModeText').text('Enable Edit Mode');
+    $('#editModeToggle').removeClass('btn-info').addClass('btn-primary');
+    $('#refreshTimetable').hide();
+    
+    // Remove visual feedback
+    $('.timetable-cell.available-for-scheduling').removeClass('edit-mode-active');
+    $('.editable-lesson').removeClass('edit-mode-active');
+    
+    // Lesson actions will be hidden automatically by CSS when edit-mode-active is removed
+    
+    // Update tooltips
+    $('.timetable-cell.available-for-scheduling').attr('title', 'Enable edit mode to schedule lesson');
+    $('.editable-lesson').attr('title', 'Enable edit mode to edit lessons');
+    
+    console.log('Edit mode disabled');
 }
 
 // Global function for edit button clicks
@@ -298,166 +731,5 @@ function editLesson(lessonId) {
         console.error('Inline editing system not initialized');
     }
 }
-
-function disableEditMode() {
-    editMode = false;
-    $('#editModeText').text('Enable Edit Mode');
-    $('#editModeToggle').removeClass('btn-warning').addClass('btn-primary');
-    $('#refreshTimetable').hide();
-    
-    // Hide lesson actions
-    $('.lesson-actions').hide();
-    
-    // Hide + buttons for adding lessons
-    $('.add-lesson-btn').hide();
-    
-    // Remove event handlers when disabling edit mode
-    console.log('Removing + button click handlers in disable edit mode');
-    $('.add-lesson-button').off('click');
-    $(document).off('click', '.add-lesson-button');
-    
-    // Remove edit mode styling
-    $('.timetable-day-column').removeClass('edit-mode editable-cell');
-    $('.editable-cell').removeClass('edit-mode-active');
-    $('.editable-lesson').removeClass('edit-mode-active');
-    
-    // Update tooltips
-    $('.editable-cell').attr('title', 'Enable edit mode to add lessons');
-    $('.editable-lesson').attr('title', 'Enable edit mode to edit lessons');
-}
 </script>
-
-<style>
-/* Timetable Header Styling */
-.timetable-header {
-    background: white;
-    text-align: center;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.timetable-title {
-    color: #28a745;
-    font-weight: bold;
-    font-size: 24px;
-    margin: 0 0 10px 0;
-    align-items:center;
-}
-
-.timetable-info {
-    color: #495057;
-    font-size: 14px;
-    margin: 0;
-    font-weight: 500;
-}
-
-/* Edit Mode Styling */
-.edit-mode .editable-cell {
-    background: #e3f2fd;
-    border: 2px dashed #2196f3;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.edit-mode .editable-cell:hover {
-    background: #bbdefb;
-    border-color: #1976d2;
-}
-
-.edit-mode .editable-lesson {
-    position: relative;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.edit-mode .editable-lesson:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.edit-mode .editable-lesson:hover .lesson-actions {
-    display: block !important;
-}
-
-.lesson-actions {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    z-index: 10;
-    display: none; /* Hidden by default */
-}
-
-.lesson-actions .btn {
-    padding: 2px 6px;
-    margin-left: 2px;
-    font-size: 10px;
-}
-
-.class-subject-name {
-    color: #6c757d;
-    font-size: 10px;
-    font-style: italic;
-    margin-top: 2px;
-    
-}
-
-/* Lesson Container and + Button Styling */
-.lesson-container {
-    position: relative;
-    margin-bottom: 5px;
-    
-}
-
-.add-lesson-btn.add-at-end {
-    margin-top: 8px;
-    padding: 4px;
-    border-top: 1px dashed #dee2e6;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.add-lesson-btn.add-at-end .add-lesson-button {
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border-radius: 50%;
-    font-size: 12px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    margin: 0 auto;
-}
-
-.add-lesson-btn.add-at-end .add-lesson-button i {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-    vertical-align: middle;
-}
-
-.add-lesson-btn.add-at-end .add-lesson-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-/* Print styles */
-@media print {
-    .no-print, .lesson-actions, .btn-group, .add-lesson-btn {
-        display: none !important;
-    }
-    
-    .edit-mode .editable-cell,
-    .edit-mode .editable-lesson {
-        background: transparent !important;
-        border: 1px solid #dee2e6 !important;
-    }
-}
-</style>
 @endsection

@@ -1,5 +1,35 @@
+<style>
+/* Hours Exceeded Toggle Button Styling */
+#modal-hours-tracking-toggle.hours-exceeded {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: #fff !important;
+    animation: pulse-red 2.5s infinite;
+}
+
+#modal-hours-tracking-toggle.hours-exceeded:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+    color: #fff !important;
+}
+
+@keyframes pulse-red {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+    50% { 
+        box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+}
+
+/* Transition for smooth color change */
+#modal-hours-tracking-toggle {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+</style>
+
 <!-- Lesson Edit Modal -->
-<div class="modal fade" id="lessonModal" tabindex="-1" role="dialog" aria-labelledby="lessonModalLabel" aria-hidden="true">
+<div class="modal fade" id="lessonModal" tabindex="-1" role="dialog" aria-labelledby="lessonModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -15,12 +45,12 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="class_id" class="required">Class</label>
+                                <label for="class_id" class="required">Section</label>
                                 <select class="form-control select2" id="class_id" name="class_id" required>
-                                    <option value="">-- Select Class --</option>
+                                    <option value="">-- Select Section --</option>
                                 </select>
                                 <div class="invalid-feedback"></div>
-                                <span class="help-block">Select the class for this lesson schedule</span>
+                                <span class="help-block">Select a section for this class schedule</span>
                             </div>
                         </div>
                         
@@ -31,7 +61,74 @@
                                     <option value="">-- Select Subject --</option>
                                 </select>
                                 <div class="invalid-feedback"></div>
-                                <span class="help-block">Select the subject for this lesson schedule</span>
+                                <span class="help-block">Select the subject for this class schedule</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lesson Type Field -->
+                    <div class="form-group">
+                        <label for="lesson_type" class="required">Lesson Type</label>
+                        <select class="form-control" id="lesson_type" name="lesson_type" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="lecture">Lecture</option>
+                            <option value="laboratory">Laboratory</option>
+                        </select>
+                        <div class="invalid-feedback"></div>
+                        <span class="help-block" id="lesson-type-help">Select whether this is a lecture or laboratory session</span>
+                    </div>
+                    
+                    {{-- Hours Tracking Display (Collapsible) --}}
+                    <div id="modal-hours-tracking-container" style="display: none;" class="mb-3">
+                        {{-- Toggle Button --}}
+                        <button type="button" class="btn btn-outline-info btn-sm btn-block" data-toggle="collapse" data-target="#modal-hours-tracking-collapse" aria-expanded="false" aria-controls="modal-hours-tracking-collapse" id="modal-hours-tracking-toggle">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span id="modal-hours-tracking-toggle-text">Show Hours Tracking</span>
+                            <i class="fas fa-chevron-down ml-2" id="modal-hours-tracking-icon"></i>
+                        </button>
+                        
+                        {{-- Collapsible Content --}}
+                        <div class="collapse mt-2" id="modal-hours-tracking-collapse">
+                            <div class="card border-info">
+                                <div class="card-body p-3">
+                                    <div id="modal-hours-tracking-content">
+                                        <div id="modal-lecture-hours-section" class="mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="font-weight-bold">Lecture Hours:</span>
+                                                <span id="modal-lecture-hours-text" class="badge badge-secondary">0h / 0h</span>
+                                            </div>
+                                            <div class="progress" style="height: 20px;">
+                                                <div id="modal-lecture-progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                    <span id="modal-lecture-progress-text">0%</span>
+                                                </div>
+                                            </div>
+                                            <small id="modal-lecture-remaining-text" class="text-muted">0h remaining</small>
+                                        </div>
+                                        
+                                        <div id="modal-lab-hours-section" class="mb-2">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="font-weight-bold">Lab Hours:</span>
+                                                <span id="modal-lab-hours-text" class="badge badge-secondary">0h / 0h</span>
+                                            </div>
+                                            <div class="progress" style="height: 20px;">
+                                                <div id="modal-lab-progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                    <span id="modal-lab-progress-text">0%</span>
+                                                </div>
+                                            </div>
+                                            <small id="modal-lab-remaining-text" class="text-muted">0h remaining</small>
+                                        </div>
+                                        
+                                        <div id="modal-hours-error-message" class="alert alert-danger mt-2" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            <span id="modal-hours-error-text"></span>
+                                        </div>
+                                        
+                                        <div id="modal-hours-info-message" class="alert alert-info mt-2" style="display: none;">
+                                            <i class="fas fa-info-circle mr-2"></i>
+                                            <span id="modal-hours-info-text"></span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -44,7 +141,7 @@
                                     <option value="">-- Select Teacher --</option>
                                 </select>
                                 <div class="invalid-feedback"></div>
-                                <span class="help-block">Select a teacher for this lesson schedule</span>
+                                <span class="help-block">Select a teacher for this class schedule</span>
                             </div>
                         </div>
                         
@@ -72,7 +169,7 @@
                                        id="start_time" 
                                        required>
                                 <div class="invalid-feedback"></div>
-                                <span class="help-block">Select the start time for this lesson (7:00 AM - 9:00 PM)</span>
+                                <span class="help-block">Select the start time for this class (7:00 AM - 9:00 PM)</span>
                             </div>
                         </div>
                         
@@ -85,72 +182,8 @@
                                        id="end_time" 
                                        required>
                                 <div class="invalid-feedback"></div>
-                                <span class="help-block">Select the end time for this lesson (7:00 AM - 9:00 PM)</span>
+                                <span class="help-block">Select the end time for this class (7:00 AM - 9:00 PM)</span>
                             </div>
-                            @push('styles')
-    <link href="{{ asset('css/lesson-timepicker.css') }}" rel="stylesheet">
-@endpush
-
-@push('scripts')
-<script>
-$(document).ready(function() {
-    // Initialize time pickers when modal opens
-    $('#lessonModal').on('show.bs.modal', function() {
-        initializeTimePickers();
-    });
-
-    function initializeTimePickers() {
-        $('.lesson-timepicker').datetimepicker({
-            format: 'HH:mm',
-            stepping: 30,
-            enabledHours: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
-            icons: {
-                up: 'fas fa-chevron-up',
-                down: 'fas fa-chevron-down',
-                time: 'fas fa-clock'
-            }
-        }).on('change.datetimepicker', function(e) {
-            validateTimes();
-        });
-    }
-
-    function validateTimes() {
-        const startTime = $('#start_time').val();
-        const endTime = $('#end_time').val();
-
-        if (startTime && endTime) {
-            const start = moment(startTime, 'HH:mm');
-            const end = moment(endTime, 'HH:mm');
-            const duration = moment.duration(end.diff(start));
-            const minutes = duration.asMinutes();
-
-            let errorMessage = '';
-            if (end <= start) {
-                errorMessage = 'End time must be after start time';
-            } else if (minutes < 30) {
-                errorMessage = 'Classes must be at least 30 minutes long';
-            } else if (minutes > 180) {
-                errorMessage = 'Classes cannot be longer than 3 hours';
-            }
-
-            // Show/hide error message
-            $('#timeValidationError').remove();
-            if (errorMessage) {
-                const alert = $('<div id="timeValidationError" class="alert alert-danger mt-2"><i class="fas fa-exclamation-circle"></i> ' + errorMessage + '</div>');
-                $('#end_time').closest('.form-group').append(alert);
-                $('#saveLessonButton').prop('disabled', true);
-            } else {
-                $('#saveLessonButton').prop('disabled', false);
-            }
-        }
-    }
-});
-</script>
-@endpush
-                            @push('scripts')
-                            <link href="{{ asset('css/lesson-timepicker.css') }}" rel="stylesheet">
-                            <script src="{{ asset('js/room-timetable-timepicker.js') }}"></script>
-                            @endpush
                         </div>
                     </div>
                     
@@ -163,13 +196,6 @@ $(document).ready(function() {
                             <i class="fas fa-calendar-day"></i>
                             <strong>Selected Day:</strong> <span id="selectedDayName">Not selected</span>
                         </div>
-                    </div>
-                    
-                    <!-- Validation Errors -->
-                    <div id="validationErrors" class="alert alert-danger" style="display: none;">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <strong>Validation Error:</strong>
-                        <ul id="validationErrorList"></ul>
                     </div>
                     
                     <!-- Conflict Warning -->
@@ -263,6 +289,12 @@ $(document).ready(function() {
     border-color: #ced4da; /* Keep normal border color */
 }
 
+/* Modal Body Overflow Fix */
+.modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
 /* Select2 Enhancements */
 .select2-container {
     width: 100% !important;
@@ -283,6 +315,16 @@ $(document).ready(function() {
     height: 36px;
 }
 
+/* Select2 Dropdown Positioning Fix - Simple approach */
+.select2-container--open .select2-dropdown {
+    z-index: 1056 !important; /* Higher than modal (1055) */
+}
+
+.select2-dropdown {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+}
+
 /* Time Picker Enhancements */
 .lesson-timepicker {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236b7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m4 4V3m-6 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'/%3e%3c/svg%3e");
@@ -290,22 +332,6 @@ $(document).ready(function() {
     background-position: right 12px center;
     background-size: 16px;
     padding-right: 40px;
-}
-
-/* Validation Errors */
-#validationErrors {
-    margin-top: 1rem;
-    animation: slideDown 0.3s ease-out;
-}
-
-#validationErrorList {
-    margin-bottom: 0;
-    padding-left: 1.5rem;
-    margin-top: 0.5rem;
-}
-
-#validationErrorList li {
-    margin-bottom: 0.25rem;
 }
 
 /* Conflict Warning */
@@ -327,6 +353,16 @@ $(document).ready(function() {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* Animation for hours tracking */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
     }
 }
 

@@ -57,8 +57,8 @@ class User extends Authenticatable
 
     public function getIsStudentAttribute()
     {
-        // Check if user has student role (role ID 4)
-        return $this->roles()->where('id', 4)->exists() || ($this->attributes['is_student'] ?? false);
+        // Student role removed from system
+        return false;
     }
 
     public function teacherLessons()
@@ -101,18 +101,13 @@ class User extends Authenticatable
     public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'teacher_subjects', 'teacher_id', 'subject_id')
-                    ->withPivot('is_primary', 'experience_years', 'notes', 'is_active')
+                    ->withPivot('is_active')
                     ->withTimestamps();
     }
 
     public function teacherSubjects()
     {
         return $this->hasMany(TeacherSubject::class, 'teacher_id', 'id');
-    }
-
-    public function getPrimarySubjectsAttribute()
-    {
-        return $this->subjects()->wherePivot('is_primary', true)->get();
     }
 
     public function getActiveSubjectsAttribute()

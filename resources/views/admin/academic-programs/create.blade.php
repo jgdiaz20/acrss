@@ -85,22 +85,8 @@
                 </div>
             </div>
             
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="is_active">Status</label>
-                        <select class="form-control {{ $errors->has('is_active') ? 'is-invalid' : '' }}" name="is_active" id="is_active">
-                            <option value="1" {{ old('is_active', '1') == '1' ? 'selected' : '' }}>Active</option>
-                            <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>Inactive</option>
-                        </select>
-                        @if($errors->has('is_active'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('is_active') }}
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
+            <!-- Hidden field - all programs are created as active -->
+            <input type="hidden" name="is_active" value="1">
             
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">

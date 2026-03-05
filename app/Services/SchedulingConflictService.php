@@ -136,51 +136,6 @@ class SchedulingConflictService
     }
 
     /**
-     * Validate room requirements for subject
-     */
-    public function validateRoomRequirements($roomId, $subjectId)
-    {
-        $room = Room::find($roomId);
-        $subject = \App\Subject::find($subjectId);
-        
-        if (!$room) {
-            return [
-                'valid' => false,
-                'message' => 'Selected room does not exist.'
-            ];
-        }
-        
-        if (!$subject) {
-            return [
-                'valid' => false,
-                'message' => 'Selected subject does not exist.'
-            ];
-        }
-        
-        $issues = [];
-        
-        if ($subject->requires_lab && !$room->is_lab) {
-            $issues[] = "Subject {$subject->name} requires a lab room, but {$room->display_name} is not a lab room.";
-        }
-        
-        if ($subject->requires_equipment && !$room->has_equipment) {
-            $issues[] = "Subject {$subject->name} requires a room with equipment, but {$room->display_name} does not have equipment.";
-        }
-        
-        if (!empty($issues)) {
-            return [
-                'valid' => false,
-                'message' => implode(' ', $issues)
-            ];
-        }
-        
-        return [
-            'valid' => true,
-            'message' => 'Room requirements are satisfied.'
-        ];
-    }
-
-    /**
      * Get comprehensive validation results for a lesson
      */
     public function validateLesson($weekday, $startTime, $endTime, $classId, $teacherId, $roomId, $subjectId, $excludeLessonId = null)
@@ -204,13 +159,6 @@ class SchedulingConflictService
         if (!$teacherSubjectValidation['valid']) {
             $results['valid'] = false;
             $results['issues'][] = $teacherSubjectValidation['message'];
-        }
-        
-        // Check room requirements
-        $roomValidation = $this->validateRoomRequirements($roomId, $subjectId);
-        if (!$roomValidation['valid']) {
-            $results['valid'] = false;
-            $results['issues'][] = $roomValidation['message'];
         }
         
         // Check if class is active

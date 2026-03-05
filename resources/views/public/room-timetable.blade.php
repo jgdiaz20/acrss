@@ -65,13 +65,25 @@
             display: inline;
         }
         
-        /* Timetable Container - Matching Admin Design */
+        /* Timetable Container - Matching Teacher Calendar Design */
         .timetable-container {
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow: hidden;
-            margin: 0;
+            margin: 20px;
+        }
+        
+        /* Timetable Scroll Wrapper - Fixed width, horizontal scroll */
+        .timetable-scroll-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .timetable-container-fixed {
+            min-width: 1000px;
+            width: 100%;
         }
         
         .timetable-header {
@@ -96,12 +108,12 @@
             font-weight: 500 !important;
         }
         
-        /* Timetable Grid - Matching Admin Design */
         .timetable-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 0;
             border: 1px solid #e1e5e9;
+            background: white;
         }
         
         .timetable-day-header {
@@ -114,77 +126,84 @@
             border-bottom: 1px solid #e1e5e9;
         }
         
-        .timetable-day-header:first-child {
-            background: #e9ecef;
-            border-right: 2px solid #dee2e6;
-        }
         
         .timetable-day-column {
             min-height: 600px;
             background: white;
             border-right: 1px solid #e1e5e9;
             padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
         }
+        
         
         .timetable-day-column:last-child {
             border-right: none;
         }
         
-        .timetable-day-column.weekend {
-            background: #f8f9fa;
-        }
+       
         
-        /* Class Box Styling - Matching Admin Design */
-        /* Enhanced base styles for better mobile readability */
-        .class-box {
-            background: white;
-            border: 2px solid #28a745;
+        /* Teacher Timetable Class Box Styling - Fixed Dimensions for Consistency */
+        .room-timetable-class-box {
+            background: white !important;
+            border: 1px solid #d1d3d4 !important;
             border-radius: 6px;
-            padding: 12px;
+            padding: 10px;
             margin-bottom: 8px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            width: 140px;
+            height: 85px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            box-sizing: border-box;
         }
         
-        .class-box:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            transform: translateY(-1px);
-        }
-        
-        .class-subject {
-            font-weight: 700;
-            color: #28a745;
-            font-size: 14px;
-            margin-bottom: 4px;
-            line-height: 1.3;
-            text-align: center;
-        }
-        
-        .class-time {
-            color: #495057;
+        .room-timetable-class-box .class-subject {
+            color: #28a745 !important;
+            font-weight: 600;
             font-size: 12px;
             margin-bottom: 3px;
-            font-weight: 600;
-            text-align: center;
-            background: #f8f9fa;
-            padding: 3px 6px;
-            border-radius: 4px;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
-        .class-instructor {
-            color: #6c757d;
+        .room-timetable-class-box .class-time {
+            color: #495057 !important;
             font-size: 11px;
+            font-weight: 500;
             margin-bottom: 2px;
-            text-align: center;
-            font-weight: 500;
+            line-height: 1.1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
-        .class-room {
-            color: #6c757d;
-            font-size: 11px;
-            text-align: center;
+        .room-timetable-class-box .class-instructor {
+            color: #6c757d !important;
+            font-size: 10px;
+            margin-bottom: 2px;
+            line-height: 1.1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .room-timetable-class-box .class-room {
+            color: #6c757d !important;
+            font-size: 10px;
             font-weight: 500;
+            line-height: 1.1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
         .not-scheduled-box {
@@ -195,471 +214,23 @@
             font-size: 14px;
         }
         
-        
-        /* School Information */
-        .school-info {
-            background-color: #e3f2fd;
-            padding: 20px;
-            text-align: center;
-            border-top: 1px solid #dee2e6;
+        /* Scrollbar Styling */
+        .timetable-scroll-wrapper::-webkit-scrollbar {
+            height: 8px;
         }
         
-        .school-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #1976d2;
-            margin-bottom: 5px;
+        .timetable-scroll-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
         }
         
-        .school-description {
-            color: #666;
-            font-size: 0.9rem;
+        .timetable-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #28a745;
+            border-radius: 4px;
         }
         
-        /* Mobile Responsive Design - Fixed Static Layout */
-        @media (max-width: 1200px) {
-            .timetable-container {
-                overflow-x: auto;
-                overflow-y: auto;
-            }
-            
-            .timetable-grid {
-                min-width: 700px;
-                grid-template-columns: repeat(7, 120px);
-                width: max-content;
-            }
-            
-            .class-box {
-                padding: 10px;
-            }
-            
-            .class-subject {
-                font-size: 13px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .mobile-nav {
-                display: block;
-            }
-            
-            .timetable-header {
-                display: none;
-            }
-            
-            /* Fixed static mobile grid layout with proper alignment */
-            .timetable-container {
-                overflow-x: auto;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-                max-height: 80vh;
-            }
-            
-            .timetable-grid {
-                min-width: 600px;
-                grid-template-columns: repeat(7, 100px);
-                width: max-content;
-                font-size: 12px;
-                gap: 1px;
-                border: 2px solid #dee2e6;
-            }
-            
-            .timetable-day-header {
-                padding: 12px 8px;
-                font-size: 11px;
-                font-weight: 700;
-                text-align: center;
-                line-height: 1.3;
-                word-break: break-word;
-                background: #e9ecef;
-                color: #495057;
-                border-bottom: 2px solid #dee2e6;
-                border-right: 1px solid #e1e5e9;
-                min-width: 100px;
-                width: 100px;
-            }
-            
-            
-            .timetable-day-column {
-                min-height: 500px;
-                padding: 8px 6px;
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-                background: white;
-                border-right: 1px solid #e1e5e9;
-                min-width: 100px;
-                width: 100px;
-            }
-            
-            .timetable-day-column:last-child {
-                border-right: none;
-            }
-            
-            .timetable-day-column.weekend {
-                background: #f8f9fa;
-            }
-            
-            /* Improved class box styling for mobile readability */
-            .class-box {
-                padding: 12px 8px;
-                margin-bottom: 0;
-                border-radius: 6px;
-                min-height: 85px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-                background: white;
-                border: 2px solid #28a745;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                transition: all 0.2s ease;
-                width: 100%;
-                box-sizing: border-box;
-            }
-            
-            .class-box:hover {
-                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-                transform: translateY(-1px);
-            }
-            
-            .class-subject {
-                font-size: 13px;
-                margin-bottom: 4px;
-                line-height: 1.3;
-                font-weight: 700;
-                color: #28a745;
-                word-break: break-word;
-                text-align: center;
-            }
-            
-            .class-time {
-                font-size: 11px;
-                margin-bottom: 3px;
-                font-weight: 600;
-                color: #495057;
-                text-align: center;
-                background: #f8f9fa;
-                padding: 3px 5px;
-                border-radius: 4px;
-                width: 100%;
-                box-sizing: border-box;
-            }
-            
-            .class-instructor {
-                font-size: 10px;
-                line-height: 1.2;
-                color: #6c757d;
-                word-break: break-word;
-                text-align: center;
-                font-weight: 500;
-            }
-            
-            .class-room {
-                font-size: 10px;
-                line-height: 1.2;
-                color: #6c757d;
-                word-break: break-word;
-                text-align: center;
-                font-weight: 500;
-            }
-            
-            .not-scheduled-box {
-                padding: 25px 10px;
-                font-size: 11px;
-                text-align: center;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 80px;
-                background: #f8f9fa;
-                border: 1px dashed #dee2e6;
-                border-radius: 6px;
-                color: #6c757d;
-                font-style: italic;
-                width: 100%;
-                box-sizing: border-box;
-            }
-            
-            .school-info {
-                padding: 15px;
-            }
-            
-            .school-name {
-                font-size: 1rem;
-            }
-            
-            .school-description {
-                font-size: 0.8rem;
-            }
-            
-            /* Mobile controls improvements */
-            .mobile-controls {
-                flex-wrap: wrap;
-                gap: 8px;
-                padding: 12px 15px;
-            }
-            
-            .mobile-controls .btn {
-                flex: 1;
-                min-width: 80px;
-                padding: 10px 12px;
-                font-size: 0.85rem;
-            }
-            
-            .mobile-controls .btn-text {
-                display: inline;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            /* Fixed static layout for small screens */
-            .timetable-container {
-                overflow-x: auto;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-                max-height: 75vh;
-            }
-            
-            .timetable-grid {
-                min-width: 500px;
-                grid-template-columns: repeat(7, 90px);
-                width: max-content;
-                gap: 1px;
-                border: 2px solid #dee2e6;
-            }
-            
-            .timetable-day-header {
-                padding: 10px 6px;
-                font-size: 10px;
-                font-weight: 700;
-                line-height: 1.2;
-                background: #e9ecef;
-                border-bottom: 2px solid #dee2e6;
-                min-width: 90px;
-                width: 90px;
-            }
-            
-            
-            .timetable-day-column {
-                min-height: 450px;
-                padding: 6px 4px;
-                gap: 5px;
-                background: white;
-                border-right: 1px solid #e1e5e9;
-                min-width: 90px;
-                width: 90px;
-            }
-            
-            .timetable-day-column.weekend {
-                background: #f8f9fa;
-            }
-            
-            /* Optimized class boxes for small mobile screens */
-            .class-box {
-                padding: 10px 6px;
-                min-height: 70px;
-                border-radius: 5px;
-                border: 2px solid #28a745;
-                background: white;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                width: 100%;
-                box-sizing: border-box;
-            }
-            
-            .class-subject {
-                font-size: 12px;
-                margin-bottom: 3px;
-                font-weight: 700;
-                color: #28a745;
-                text-align: center;
-                line-height: 1.2;
-            }
-            
-            .class-time {
-                font-size: 10px;
-                margin-bottom: 2px;
-                font-weight: 600;
-                color: #495057;
-                text-align: center;
-                background: #f8f9fa;
-                padding: 2px 3px;
-                border-radius: 3px;
-            }
-            
-            .class-instructor {
-                font-size: 9px;
-                line-height: 1.1;
-                color: #6c757d;
-                text-align: center;
-                font-weight: 500;
-            }
-            
-            .class-room {
-                font-size: 9px;
-                line-height: 1.1;
-                color: #6c757d;
-                text-align: center;
-                font-weight: 500;
-            }
-            
-            .not-scheduled-box {
-                padding: 20px 8px;
-                font-size: 10px;
-                min-height: 70px;
-                background: #f8f9fa;
-                border: 1px dashed #dee2e6;
-                border-radius: 5px;
-                width: 100%;
-                box-sizing: border-box;
-            }
-            
-            /* Mobile navigation improvements */
-            .mobile-nav {
-                padding: 12px 15px;
-            }
-            
-            .mobile-nav h1 {
-                font-size: 1.3rem;
-            }
-            
-            .mobile-nav .room-info {
-                font-size: 0.85rem;
-            }
-            
-            /* Mobile controls for small screens */
-            .mobile-controls {
-                padding: 10px 15px;
-            }
-            
-            .mobile-controls .btn {
-                padding: 8px 10px;
-                font-size: 0.8rem;
-                min-width: 70px;
-            }
-            
-            .mobile-controls .btn-text {
-                display: none;
-            }
-        }
-        
-        @media (max-width: 360px) {
-            /* Fixed static layout for very small screens */
-            .timetable-container {
-                overflow-x: auto;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-                max-height: 70vh;
-            }
-            
-            .timetable-grid {
-                min-width: 450px;
-                grid-template-columns: repeat(7, 80px);
-                width: max-content;
-                gap: 1px;
-                border: 2px solid #dee2e6;
-            }
-            
-            .timetable-day-header {
-                padding: 8px 4px;
-                font-size: 9px;
-                font-weight: 700;
-                line-height: 1.1;
-                background: #e9ecef;
-                border-bottom: 2px solid #dee2e6;
-                min-width: 80px;
-                width: 80px;
-            }
-            
-            
-            .timetable-day-column {
-                padding: 4px 3px;
-                min-height: 400px;
-                gap: 4px;
-                background: white;
-                border-right: 1px solid #e1e5e9;
-                min-width: 80px;
-                width: 80px;
-            }
-            
-            .timetable-day-column.weekend {
-                background: #f8f9fa;
-            }
-            
-            /* Compact but readable class boxes for very small screens */
-            .class-box {
-                padding: 8px 5px;
-                min-height: 65px;
-                border-radius: 4px;
-                border: 2px solid #28a745;
-                background: white;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                width: 100%;
-                box-sizing: border-box;
-            }
-            
-            .class-subject {
-                font-size: 11px;
-                margin-bottom: 2px;
-                font-weight: 700;
-                color: #28a745;
-                text-align: center;
-                line-height: 1.1;
-            }
-            
-            .class-time {
-                font-size: 9px;
-                margin-bottom: 2px;
-                font-weight: 600;
-                color: #495057;
-                text-align: center;
-                background: #f8f9fa;
-                padding: 1px 2px;
-                border-radius: 2px;
-            }
-            
-            .class-instructor {
-                font-size: 8px;
-                line-height: 1;
-                color: #6c757d;
-                text-align: center;
-                font-weight: 500;
-            }
-            
-            .class-room {
-                font-size: 8px;
-                line-height: 1;
-                color: #6c757d;
-                text-align: center;
-                font-weight: 500;
-            }
-            
-            .not-scheduled-box {
-                padding: 15px 5px;
-                font-size: 9px;
-                min-height: 65px;
-                background: #f8f9fa;
-                border: 1px dashed #dee2e6;
-                border-radius: 4px;
-                width: 100%;
-                box-sizing: border-box;
-            }
-            
-            /* Mobile controls for very small screens */
-            .mobile-controls {
-                padding: 8px 12px;
-            }
-            
-            .mobile-controls .btn {
-                padding: 6px 8px;
-                font-size: 0.75rem;
-                min-width: 60px;
-            }
-            
-            .mobile-controls .btn-text {
-                display: none;
-            }
+        .timetable-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #218838;
         }
         
         /* Print Styles */
@@ -689,6 +260,12 @@
                 color: #28a745 !important;
             }
             
+            .timetable-scroll-wrapper,
+            .timetable-container-fixed {
+                overflow: visible !important;
+                min-width: auto !important;
+            }
+            
             .timetable-grid {
                 display: grid !important;
                 grid-template-columns: repeat(7, 1fr) !important;
@@ -710,6 +287,10 @@
                 border: 1px solid #333 !important;
                 padding: 8px !important;
                 page-break-inside: avoid;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
             }
             
             .timetable-day-column.weekend {
@@ -726,6 +307,18 @@
                 padding: 8px !important;
                 margin-bottom: 6px !important;
                 page-break-inside: avoid;
+                width: auto !important;
+                height: auto !important;
+                min-height: 60px !important;
+            }
+            
+            .class-subject,
+            .class-time,
+            .class-instructor,
+            .class-room {
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
             }
             
             .class-subject {
@@ -739,7 +332,29 @@
                 print-color-adjust: exact;
                 color-adjust: exact;
             }
+            
         }
+         
+        /* School Information */
+        .school-info {
+            background-color: #e3f2fd;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .school-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 5px;
+        }
+        
+        .school-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
         
         /* Touch-friendly interactions */
         .class-box:active {
@@ -768,7 +383,7 @@
                 {{ $room->description }}
             @endif
             @if($room->capacity)
-                • Capacity: {{ $room->capacity }} students
+                • Capacity: {{ $room->capacity }} 
             @endif
         </div>
     </div>
@@ -794,47 +409,51 @@
                 @if($room->description)
                     <p class="timetable-info">{{ $room->description }}</p>
                 @endif
-                <div class="print-only" style="margin-top: 10px; font-size: 12px; opacity: 0.8;">
-                    <p>Printed on: {{ date('F j, Y \a\t g:i A') }}</p>
-                    @if($room->capacity)
-                        <p>Capacity: {{ $room->capacity }} students</p>
-                    @endif
                 </div>
             </div>
 
             <!-- Timetable Grid -->
-            <div class="timetable-grid">
-                <!-- Day headers only -->
-                @foreach($weekDays as $dayNumber => $dayName)
-                    <div class="timetable-day-header">{{ $dayName }}</div>
-                @endforeach
+            <div class="timetable-scroll-wrapper">
+                <div class="timetable-container-fixed">
+                    <div class="timetable-grid">
+                    <!-- Day headers -->
+                    @foreach($weekDays as $day)
+                        <div class="timetable-day-header">{{ $day }}</div>
+                    @endforeach
 
-                <!-- Day columns with lessons -->
-                @foreach($weekDays as $dayNumber => $dayName)
-                    <div class="timetable-day-column {{ ($dayNumber == 6 || $dayNumber == 7) ? 'weekend' : '' }}" data-day="{{ $dayNumber }}">
-                        @if(isset($calendarData[$dayNumber]) && count($calendarData[$dayNumber]) > 0)
-                            @foreach($calendarData[$dayNumber] as $lessonIndex => $lesson)
-                                <div class="lesson-container">
-                                    <div class="class-box" onclick="showLessonDetails('{{ $lesson['subject_name'] }}', '{{ $lesson['start_time'] }}', '{{ $lesson['end_time'] }}', '{{ $lesson['teacher_name'] }}', '{{ $lesson['class_name'] }}')">
-                                        <div class="class-subject">{{ $lesson['subject_name'] }}</div>
+                    <!-- Day columns with lessons -->
+                    @foreach($weekDays as $index => $day)
+                        <div class="timetable-day-column {{ ($index == 6 || $index == 7) ? 'weekend' : '' }}">
+                            @if(isset($calendarData[$index]) && count($calendarData[$index]) > 0)
+                                @foreach($calendarData[$index] as $lesson)
+                                    <div class="class-box room-timetable-class-box">
+                                        <div class="class-subject">
+                                            {{ $lesson['subject_code'] }}
+                                            @if(isset($lesson['lesson_type']) && $lesson['lesson_type'] === 'laboratory')
+                                                <i class="fas fa-flask ml-1" title="Laboratory"></i>
+                                            @elseif(isset($lesson['lesson_type']))
+                                                <i class="fas fa-chalkboard-teacher ml-1" title="Lecture"></i>
+                                            @endif
+                                        </div>
                                         <div class="class-time">{{ $lesson['start_time'] }} - {{ $lesson['end_time'] }}</div>
                                         <div class="class-instructor">{{ $lesson['teacher_name'] }}</div>
                                         <div class="class-room">{{ $lesson['class_name'] }}</div>
                                     </div>
+                                @endforeach
+                            @else
+                                <div class="not-scheduled-box">
+                                    Available
                                 </div>
-                            @endforeach
-                        @else
-                            <div class="not-scheduled-box">
-                                {{ ($dayNumber == 6 || $dayNumber == 7) ? 'Weekend' : '' }}
-                            </div>
-                        @endif
+                            @endif
+                        </div>
+                    @endforeach
                     </div>
-                @endforeach
+                </div>
             </div>
 
             <!-- School Information -->
             <div class="school-info">
-                <div class="school-name">Laravel School Timetable Calendar</div>
+                <div class="school-name">Asian College Room Schedules</div>
                 <div class="school-description">
                     <i class="fas fa-info-circle mr-1"></i>
                     Scan QR code to view this timetable anytime • Last updated: {{ date('M j, Y') }}

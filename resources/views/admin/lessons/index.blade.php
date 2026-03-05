@@ -10,7 +10,7 @@
             </a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-            <i class="fas fa-clock"></i> Lessons Management
+            <i class="fas fa-clock"></i> Manage Class Schedules
         </li>
     </ol>
 </nav>
@@ -21,9 +21,13 @@
             <a class="btn btn-success" href="{{ route("admin.lessons.create") }}">
                 <i class="fas fa-plus"></i> Add Class Schedule
             </a>
+            <a href="{{ route('admin.room-management.master-timetable.show', request('weekday', 1)) }}" class="btn btn-light">
+                <i class="fas fa-th"></i> Master Timetable
+            </a>
         </div>
     </div>
 @endcan
+
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">
@@ -31,7 +35,7 @@
             {{ trans('cruds.lesson.title_singular') }} {{ trans('global.list') }}
         </h3>
         <div class="card-tools">
-            <span class="badge badge-primary mr-2">Total: {{ $lessons->total() }} lessons</span>
+            <span class="badge badge-primary mr-2">Total: {{ $lessons->total() }} Schedules</span>
             <div class="dropdown d-inline-block">
                 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="columnToggleBtn">
                     <i class="fas fa-columns"></i> Show/Hide Columns
@@ -104,7 +108,7 @@
             <div class="row d-none d-md-flex">
                 <div class="col-md-2">
                     <select class="form-control form-control-sm" id="class-filter">
-                        <option value="">All Classes</option>
+                        <option value="">All Sections</option>
                         @foreach($classes as $id => $name)
                             <option value="{{ $id }}" {{ (isset($filters['class_id']) && $filters['class_id'] == $id) ? 'selected' : '' }}>
                                 {{ $name }}
@@ -187,7 +191,7 @@
                         <div class="form-group">
                             <label>Class</label>
                             <select class="form-control form-control-sm" id="class-filter-mobile">
-                                <option value="">All Classes</option>
+                                <option value="">All Sections</option>
                                 @foreach($classes as $id => $name)
                                     <option value="{{ $id }}" {{ (isset($filters['class_id']) && $filters['class_id'] == $id) ? 'selected' : '' }}>
                                         {{ $name }}
@@ -271,13 +275,16 @@
                             {{ trans('cruds.lesson.fields.id') }}
                         </th>
                         <th>
-                            {{ trans('cruds.lesson.fields.class') }}
+                            {{ trans('cruds.lesson.fields.section') }}
                         </th>
                         <th>
                             {{ trans('cruds.lesson.fields.teacher') }}
                         </th>
                         <th>
                             Subject
+                        </th>
+                        <th>
+                            Type
                         </th>
                         <th>
                             Room
@@ -292,7 +299,7 @@
                             {{ trans('cruds.lesson.fields.end_time') }}
                         </th>
                         <th>
-                            &nbsp;
+                            Actions
                         </th>
                     </tr>
                 </thead>
@@ -313,6 +320,13 @@
                             </td>
                             <td>
                                 {{ $lesson->subject->name ?? 'No Subject' }}
+                            </td>
+                            <td>
+                                @if($lesson->lesson_type === 'laboratory')
+                                    <span class="badge badge-info"><i class="fas fa-flask"></i> Laboratory</span>
+                                @else
+                                    <span class="badge badge-primary"><i class="fas fa-chalkboard-teacher"></i> Lecture</span>
+                                @endif
                             </td>
                             <td>
                                 {{ $lesson->room->display_name ?? '' }}
@@ -492,6 +506,25 @@
         $('#weekday-filter-mobile').val($(this).val());
     });
 
+    // Display mass delete success message if present
+    $(document).ready(function() {
+        const massDeleteMsg = sessionStorage.getItem('massDeleteSuccess');
+        if (massDeleteMsg) {
+            // Create and show success alert
+            const alertHtml = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> ${massDeleteMsg}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            `;
+            $('nav[aria-label="breadcrumb"]').after(alertHtml);
+            // Clear the message
+            sessionStorage.removeItem('massDeleteSuccess');
+        }
+    });
+
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 @can('lesson_delete')
@@ -516,7 +549,13 @@
           method: 'POST',
           url: config.url,
           data: { ids: ids, _method: 'DELETE' }})
-          .done(function () { location.reload() })
+          .done(function (response) { 
+            // Store success message in sessionStorage before reload
+            if (response.message) {
+              sessionStorage.setItem('massDeleteSuccess', response.message);
+            }
+            location.reload();
+          })
       }
     }
   }

@@ -59,9 +59,6 @@
                         </a>
                     </div>
                 </div>
-                <button type="button" class="btn btn-light btn-sm" onclick="printTimetable()">
-                    <i class="fas fa-print"></i> Print
-                </button>
             </div>
         </div>
     </div>
@@ -88,37 +85,21 @@
         <!-- Timetable Statistics -->
         <div class="p-3 bg-light border-bottom">
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="text-center">
-                        <h5 class="mb-0 text-primary"><?php echo e($timetableData['statistics']['total_rooms']); ?></h5>
-                        <small class="text-muted">Total Rooms</small>
+                        <a href="<?php echo e(route('admin.room-management.room-timetables.index')); ?>" target="_blank" class="text-decoration-none">
+                            <h5 class="mb-0 text-primary"><?php echo e($timetableData['statistics']['total_rooms']); ?></h5>
+                            <small class="text-muted">Total Rooms</small>
+                        </a>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="text-center">
-                        <h5 class="mb-0 text-success"><?php echo e($timetableData['statistics']['occupied_slots']); ?></h5>
-                        <small class="text-muted">Occupied Slots</small>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="text-center">
-                        <h5 class="mb-0 text-warning"><?php echo e($timetableData['statistics']['empty_slots']); ?></h5>
-                        <small class="text-muted">Available Slots</small>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="text-center">
-                        <h5 class="mb-0 text-info"><?php echo e($timetableData['statistics']['utilization_percentage']); ?>%</h5>
-                        <small class="text-muted">Utilization</small>
-                    </div>
-                </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="text-center">
                         <h5 class="mb-0 text-secondary"><?php echo e($timetableData['statistics']['rooms_with_lessons']); ?></h5>
                         <small class="text-muted">Active Rooms</small>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="text-center">
                         <h5 class="mb-0 text-dark"><?php echo e($timetableData['statistics']['rooms_without_lessons']); ?></h5>
                         <small class="text-muted">Empty Rooms</small>
@@ -143,7 +124,10 @@
                 
                 <!-- Room Headers -->
                 <?php $__currentLoopData = $timetableData['rooms']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <div class="timetable-room-header" data-room-id="<?php echo e($room->id); ?>">
+                    <div class="timetable-room-header" data-room-id="<?php echo e($room->id); ?>" 
+                         style="cursor: pointer;" 
+                         onclick="window.open('<?php echo e(route('admin.room-management.room-timetables.show', $room->id)); ?>', '_blank')"
+                         title="Click to view <?php echo e($room->name); ?> timetable">
                         <div class="room-header-cell">
                             <strong><?php echo e($room->name); ?></strong>
                             <?php if($room->is_lab): ?>
@@ -151,6 +135,10 @@
                             <?php endif; ?>
                             <br>
                             <small class="text-muted"><?php echo e($room->capacity ?? 'N/A'); ?> seats</small>
+                            <br>
+                            <small class="text-info" style="font-size: 0.75rem;">
+                                <i class="fas fa-clock"></i> <?php echo e($timetableData['room_hours_available'][$room->id]); ?>h available
+                            </small>
                         </div>
                     </div>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -171,22 +159,40 @@
                             $isLesson = $roomData['type'] === 'lesson';
                             $lesson = $isLesson ? $roomData['lesson'] : null;
                             $isStartSlot = $isLesson && (\Carbon\Carbon::createFromFormat('H:i:s', $lesson->getRawOriginal('start_time'))->format('H:i') === $row['time_slot']['start']);
-                            $isWithinLesson = $isLesson && (\Carbon\Carbon::createFromFormat('H:i:s', $lesson->getRawOriginal('start_time'))->format('H:i') !== $row['time_slot']['end']);
+                            $isEndSlot = $isLesson && (\Carbon\Carbon::createFromFormat('H:i:s', $lesson->getRawOriginal('end_time'))->format('H:i') === $row['time_slot']['end']);
+                            $isMiddleSlot = $isLesson && !$isStartSlot && !$isEndSlot;
+
+                            $lessonClass = '';
+                            if ($isStartSlot) {
+                                $lessonClass = 'lesson-start';
+                            } elseif ($isMiddleSlot) {
+                                $lessonClass = 'lesson-middle';
+                            } elseif ($isEndSlot) {
+                                $lessonClass = 'lesson-end';
+                            }
                         ?>
-                        <div class="timetable-cell <?php echo e($rowIndex % 2 === 0 ? 'zebra-row' : ''); ?> <?php echo e($isLesson ? $roomData['css_class'] : $roomData['css_class']); ?>" 
+                        <div class="timetable-cell <?php echo e($rowIndex % 2 === 0 ? 'zebra-row' : ''); ?> <?php echo e($isLesson ? 'lesson-cell ' . $lessonClass . ' ' . $roomData['css_class'] : $roomData['css_class']); ?>" 
                              data-room-id="<?php echo e($timetableData['rooms'][$roomIndex]->id); ?>"
+                             data-room-name="<?php echo e($timetableData['rooms'][$roomIndex]->name); ?>"
                              data-time-slot="<?php echo e($row['time_slot']['start']); ?>"
-                             data-time-end="<?php echo e($row['time_slot']['end']); ?>">
+                             data-time-end="<?php echo e($row['time_slot']['end']); ?>"
+                             data-time-start="<?php echo e($row['time_slot']['start_formatted']); ?>"
+                             data-time-end-formatted="<?php echo e($row['time_slot']['end_formatted']); ?>"
+                             data-weekday="<?php echo e($timetableData['weekday']); ?>"
+                             data-weekday-name="<?php echo e($timetableData['weekday_name']); ?>"
+                             <?php if(!$isLesson): ?> title="Click to schedule lesson in <?php echo e($timetableData['rooms'][$roomIndex]->name); ?> from <?php echo e($row['time_slot']['start_formatted']); ?> - <?php echo e($row['time_slot']['end_formatted']); ?>" <?php endif; ?>>
                             <?php if($isLesson): ?>
                                 <?php if($isStartSlot): ?>
                                     <div class="class-box lesson-slot <?php echo e(str_replace(['has-conflicts','long-lesson','short-lesson'], '', $roomData['css_class'])); ?>" 
                                          data-lesson-id="<?php echo e($lesson->id); ?>"
-                                         title="Subject: <?php echo e($lesson->subject->name ?? 'No Subject'); ?> | Class: <?php echo e($lesson->class->display_name ?? 'No Class'); ?> | Teacher: <?php echo e($lesson->teacher->name ?? 'No Teacher'); ?> | Time: <?php echo e($lesson->start_time); ?> - <?php echo e($lesson->end_time); ?>">
+                                         title="Subject: <?php echo e($lesson->subject->code ?? 'No Subject'); ?> | Type: <?php echo e(ucfirst($lesson->lesson_type)); ?> | Class: <?php echo e($lesson->class->display_name ?? 'No Class'); ?> | Teacher: <?php echo e($lesson->teacher->name ?? 'No Teacher'); ?> | Time: <?php echo e($lesson->start_time); ?> - <?php echo e($lesson->end_time); ?>">
                                         <div class="class-subject">
-                                            <?php echo e($lesson->subject->name ?? 'No Subject'); ?>
+                                            <?php echo e($lesson->subject->code ?? 'No Subject'); ?>
 
-                                            <?php if($lesson->subject && $lesson->subject->requires_lab): ?>
-                                                <i class="fas fa-flask ml-1" title="Lab Required"></i>
+                                            <?php if($lesson->lesson_type === 'laboratory'): ?>
+                                                <i class="fas fa-flask ml-1" title="Laboratory"></i>
+                                            <?php else: ?>
+                                                <i class="fas fa-chalkboard-teacher ml-1" title="Lecture"></i>
                                             <?php endif; ?>
                                         </div>
                                         <div class="class-time"><?php echo e($lesson->start_time); ?> - <?php echo e($lesson->end_time); ?></div>
@@ -197,14 +203,7 @@
                                     <div class="lesson-continued-slot" aria-hidden="true"></div>
                                 <?php endif; ?>
                             <?php else: ?>
-                                <div class="empty-slot-content" 
-                                     title="Available time slot"
-                                     data-room-id="<?php echo e($timetableData['rooms'][$roomIndex]->id); ?>"
-                                     data-room-name="<?php echo e($timetableData['rooms'][$roomIndex]->name); ?>"
-                                     data-time-start="<?php echo e($row['time_slot']['start_formatted']); ?>"
-                                     data-time-end="<?php echo e($row['time_slot']['end_formatted']); ?>"
-                                     data-weekday="<?php echo e($timetableData['weekday']); ?>"
-                                     data-weekday-name="<?php echo e($timetableData['weekday_name']); ?>">
+                                <div class="empty-slot-content">
                                     <div class="empty-slot-text">
                                         <i class="fas fa-clock"></i>
                                         <br>
@@ -220,26 +219,7 @@
     </div>
 </div>
 
-<!-- Lesson Details Modal -->
-<div class="modal fade" id="lessonDetailsModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Lesson Details</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="lessonDetailsContent">
-                <!-- Content will be loaded via AJAX -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="editLessonBtn">Edit Lesson</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- Quick Schedule Modal -->
 <div class="modal fade" id="quickScheduleModal" tabindex="-1" role="dialog">
@@ -253,12 +233,12 @@
             </div>
             <div class="modal-body">
                 <div id="quickScheduleContent">
-                    <!-- Content will be populated -->
+                    <!-- Content will be populated -->  
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success" id="scheduleLessonBtn">Schedule Lesson</button>
+                <button type="button" class="btn btn-success" id="scheduleLessonBtn">Create Schedule</button>
             </div>
         </div>
     </div>
@@ -296,6 +276,11 @@
         position: sticky;
         top: 0;
         z-index: 5;
+        transition: background-color 0.2s ease;
+    }
+    
+    .timetable-room-header:hover {
+        background-color: #dee2e6;
     }
 
     .timetable-time-cell {
@@ -323,7 +308,45 @@
         position: relative;
     }
 
-    .timetable-cell:hover {
+    /* Style lesson cells based on their position in multi-hour blocks */
+    #masterTimetableGrid .timetable-cell.lesson-start {
+        border: none !important;
+        border-top: 1px solid #dee2e6 !important;
+        border-left: 1px solid #dee2e6 !important;
+        border-right: 1px solid #dee2e6 !important;
+        padding: 0 !important;
+    }
+
+    #masterTimetableGrid .timetable-cell.lesson-middle {
+        border: none !important;
+        border-left: 1px solid #dee2e6 !important;
+        border-right: 1px solid #dee2e6 !important;
+        padding: 0 !important;
+    }
+
+    #masterTimetableGrid .timetable-cell.lesson-end {
+        border: none !important;
+        border-left: 1px solid #dee2e6 !important;
+        border-right: 1px solid #dee2e6 !important;
+        border-bottom: 1px solid #dee2e6 !important;
+        padding: 0 !important;
+    }
+
+    /* Remove borders from lesson-slot and class-box elements */
+    #masterTimetableGrid .lesson-slot,
+    #masterTimetableGrid .class-box {
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    /* Remove borders from continuation slots */
+    #masterTimetableGrid .lesson-continued-slot {
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    /* Only apply hover effects to available cells (not lesson cells) */
+    .timetable-cell:not(.lesson-cell):hover {
         background-color: #f8f9fa;
         z-index: 10;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -374,6 +397,10 @@
         border: 1px dashed #dee2e6;
     }
 
+    .empty-slot.available-for-scheduling {
+        cursor: pointer;
+    }
+
     .empty-slot.available-for-scheduling:hover {
         background-color: #e8f5e8;
         border-color: #28a745;
@@ -385,10 +412,10 @@
         align-items: center;
         justify-content: center;
         opacity: 0.6;
-        pointer-events: auto;
+        pointer-events: none; /* Disable clicks on inner content */
     }
 
-    .empty-slot-content:hover {
+    .timetable-cell.available-for-scheduling:hover .empty-slot-content {
         opacity: 1;
     }
 
@@ -437,7 +464,7 @@
         background: transparent;
     }
 
-    /* Master Timetable unified style: white background, green text for all lessons */
+    /* Master Timetable lesson styling - white background with green text */
     #masterTimetableGrid .lesson-slot,
     #masterTimetableGrid .class-box {
         background: #ffffff !important;
@@ -454,28 +481,9 @@
         color: #28a745 !important;
     }
 
-    /* Icons inherit green; keep lab icon only for distinction */
-    #masterTimetableGrid .class-box i { color: #28a745 !important; }
-
-    /* Ensure all inner texts are green */
-    #masterTimetableGrid .class-box .class-subject,
-    #masterTimetableGrid .class-box .class-time,
-    #masterTimetableGrid .class-box .class-teacher,
-    #masterTimetableGrid .class-box .class-class {
-        color: #28a745 !important;
-    }
-
-    /* Icons inherit green; keep lab icon only for distinction */
-    #masterTimetableGrid .class-box i { color: #28a745 !important; }
-
-    /* Neutralize variant classes within Master Timetable (no conflict/length variants) */
-    #masterTimetableGrid .has-conflicts,
-    #masterTimetableGrid .long-lesson,
-    #masterTimetableGrid .short-lesson {
-        background: #ffffff !important;
-        color: #28a745 !important;
-        border: none !important;
-        box-shadow: none !important;
+    /* Icons inherit green color */
+    #masterTimetableGrid .class-box i { 
+        color: #28a745 !important; 
     }
 
     /* Enforce consistent class-box layout in Master Timetable */
@@ -492,7 +500,7 @@
         background-clip: padding-box !important;
     }
 
-    /* Improve visual merging for continuation cells */
+    /* Improve visual merging for continuation cells - white background to merge seamlessly */
     #masterTimetableGrid .lesson-continued-slot {
         background: #ffffff !important;
         border: none !important;
@@ -521,22 +529,34 @@
         }
     }
 
-    /* Print styles */
-    @media  print {
-        .card-header,
-        .breadcrumb,
-        .btn,
-        .modal {
-            display: none !important;
-        }
-        
         .timetable-grid {
             border: 2px solid #000;
         }
         
+        .timetable-cell.lesson-start {
+            border-top: 1px solid #000 !important;
+            border-left: 1px solid #000 !important;
+            border-right: 1px solid #000 !important;
+            border-bottom: none !important;
+        }
+
+        .timetable-cell.lesson-middle {
+            border-left: 1px solid #000 !important;
+            border-right: 1px solid #000 !important;
+            border-top: none !important;
+            border-bottom: none !important;
+        }
+
+        .timetable-cell.lesson-end {
+            border-left: 1px solid #000 !important;
+            border-right: 1px solid #000 !important;
+            border-bottom: 1px solid #000 !important;
+            border-top: none !important;
+        }
+
         .lesson-slot {
             background-color: #f0f0f0 !important;
-            border: 1px solid #000;
+            border: none !important;
         }
         
         .empty-slot {
@@ -558,13 +578,13 @@ $(document).ready(function() {
         showLessonDetails(lessonId);
     });
     
-    // Empty slot click handler
-    $(document).on('click', '.empty-slot-content', function(e) {
+    // Empty slot click handler - now on the entire cell
+    $(document).on('click', '.timetable-cell.available-for-scheduling', function(e) {
         e.stopPropagation();
         const roomId = $(this).data('room-id');
         const roomName = $(this).data('room-name');
         const timeStart = $(this).data('time-start');
-        const timeEnd = $(this).data('time-end');
+        const timeEnd = $(this).data('time-end-formatted');
         const weekday = $(this).data('weekday');
         const weekdayName = $(this).data('weekday-name');
         showQuickSchedule({ roomId, roomName, timeStart, timeEnd, weekday, weekdayName });
@@ -582,79 +602,43 @@ $(document).ready(function() {
             window.location.href = `/admin/lessons/${lessonId}/edit`;
         }
     });
+    
+    // Create schedule button handler
+    $('#scheduleLessonBtn').on('click', function() {
+        const roomId = $(this).data('room-id');
+        const timeStart = $(this).data('time-start');
+        const weekday = $(this).data('weekday');
+        
+        if (roomId && timeStart && weekday) {
+            // Redirect to lesson creation page with pre-filled data
+            // Note: end_time is NOT passed - it will be auto-suggested based on lesson type selection
+            const params = new URLSearchParams({
+                room_id: roomId,
+                start_time: timeStart,
+                weekday: weekday
+            });
+            window.location.href = `/admin/lessons/create?${params.toString()}`;
+        } else {
+            alert('Missing required information to create schedule. Please try again.');
+        }
+    });
 });
 
-function showLessonDetails(lessonId) {
-    // Use the new lessons.info endpoint
-    $.get(`/admin/lessons/${lessonId}/info`)
-    .done(function(lesson) {
-        const content = `
-            <div class="lesson-info-display">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6><i class="fas fa-info-circle mr-2"></i>Lesson Information</h6>
-                        <table class="table table-sm table-borderless">
-                            <tr>
-                                <td class="text-muted" style="width: 40%;"><i class="fas fa-book mr-2"></i>Subject:</td>
-                                <td><strong>${lesson.subject_name}</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted"><i class="fas fa-users mr-2"></i>Class:</td>
-                                <td><strong>${lesson.class_name}</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted"><i class="fas fa-chalkboard-teacher mr-2"></i>Teacher:</td>
-                                <td><strong>${lesson.teacher_name}</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted"><i class="fas fa-door-open mr-2"></i>Room:</td>
-                                <td><strong>${lesson.room_name}</strong></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-md-6">
-                        <h6><i class="fas fa-clock mr-2"></i>Schedule</h6>
-                        <table class="table table-sm table-borderless">
-                            <tr>
-                                <td class="text-muted" style="width: 40%;"><i class="fas fa-calendar-day mr-2"></i>Day:</td>
-                                <td><strong>${lesson.weekday_name}</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted"><i class="fas fa-clock mr-2"></i>Time:</td>
-                                <td><strong>${lesson.start_time} - ${lesson.end_time}</strong></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        $('#lessonDetailsContent').html(content);
-        $('#editLessonBtn').data('lesson-id', lessonId);
-        $('#lessonDetailsModal').modal('show');
-    })
-    .fail(function(xhr) {
-        let errorMsg = 'Failed to load lesson details';
-        if (xhr.status === 403) {
-            errorMsg = 'You do not have permission to view this lesson';
-        }
-        alert(errorMsg);
-    });
-}
 
 function showQuickSchedule({ roomId, roomName, timeStart, timeEnd, weekday, weekdayName }) {
     const content = `
         <div class="alert alert-info">
             <i class="fas fa-info-circle"></i>
-            Click "Schedule Lesson" to create a new lesson for this time slot.
+            Click "Create Schedule" to create a new class schedule starting at this time slot.
+            <br><small class="text-muted">End time will be auto-suggested based on your lesson type selection.</small>
         </div>
         <div class="form-group">
             <label>Room:</label>
             <input type="text" class="form-control" value="${roomName} (ID: ${roomId})" readonly>
         </div>
         <div class="form-group">
-            <label>Time Slot:</label>
-            <input type="text" class="form-control" value="${timeStart} - ${timeEnd}" readonly>
+            <label>Start Time:</label>
+            <input type="text" class="form-control" value="${timeStart}" readonly>
         </div>
         <div class="form-group">
             <label>Day:</label>
@@ -666,7 +650,6 @@ function showQuickSchedule({ roomId, roomName, timeStart, timeEnd, weekday, week
     $('#scheduleLessonBtn')
         .data('room-id', roomId)
         .data('time-start', timeStart)
-        .data('time-end', timeEnd)
         .data('weekday', weekday);
     $('#quickScheduleModal').modal('show');
 }
@@ -797,23 +780,6 @@ function exportAllDays(format) {
     });
 }
 
-function printTimetable() {
-    window.print();
-}
-
-// Schedule lesson button handler
-$('#scheduleLessonBtn').on('click', function() {
-    const roomId = $(this).data('room-id');
-    const timeStart = $(this).data('time-start');
-    const timeEnd = $(this).data('time-end');
-    const weekday = $(this).data('weekday');
-    
-    // Redirect to lesson creation with pre-filled data
-    // Ensure start_time is normalized like '7:00 AM'
-    const normalizedStart = moment(timeStart, ['h:mm A','H:mm']).format('h:mm A');
-    const url = `/admin/lessons/create?room_id=${encodeURIComponent(roomId)}&weekday=${encodeURIComponent(weekday)}&start_time=${encodeURIComponent(normalizedStart)}`;
-    window.location.href = url;
-});
 
 // Fallback export method
 function tryFallbackExport(url, exportBtn, originalText, format) {

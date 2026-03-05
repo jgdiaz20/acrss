@@ -1,39 +1,38 @@
-{{-- Simple Conflict Notification Modal --}}
+aaaaaaaaaa{{-- Simple Conflict Notification Modal --}}
 <div class="modal fade" id="validationModal" tabindex="-1" role="dialog" aria-labelledby="validationModalLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+        <div class="modal-content validation-modal">
             <div class="modal-header bg-warning text-dark">
                 <h5 class="modal-title" id="validationModalLabel">
                     <i class="fas fa-exclamation-triangle mr-2"></i>
                     <span id="modalTitle">Scheduling Conflicts Detected</span>
+                    <span class="badge badge-danger ml-2" id="conflictCountBadge">0</span>
                 </h5>
             </div>
             
             <div class="modal-body">
                 {{-- Conflict Summary --}}
-                <div class="conflict-summary mb-4">
-                    <div class="alert alert-warning">
-                        <h6><i class="fas fa-info-circle mr-2"></i><span id="conflictCount">0</span> Conflicts Detected</h6>
-                        <p class="mb-0" id="conflictDescription">The selected time slot conflicts with existing schedules. Please review the details below and adjust your schedule accordingly.</p>
-                    </div>
+                <div class="conflict-summary mb-3">
+                    <p class="mb-0" id="conflictDescription">The selected time slot conflicts with existing schedules. Please review the details below.</p>
                 </div>
 
                 {{-- Conflict Details --}}
                 <div class="conflict-details">
-                    <h6 class="text-danger mb-3">
-                        <i class="fas fa-times-circle mr-2"></i>Conflict Details
-                    </h6>
                     <div id="conflictsList" class="conflicts-list">
                         {{-- Conflicts will be populated by JavaScript --}}
                     </div>
                 </div>
 
-                {{-- Close Button --}}
-                <div class="text-right mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-secondary btn-md" data-dismiss="modal">
-                        <i class="fas fa-times mr-2"></i>Close
+                {{-- Action Buttons --}}
+                <div class="text-right mt-3 pt-3 border-top">
+                    <a href="{{ route('admin.room-management.master-timetable.show', request('weekday', 1)) }}" class="btn btn-outline-primary btn-md" target="_blank">
+                        <i class="fas fa-th mr-1"></i> Master Timetable
+                    </a>
+                    <button type="button" class="btn btn-secondary btn-md ml-2" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i> Close
                     </button>
                 </div>
+                
             </div>
         </div>
     </div>
@@ -59,7 +58,7 @@
 }
 
 #validationModal .modal-body {
-    padding: 2rem 2rem 1.5rem 2rem;
+    padding: 1.5rem;
     max-height: 70vh;
     overflow-y: auto;
 }
@@ -72,24 +71,62 @@
 }
 
 /* Conflict Item Styling */
-.validation-modal .conflict-item {
+#validationModal .conflict-item {
     border-left: 4px solid #dc3545;
     background: #f8f9fa;
-    margin-bottom: 1rem;
-    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    padding: 0;
     border-radius: 0.375rem;
     transition: all 0.3s ease;
     border: 1px solid #e9ecef;
+    position: relative;
 }
 
-.validation-modal .conflict-item:hover {
+/* Add separator line after each conflict except the last one */
+#validationModal .conflict-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: -0.625rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #dee2e6 20%, #dee2e6 80%, transparent);
+}
+
+#validationModal .conflict-item:hover {
     background: #e9ecef;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     border-color: #dc3545;
 }
 
-.validation-modal .conflict-type {
+/* Conflict Header (Clickable) */
+#validationModal .conflict-header {
+    padding: 1rem 1.25rem;
+    border-radius: 0.375rem 0.375rem 0 0;
+    transition: background-color 0.2s ease;
+}
+
+#validationModal .conflict-header:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Collapse Icon Animation */
+#validationModal .collapse-icon {
+    transition: transform 0.3s ease;
+    color: #6c757d;
+}
+
+#validationModal .conflict-header[aria-expanded="false"] .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+#validationModal .conflict-header[aria-expanded="true"] .collapse-icon {
+    transform: rotate(0deg);
+}
+
+#validationModal .conflict-type {
     font-weight: 700;
     color: #dc3545;
     text-transform: uppercase;
@@ -97,18 +134,18 @@
     letter-spacing: 0.5px;
 }
 
-.validation-modal .conflict-severity {
+#validationModal .conflict-severity {
     font-size: 0.75rem;
     font-weight: 600;
 }
 
-.validation-modal .conflict-details {
-    margin-top: 0.75rem;
+#validationModal .conflict-details {
+    padding: 0 1.25rem 1.25rem 1.25rem;
     color: #6c757d;
     line-height: 1.5;
 }
 
-.validation-modal .conflicting-lesson {
+#validationModal .conflicting-lesson {
     background: #fff;
     border: 1px solid #dee2e6;
     border-radius: 0.375rem;
@@ -117,71 +154,26 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.validation-modal .conflicting-lesson .lesson-info {
+#validationModal .conflicting-lesson .lesson-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.75rem;
 }
 
-.validation-modal .conflicting-lesson .lesson-details {
+#validationModal .conflicting-lesson .lesson-details {
     font-size: 0.875rem;
     color: #6c757d;
     line-height: 1.6;
 }
 
-.validation-modal .conflicting-lesson .lesson-time {
+#validationModal .conflicting-lesson .lesson-time {
     font-weight: 600;
     color: #495057;
     font-size: 0.9rem;
 }
 
 /* Button Improvements */
-#validationModal .btn {
-    border-radius: 0.375rem;
-    font-weight: 500;
-    padding: 0.75rem 1.5rem;
-    transition: all 0.2s ease;
-}
-
-#validationModal .btn-lg {
-    padding: 0.875rem 2rem;
-    font-size: 1rem;
-}
-
-#validationModal .btn-secondary {
-    background-color:rgb(244, 79, 53);
-    border-color: #6c757d;
-}
-
-#validationModal .btn-secondary:hover {
-    background-color:rgb(91, 74, 226);
-    border-color: #545b62;
-    transform: translateY(-1px);
-}
-
-#validationModal .btn-outline-primary {
-    color: #007bff;
-    border-color: #007bff;
-}
-
-#validationModal .btn-outline-primary:hover {
-    background-color: #007bff;
-    border-color: #007bff;
-    transform: translateY(-1px);
-}
-
-#validationModal .btn-outline-warning {
-    color: #ffc107;
-    border-color: #ffc107;
-}
-
-#validationModal .btn-outline-warning:hover {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #212529;
-    transform: translateY(-1px);
-}
 
 /* Alert Improvements */
 #validationModal .alert {
@@ -218,13 +210,13 @@
         max-width: 200px;
     }
     
-    .validation-modal .conflicting-lesson .lesson-info {
+    #validationModal .conflicting-lesson .lesson-info {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
     }
     
-    .validation-modal .conflict-item {
+    #validationModal .conflict-item {
         padding: 1rem;
     }
 }
@@ -261,5 +253,30 @@
 /* Icon improvements */
 #validationModal .fas {
     font-size: 0.9em;
+}
+
+/* Conflict Count Badge */
+#conflictCountBadge {
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 0.35rem 0.65rem;
+    border-radius: 50%;
+    min-width: 2rem;
+    text-align: center;
+    background-color: #dc3545 !important;
+    color: #fff !important;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.5);
+    }
 }
 </style>

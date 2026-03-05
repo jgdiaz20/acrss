@@ -89,30 +89,50 @@
                     </div>
                     <div class="col-md-6">
                         <div class="info-item mb-3">
-                            <label class="info-label">Credits</label>
-                            <div class="info-value"><?php echo e($subject->credits); ?></div>
+                            <label class="info-label">Total Credits</label>
+                            <div class="info-value"><?php echo e($subject->credits); ?> units</div>
                         </div>
                         <div class="info-item mb-3">
-                            <label class="info-label">Status</label>
+                            <label class="info-label">Scheduling Mode</label>
                             <div class="info-value">
-                                <span class="badge badge-<?php echo e($subject->is_active ? 'success' : 'danger'); ?>">
-                                    <?php echo e($subject->is_active ? 'Active' : 'Inactive'); ?>
+                                <span class="badge badge-<?php echo e($subject->scheduling_mode === 'lab' ? 'warning' : 'info'); ?>">
+                                    <?php echo e(\App\Subject::SCHEDULING_MODES[$subject->scheduling_mode] ?? 'N/A'); ?>
 
                                 </span>
                             </div>
                         </div>
-                        <div class="info-item mb-3">
-                            <label class="info-label">Requirements</label>
-                            <div class="info-value">
-                                <?php if($subject->requires_lab): ?>
-                                    <span class="badge badge-warning mr-1">Laboratory</span>
-                                <?php endif; ?>
-                                <?php if($subject->requires_equipment): ?>
-                                    <span class="badge badge-info mr-1">Equipment</span>
-                                <?php endif; ?>
-                                <?php if(!$subject->requires_lab && !$subject->requires_equipment): ?>
-                                    <span class="badge badge-success">No Special Requirements</span>
-                                <?php endif; ?>
+                    </div>
+                </div>
+                
+                <!-- Credit Breakdown -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6 class="font-weight-bold mb-3">Credit Breakdown</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="text-center p-3 bg-white rounded">
+                                            <div class="text-muted small">Lecture Units</div>
+                                            <div class="h4 mb-0"><?php echo e($subject->lecture_units); ?></div>
+                                            <div class="small text-success"><?php echo e($subject->total_lecture_hours); ?> hours</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center p-3 bg-white rounded">
+                                            <div class="text-muted small">Laboratory Units</div>
+                                            <div class="h4 mb-0"><?php echo e($subject->lab_units); ?></div>
+                                            <div class="small text-warning"><?php echo e($subject->total_lab_hours); ?> hours</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center p-3 bg-primary text-white rounded">
+                                            <div class="small">Total Hours</div>
+                                            <div class="h4 mb-0"><?php echo e($subject->total_hours); ?></div>
+                                            <div class="small">Required</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -125,13 +145,7 @@
                     </div>
                 <?php endif; ?>
                 
-                <?php if($subject->equipment_requirements): ?>
-                    <div class="info-item">
-                        <label class="info-label">Equipment Requirements</label>
-                        <div class="info-value"><?php echo e($subject->equipment_requirements); ?></div>
-                    </div>
-                <?php endif; ?>
-            </div>
+                            </div>
         </div>
     </div>
     
@@ -147,11 +161,11 @@
             <div class="card-body">
                 <div class="stat-item text-center mb-3">
                     <div class="stat-number text-primary"><?php echo e($stats['total_lessons']); ?></div>
-                    <div class="stat-label">Total Lessons</div>
+                    <div class="stat-label">Total Class Schedules</div>
                 </div>
                 <div class="stat-item text-center mb-3">
                     <div class="stat-number text-success"><?php echo e($stats['active_teachers']); ?></div>
-                    <div class="stat-label">Active Teachers</div>
+                    <div class="stat-label">Assigned Teachers</div>
                 </div>
                 <div class="stat-item text-center">
                     <div class="stat-number text-info"><?php echo e(number_format($stats['weekly_hours'], 1)); ?></div>
@@ -176,10 +190,6 @@
                 <thead class="thead-light">
                     <tr>
                         <th>Teacher Name</th>
-                        <th>Role</th>
-                        <th>Experience</th>
-                        <th>Status</th>
-                        <th>Notes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -195,21 +205,6 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <?php if($teacher->pivot->is_primary): ?>
-                                    <span class="badge badge-primary">Primary</span>
-                                <?php else: ?>
-                                    <span class="badge badge-secondary">Secondary</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?php echo e($teacher->pivot->experience_years); ?> years</td>
-                            <td>
-                                <span class="badge badge-<?php echo e($teacher->pivot->is_active ? 'success' : 'danger'); ?>">
-                                    <?php echo e($teacher->pivot->is_active ? 'Active' : 'Inactive'); ?>
-
-                                </span>
-                            </td>
-                            <td><?php echo e($teacher->pivot->notes ?? 'N/A'); ?></td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
@@ -224,7 +219,7 @@
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-calendar-alt text-info mr-2"></i>
-            Recent Lessons
+            Recent Schedules
         </h3>
     </div>
     <div class="card-body">

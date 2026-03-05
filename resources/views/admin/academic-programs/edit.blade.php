@@ -1,40 +1,6 @@
 @extends('layouts.admin')
 @section('content')
 
-@if($academicProgram->type === 'diploma' && $weekendLessonCount > 0)
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <h5 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Weekend Lessons Detected</h5>
-        <p class="mb-2">
-            <strong>{{ $weekendLessonCount }}</strong> lesson(s) are currently scheduled on weekends (Saturday/Sunday) for this Diploma Program.
-        </p>
-        <p class="mb-2">
-            <strong>Important:</strong> If you change this program type to <strong>Senior High School</strong> or <strong>College</strong>, 
-            you must first delete or reschedule these weekend lessons to weekdays (Monday-Friday).
-        </p>
-        <hr>
-        <p class="mb-2"><strong>Weekend Lessons:</strong></p>
-        <ul class="mb-2">
-            @foreach($weekendLessons->take(5) as $lesson)
-                <li>
-                    <strong>{{ $lesson->class->name ?? 'Unknown Class' }}</strong> - 
-                    {{ $lesson->subject->name ?? 'Unknown Subject' }} 
-                    ({{ $lesson->weekday == 6 ? 'Saturday' : 'Sunday' }} 
-                    {{ $lesson->start_time }} - {{ $lesson->end_time }})
-                </li>
-            @endforeach
-            @if($weekendLessonCount > 5)
-                <li><em>...and {{ $weekendLessonCount - 5 }} more</em></li>
-            @endif
-        </ul>
-        <a href="{{ route('admin.lessons.index') }}?program_id={{ $academicProgram->id }}" class="btn btn-sm btn-warning">
-            <i class="fas fa-calendar-alt"></i> View All Lessons
-        </a>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-@endif
-
 <div class="card">
     <div class="card-header">
         Edit Academic Program
@@ -119,22 +85,8 @@
                 </div>
             </div>
             
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="is_active">Status</label>
-                        <select class="form-control {{ $errors->has('is_active') ? 'is-invalid' : '' }}" name="is_active" id="is_active">
-                            <option value="1" {{ old('is_active', $academicProgram->is_active) == '1' ? 'selected' : '' }}>Active</option>
-                            <option value="0" {{ old('is_active', $academicProgram->is_active) == '0' ? 'selected' : '' }}>Inactive</option>
-                        </select>
-                        @if($errors->has('is_active'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('is_active') }}
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
+            <!-- Hidden field - all programs remain active (cannot be changed to inactive) -->
+            <input type="hidden" name="is_active" value="1">
             
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">

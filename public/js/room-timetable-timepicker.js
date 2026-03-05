@@ -4,27 +4,66 @@ $(document).ready(function() {
     $('#lessonModal').on('shown.bs.modal', function () {
         initializeTimePickers();
     });
+    
+    // Also initialize on modal hidden to clean up
+    $('#lessonModal').on('hidden.bs.modal', function () {
+        destroyTimePickers();
+    });
 
     function initializeTimePickers() {
-        $('.lesson-timepicker').each(function() {
-            $(this).attr('type', 'time');
-            $(this).attr('step', '1800'); // 30 minutes in seconds
-            $(this).attr('min', '07:00');
-            $(this).attr('max', '21:00');
+        // Target only timepickers within the modal to avoid conflicts
+        const $modalTimepickers = $('#lessonModal .lesson-timepicker');
+        
+        // Destroy any existing datetimepicker instances first
+        $modalTimepickers.each(function() {
+            if ($(this).data('DateTimePicker')) {
+                $(this).data('DateTimePicker').destroy();
+            }
         });
-
-        // Enable time picker functionality while keeping readonly for manual input prevention
-        $('.lesson-timepicker').off('click').on('click', function() {
-            $(this).removeAttr('readonly');
-            $(this).focus();
-            $(this).blur(() => {
-                $(this).attr('readonly', 'readonly');
+        
+        // Initialize bootstrap-datetimepicker (same as main form)
+        if (typeof $.fn.datetimepicker !== 'undefined') {
+            $modalTimepickers.each(function() {
+                const $input = $(this);
+                const hasPrefill = !!$input.val();
+                
+                $input.datetimepicker({
+                    format: 'h:mm A',
+                    stepping: 30,
+                    minDate: moment().startOf('day').add(7, 'hours'), // 7:00 AM
+                    maxDate: moment().startOf('day').add(21, 'hours'), // 9:00 PM
+                    useCurrent: false, // do not auto-set current time
+                    icons: {
+                        up: 'fas fa-chevron-up',
+                        down: 'fas fa-chevron-down',
+                        previous: 'fas fa-chevron-left',
+                        next: 'fas fa-chevron-right'
+                    }
+                });
+                
+                // If value exists (e.g., from edit mode), let it display as-is. Otherwise, keep empty.
+                if (!hasPrefill) {
+                    $input.val('');
+                }
+                
+                // Time validation on change
+                $input.on('dp.change', function() {
+                    validateTimeSelection();
+                });
             });
-        });
-
-        // Time validation
-        $('.lesson-timepicker').on('change', function() {
-            validateTimeSelection();
+            
+            console.log('Timepickers initialized for modal with time restrictions (7 AM - 9 PM)');
+        } else {
+            console.error('DateTimePicker plugin not available');
+        }
+    }
+    
+    function destroyTimePickers() {
+        // Target only timepickers within the modal
+        $('#lessonModal .lesson-timepicker').each(function() {
+            if ($(this).data('DateTimePicker')) {
+                $(this).data('DateTimePicker').destroy();
+            }
         });
     }
 
@@ -33,18 +72,19 @@ $(document).ready(function() {
         const endTime = $('#end_time').val();
 
         if (startTime && endTime) {
-            const start = moment(startTime, 'HH:mm');
-            const end = moment(endTime, 'HH:mm');
+            // Parse times using the same format as datetimepicker (h:mm A)
+            const start = moment(startTime, 'h:mm A');
+            const end = moment(endTime, 'h:mm A');
             
             // Validate school hours (7 AM - 9 PM)
-            const schoolStart = moment('07:00', 'HH:mm');
-            const schoolEnd = moment('21:00', 'HH:mm');
+            const schoolStart = moment('7:00 AM', 'h:mm A');
+            const schoolEnd = moment('9:00 PM', 'h:mm A');
             
             let errorMessage = '';
             
             if (start < schoolStart || start > schoolEnd || 
                 end < schoolStart || end > schoolEnd) {
-                errorMessage = 'Lessons must be scheduled between 7 AM and 9 PM';
+                errorMessage = 'Lessons must be scheduled between 7:00 AM and 9:00 PM';
             } else if (end <= start) {
                 errorMessage = 'End time must be after start time';
             } else {
@@ -55,9 +95,9 @@ $(document).ready(function() {
                     errorMessage = 'Lesson times must be in 30-minute intervals';
                 } else if (minutes < 30) {
                     errorMessage = 'Lesson must be at least 30 minutes long';
-                } else if (minutes > 180) {
-                    errorMessage = 'Lesson cannot be longer than 3 hours';
                 }
+                // Note: Server-side validation handles max duration based on lesson type
+                // Laboratory: 3-5 hours, Lecture: 1-3 hours
             }
 
             if (errorMessage) {

@@ -62,7 +62,10 @@ class AcademicProgramController extends Controller
 
     public function store(StoreAcademicProgramRequest $request)
     {
-        $academicProgram = AcademicProgram::create($request->all());
+        $data = $request->all();
+        // Ensure all programs are created as active
+        $data['is_active'] = true;
+        $academicProgram = AcademicProgram::create($data);
 
         // Automatically create grade levels based on program type
         $this->createGradeLevelsForProgram($academicProgram);
@@ -75,29 +78,17 @@ class AcademicProgramController extends Controller
         abort_if(Gate::denies('academic_program_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $academicProgram->load('gradeLevels');
-        
-        // Check for weekend lessons if this is a diploma program
-        $weekendLessonCount = 0;
-        $weekendLessons = collect();
-        
-        if ($academicProgram->type === 'diploma') {
-            $weekendLessons = \App\Lesson::whereHas('class', function($q) use ($academicProgram) {
-                $q->where('program_id', $academicProgram->id);
-            })
-            ->whereIn('weekday', [6, 7])
-            ->with(['class', 'subject'])
-            ->get();
-            
-            $weekendLessonCount = $weekendLessons->count();
-        }
 
-        return view('admin.academic-programs.edit', compact('academicProgram', 'weekendLessonCount', 'weekendLessons'));
+        return view('admin.academic-programs.edit', compact('academicProgram'));
     }
 
     public function update(UpdateAcademicProgramRequest $request, AcademicProgram $academicProgram)
     {
         $oldType = $academicProgram->type;
-        $academicProgram->update($request->all());
+        $data = $request->all();
+        // Ensure all programs remain active (cannot be changed to inactive)
+        $data['is_active'] = true;
+        $academicProgram->update($data);
 
         // If program type changed, recreate grade levels
         if ($oldType !== $academicProgram->type) {

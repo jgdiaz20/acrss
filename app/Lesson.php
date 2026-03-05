@@ -22,6 +22,8 @@ class Lesson extends Model
         'class_id',
         'room_id',
         'subject_id',
+        'lesson_type',
+        'duration_hours',
         'end_time',
         'teacher_id',
         'start_time',
@@ -37,6 +39,11 @@ class Lesson extends Model
         '5' => 'Friday',
         '6' => 'Saturday',
         '7' => 'Sunday',
+    ];
+
+    const LESSON_TYPES = [
+        'lecture' => 'Lecture',
+        'laboratory' => 'Laboratory',
     ];
 
     public function getDifferenceAttribute()
@@ -182,5 +189,43 @@ class Lesson extends Model
             ->when(request()->input('class_id'), function ($query) {
                 $query->where('class_id', request()->input('class_id'));
             });
+    }
+
+    /**
+     * Calculate duration in hours from start and end time
+     */
+    public static function calculateDuration($startTime, $endTime)
+    {
+        try {
+            $start = Carbon::parse($startTime);
+            $end = Carbon::parse($endTime);
+            $minutes = $end->diffInMinutes($start);
+            
+            // Round to nearest 30 minutes
+            $roundedMinutes = round($minutes / 30) * 30;
+            $hours = $roundedMinutes / 60;
+            
+            return $hours;
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Get formatted duration display
+     */
+    public function getFormattedDurationAttribute()
+    {
+        if (!$this->duration_hours) {
+            return 'N/A';
+        }
+        
+        $hours = floor($this->duration_hours);
+        $minutes = ($this->duration_hours - $hours) * 60;
+        
+        if ($minutes > 0) {
+            return $hours . 'h ' . round($minutes) . 'm';
+        }
+        return $hours . 'h';
     }
 }

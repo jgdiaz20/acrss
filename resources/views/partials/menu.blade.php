@@ -19,14 +19,10 @@
                         </i>
                         My Dashboard
                     </a>
-                </li>
-            @endif
-            @if(auth()->user()->is_student)
-                <li class="nav-item">
-                    <a href="{{ route("student.calendar.index") }}" class="nav-link {{ request()->is('student/calendar') || request()->is('student/calendar/*') ? 'active' : '' }}">
-                        <i class="fa-fw fas fa-calendar nav-icon">
+                    <a href="{{ route("teacher.calendar.index") }}" class="nav-link {{ request()->is('teacher') || request()->is('teacher/calendar/*') ? 'active' : '' }}">
+                        <i class="fa-fw fas fa-calendar-alt nav-icon">
                         </i>
-                        My Schedule
+                        My Timetable
                     </a>
                 </li>
             @endif
@@ -39,7 +35,7 @@
                         {{ trans('cruds.userManagement.title') }}
                     </a>
                     <ul class="nav-dropdown-items">
-                        @can('permission_access')
+                      <!--  @can('permission_access')
                             @if(config('app.env') !== 'production')
                                 <li class="nav-item">
                                     <a href="{{ route("admin.permissions.index") }}" class="nav-link {{ request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : '' }}">
@@ -50,7 +46,7 @@
                                     </a>
                                 </li>
                             @endif
-                        @endcan
+                        @endcan 
                         @can('role_access')
                             <li class="nav-item">
                                 <a href="{{ route("admin.roles.index") }}" class="nav-link {{ request()->is('admin/roles') || request()->is('admin/roles/*') ? 'active' : '' }}">
@@ -60,7 +56,7 @@
                                     {{ trans('cruds.role.title') }}
                                 </a>
                             </li>
-                        @endcan
+                        @endcan-->
                         @can('user_access')
                             <li class="nav-item">
                                 <a href="{{ route("admin.users.index") }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
@@ -78,14 +74,6 @@
                                     Teachers
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route("admin.users.index") }}?role=4" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
-                                    <i class="fa-fw fas fa-user nav-icon">
-
-                                    </i>
-                                    Students
-                                </a>
-                            </li>
                         @endcan
                     </ul>
                 </li>
@@ -94,9 +82,8 @@
                 <li class="nav-item nav-dropdown">
                     <a class="nav-link nav-dropdown-toggle" href="#">
                         <i class="fa-fw fas fa-school nav-icon">
-
                         </i>
-                        {{ trans('cruds.schoolClass.title') }}
+                        Programs
                     </a>
                     <ul class="nav-dropdown-items">
                         <li class="nav-item">
@@ -121,6 +108,14 @@
 
                                 </i>
                                 College
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.school-classes.index', ) }}" class="nav-link {{ request()->is('admin/school-classes*') ? 'active' : '' }}">
+                                <i class="fa-fw fas fa-layer-group nav-icon">
+
+                                </i>
+                                All Programs
                             </a>
                         </li>
                         <li class="nav-item">

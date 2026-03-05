@@ -105,7 +105,7 @@
                         @if($room->capacity)
                             <div class="detail-item">
                                 <i class="fas fa-users"></i>
-                                <span>{{ $room->capacity }} students</span>
+                                <span>{{ $room->capacity }} capacity</span>
                             </div>
                         @endif
                         

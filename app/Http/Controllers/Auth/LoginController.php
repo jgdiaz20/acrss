@@ -35,5 +35,28 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+        $this->middleware('auth')->only('logout');
+    }
+    
+    /**
+     * Log the user out of the application.
+     * Handles expired sessions gracefully without CSRF errors.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function logout(\Illuminate\Http\Request $request)
+    {
+        // Force logout even if session/CSRF token is expired
+        \Illuminate\Support\Facades\Auth::logout();
+        
+        // Invalidate the session
+        $request->session()->invalidate();
+        
+        // Regenerate CSRF token
+        $request->session()->regenerateToken();
+        
+        return redirect()->route('login')
+            ->with('status', 'You have been successfully logged out.');
     }
 }

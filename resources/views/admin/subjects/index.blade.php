@@ -49,28 +49,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-control form-control-sm" id="lab-filter">
-                        <option value="">Lab/Non-Lab</option>
-                        <option value="1" {{ request('lab') == '1' ? 'selected' : '' }}>Lab Required</option>
-                        <option value="0" {{ request('lab') == '0' ? 'selected' : '' }}>No Lab</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-control form-control-sm" id="equipment-filter">
-                        <option value="">Equipment</option>
-                        <option value="1" {{ request('equipment') == '1' ? 'selected' : '' }}>Equipment Required</option>
-                        <option value="0" {{ request('equipment') == '0' ? 'selected' : '' }}>No Equipment</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-control form-control-sm" id="status-filter">
-                        <option value="">All Status</option>
-                        <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>Active</option>
-                        <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>Inactive</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="input-group input-group-sm">
                         <input type="text" class="form-control" id="search-input" placeholder="Search subjects..." value="{{ request('search') }}">
                         <div class="input-group-append">
@@ -80,7 +59,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-2">
                     <button class="btn btn-primary btn-sm btn-block" type="button" onclick="filterTable()">
                         <i class="fas fa-filter"></i> Apply
                     </button>
@@ -119,30 +98,6 @@
                                 @foreach(\App\Subject::SUBJECT_TYPES as $key => $type)
                                     <option value="{{ $key }}" {{ request('type') == $key ? 'selected' : '' }}>{{ $type }}</option>
                                 @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Lab Requirement</label>
-                            <select class="form-control form-control-sm" id="lab-filter-mobile">
-                                <option value="">All Subjects</option>
-                                <option value="1" {{ request('lab') == '1' ? 'selected' : '' }}>Lab Required</option>
-                                <option value="0" {{ request('lab') == '0' ? 'selected' : '' }}>No Lab Required</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Equipment Requirement</label>
-                            <select class="form-control form-control-sm" id="equipment-filter-mobile">
-                                <option value="">All Subjects</option>
-                                <option value="1" {{ request('equipment') == '1' ? 'selected' : '' }}>Equipment Required</option>
-                                <option value="0" {{ request('equipment') == '0' ? 'selected' : '' }}>No Equipment Required</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Status</label>
-                            <select class="form-control form-control-sm" id="status-filter-mobile">
-                                <option value="">All Status</option>
-                                <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>Active</option>
-                                <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>Inactive</option>
                             </select>
                         </div>
                         <button class="btn btn-primary btn-sm btn-block" onclick="filterTable()">
@@ -190,11 +145,9 @@
                         <th>Code</th>
                         <th>Type</th>
                         <th>Credits</th>
-                        <th>Requirements</th>
-                        <th>Lessons</th>
+                        <th>Schedules</th>
                         <th>Teachers</th>
-                        <th>Status</th>
-                        <th>&nbsp;</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -204,29 +157,24 @@
 
                             </td>
                             <td><span class="badge badge-secondary">{{ $subject->id }}</span></td>
-                            <td>{{ $subject->name }}</td>
+                            <td>
+                                {{ $subject->name }}
+                                {!! $subject->mode_badge !!}
+                            </td>
                             <td><span class="badge badge-info">{{ $subject->code }}</span></td>
                             <td>
                                 <span class="badge badge-{{ $subject->type === 'core' ? 'primary' : 'secondary' }}">
                                     {{ \App\Subject::SUBJECT_TYPES[$subject->type] }}
                                 </span>
                             </td>
-                            <td>{{ $subject->credits }}</td>
                             <td>
-                                @if($subject->requires_lab)
-                                    <span class="badge badge-warning">Lab</span>
-                                @endif
-                                @if($subject->requires_equipment)
-                                    <span class="badge badge-info">Equipment</span>
-                                @endif
+                                <span data-toggle="tooltip" data-html="true" 
+                                      title="<strong>Total:</strong> {{ $subject->total_hours }}h<br><strong>Lecture:</strong> {{ $subject->lecture_units }}u ({{ $subject->total_lecture_hours }}h)<br><strong>Lab:</strong> {{ $subject->lab_units }}u ({{ $subject->total_lab_hours }}h)">
+                                    {{ $subject->credits }} 
+                                </span>
                             </td>
                             <td>{{ $subject->lessons_count }}</td>
                             <td>{{ $subject->teachers_count }}</td>
-                            <td>
-                                <span class="badge badge-{{ $subject->is_active ? 'success' : 'danger' }}">
-                                    {{ $subject->is_active ? 'Active' : 'Inactive' }}
-                                </span>
-                            </td>
                             <td>
                                 @can('subject_show')
                                     <a class="btn btn-xs btn-primary" href="{{ route('admin.subjects.show', $subject->id) }}">
@@ -254,18 +202,18 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <div class="empty-state">
                                     <i class="fas fa-search fa-3x text-muted mb-3"></i>
                                     <h5 class="text-muted">No subjects found</h5>
                                     <p class="text-muted">
-                                        @if(request()->hasAny(['type', 'lab', 'equipment', 'is_active', 'search']))
+                                        @if(request()->hasAny(['type', 'search']))
                                             No subjects found matching your filters. Try adjusting your search criteria.
                                         @else
                                             No subjects have been created yet. Click "Add Subject" to create your first subject.
                                         @endif
                                     </p>
-                                    @if(request()->hasAny(['type', 'lab', 'equipment', 'is_active', 'search']))
+                                    @if(request()->hasAny(['type', 'search']))
                                         <a href="{{ route('admin.subjects.index') }}" class="btn btn-primary mt-2">
                                             </i> Clear All Filters
                                         </a>
@@ -277,9 +225,11 @@
                 </tbody>
             </table>
         </div>
-
-        {{ $subjects->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4') }}
-    </div>
+        @if($subjects->hasPages())
+            <div class="d-flex justify-content-center mt-3">
+            {{ $subjects->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4') }}
+            </div>
+        @endif
 </div>
 
 
@@ -316,7 +266,7 @@
         border-right: 1px solid #dee2e6;
     }
 
-    /* Pagination uses Bootstrap 4 template; no overrides needed */
+    
 </style>
 @endsection
 
@@ -335,7 +285,15 @@ $(function () {
       $('.card').first().before(alertHtml);
       localStorage.removeItem('flash_success');
   }
-
+  // Pagination
+  //pagination
+    function changePerPage() {
+    const perPage = document.getElementById('per-page-selector').value;
+    const url = new URL(window.location);
+    url.searchParams.set('per_page', perPage);
+    url.searchParams.delete('page'); // Reset to first page
+    window.location.href = url.toString();
+    }
   // Initialize DataTable with select-checkbox first column
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 
@@ -409,9 +367,6 @@ $(function () {
 function filterTable() {
     const isMobile = window.innerWidth < 768;
     const typeFilter = isMobile ? document.getElementById('type-filter-mobile').value : document.getElementById('type-filter').value;
-    const labFilter = isMobile ? document.getElementById('lab-filter-mobile').value : document.getElementById('lab-filter').value;
-    const equipmentFilter = isMobile ? document.getElementById('equipment-filter-mobile').value : document.getElementById('equipment-filter').value;
-    const statusFilter = isMobile ? document.getElementById('status-filter-mobile').value : document.getElementById('status-filter').value;
     const searchInput = isMobile ? document.getElementById('search-input-mobile').value : document.getElementById('search-input').value;
     
     const url = new URL(window.location);
@@ -421,27 +376,6 @@ function filterTable() {
         url.searchParams.set('type', typeFilter);
     } else {
         url.searchParams.delete('type');
-    }
-    
-    // Lab filter
-    if (labFilter) {
-        url.searchParams.set('lab', labFilter);
-    } else {
-        url.searchParams.delete('lab');
-    }
-    
-    // Equipment filter
-    if (equipmentFilter) {
-        url.searchParams.set('equipment', equipmentFilter);
-    } else {
-        url.searchParams.delete('equipment');
-    }
-    
-    // Status filter
-    if (statusFilter) {
-        url.searchParams.set('is_active', statusFilter);
-    } else {
-        url.searchParams.delete('is_active');
     }
     
     // Search
@@ -475,29 +409,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const labFilter = document.getElementById('lab-filter');
-    const labFilterMobile = document.getElementById('lab-filter-mobile');
-    if (labFilter && labFilterMobile) {
-        labFilter.addEventListener('change', function() {
-            labFilterMobile.value = this.value;
-        });
-    }
-
-    const equipmentFilter = document.getElementById('equipment-filter');
-    const equipmentFilterMobile = document.getElementById('equipment-filter-mobile');
-    if (equipmentFilter && equipmentFilterMobile) {
-        equipmentFilter.addEventListener('change', function() {
-            equipmentFilterMobile.value = this.value;
-        });
-    }
-
-    const statusFilter = document.getElementById('status-filter');
-    const statusFilterMobile = document.getElementById('status-filter-mobile');
-    if (statusFilter && statusFilterMobile) {
-        statusFilter.addEventListener('change', function() {
-            statusFilterMobile.value = this.value;
-        });
-    }
 });
 
 function massDestroy() {
@@ -577,6 +488,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize highlighting for already checked boxes
         toggleRowHighlight(checkbox);
     });
+
+    // Initialize tooltips for credit breakdown
+    $('[data-toggle="tooltip"]').tooltip();
 });
 
 function toggleRowHighlight(checkbox) {
