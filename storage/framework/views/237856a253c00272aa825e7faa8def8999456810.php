@@ -41,7 +41,7 @@
     <div class="row">
         <div class="col-lg-12">
             <!-- Header -->
-            <div class="timetable-container">
+            <div class="timetable-container school-class-timetable">
                 <div class="timetable-header">
                     <div class="text-center mb-3">
                         <h2 class="timetable-title"><?php echo e($schoolClass->name); ?> - Class Schedule</h2>
@@ -87,9 +87,9 @@
                         <div class="timetable-day-column <?php echo e(($index == 6 || $index == 7) ? 'weekend' : ''); ?>" data-day="<?php echo e($index); ?>">
                             <?php if(isset($calendarData[$index]) && count($calendarData[$index]) > 0): ?>
                                 <?php $__currentLoopData = $calendarData[$index]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lesson): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <div class="class-box lesson-display" 
-                                         title="Lesson: <?php echo e($lesson['subject_name']); ?> with <?php echo e($lesson['teacher_name']); ?>">
-                                        <div class="class-subject"><?php echo e($lesson['subject_name']); ?></div>
+                                    <div class="class-box school-class-lesson-box" 
+                                         title="Lesson: <?php echo e($lesson['subject_code']); ?> with <?php echo e($lesson['teacher_name']); ?>">
+                                        <div class="class-subject"><?php echo e($lesson['subject_code']); ?></div>
                                         <div class="class-time"><?php echo e($lesson['start_time']); ?> - <?php echo e($lesson['end_time']); ?></div>
                                         <div class="class-instructor"><?php echo e($lesson['teacher_name']); ?></div>
                                         <div class="class-room"><?php echo e($lesson['room_name']); ?></div>
@@ -99,7 +99,7 @@
                                 <div class="not-scheduled-box">
                                     Available
                                 </div>
-                            <?php endif; ?>
+                            <?php endif; ?>                  
                         </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>

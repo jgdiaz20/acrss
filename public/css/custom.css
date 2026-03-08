@@ -63,6 +63,56 @@ table.dataTable thead .sorting_desc {
 .sidebar .nav-item {
     cursor: pointer;
 }
+.navbar-brand-logo {
+    height: 35px;
+    width: auto;
+    margin-right: 10px;
+}
+
+.navbar-brand-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.navbar-brand-logo-minimized {
+    height: 25px;
+    width: auto;
+}
+
+.navbar-brand-text-minimized {
+    display: none;
+}
+
+/* Responsive behavior */
+@media (min-width: 992px) {
+    .navbar-brand .d-flex:first-child {
+        display: flex !important;
+    }
+    .navbar-brand .d-flex:last-child {
+        display: none !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .navbar-brand .d-flex:first-child {
+        display: none !important;
+    }
+    .navbar-brand .d-flex:last-child {
+        display: flex !important;
+    }
+    
+    /* Show text only on larger screens within minimized state */
+    @media (min-width: 768px) {
+        .navbar-brand-text-minimized {
+            display: inline;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-left: 8px;
+        }
+    }
+}
 
 .btn-default {
     color: #23282c;
@@ -820,6 +870,53 @@ table.dataTable thead .sorting_desc {
     color: #6c757d;
     font-style: italic;
     font-size: 14px;
+}
+.school-class-timetable .school-class-lesson-box{
+    background: white !important;
+    border: 1px solid #d1d3d4 !important;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0,1);
+    width: 140px;
+    height: 85px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+.school-class-timetable .school-class-lesson-box .class-subject{
+    color: #28a745 !important;
+    font-weight: 600;
+    font-size:12px;
+    margin-bottom: 3px;
+    line-height: 1.2;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.school-class-timetable .school-class-lesson-box .class-time{
+    color:#495057 !important;
+    font-size:11px;
+    font-weight: 500;
+    margin-bottom:2px;
+    line-height:1.1;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.school-class-timetable .school-class-lesson-box .class-room{
+    color: #6c757d !important;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* Time column styling */

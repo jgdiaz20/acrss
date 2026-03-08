@@ -23,19 +23,25 @@
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet" />
     @yield('styles')
 </head>
-
 <body class="app header-fixed sidebar-fixed aside-menu-fixed pace-done sidebar-lg-show">
     <header class="app-header navbar">
         <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
             <span class="navbar-toggler-icon"></span>
         </button>
         <a class="navbar-brand" href="#">
-            <span class="navbar-brand-full">{{ trans('panel.site_title') }}</span>
-            <span class="navbar-brand-minimized">{{ trans('panel.site_title') }}</span>
+            <span class="navbar-brand-full d-flex align-items-center">
+                <img src="{{ asset('images/acrss-logo-new.svg') }}" 
+                    alt="{{ trans('panel.site_title') }}" 
+                    style="height: 35px; width: auto; margin-right: 10px;">
+                {{ trans('panel.site_title') }}
+            </span>
+            <span class="navbar-brand-minimized d-flex align-items-center">
+                <img src="{{ asset('images/acrss-logo-new.svg') }}" 
+                    alt="{{ trans('panel.site_title') }}" 
+                    style="height: 25px; width: auto;">
+                <span class="d-none d-md-inline ml-2">{{ trans('panel.site_title') }}</span>
+            </span>
         </a>
-        <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
-            <span class="navbar-toggler-icon"></span>
-        </button>
 
         <ul class="nav navbar-nav ml-auto">
             @if(count(config('panel.available_languages', [])) > 1)

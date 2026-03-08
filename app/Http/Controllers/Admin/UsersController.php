@@ -25,6 +25,16 @@ class UsersController extends Controller
                     $query->whereId($request->role);
                 });
             })
+            ->when($request->search, function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'LIKE', "%{$search}%")
+                          ->orWhere('email', 'LIKE', "%{$search}%")
+                          ->orWhereHas('roles', function ($query) use ($search) {
+                              $query->where('title', 'LIKE', "%{$search}%");
+                          });
+                });
+            })
             ->paginate($perPage);
 
         return view('admin.users.index', compact('users'));

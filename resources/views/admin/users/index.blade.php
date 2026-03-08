@@ -59,24 +59,12 @@
                     <div class="dropdown-item">
                         <div class="form-check">
                             <input class="form-check-input column-toggle" data-column="4" type="checkbox" checked>
-                            <label class="form-check-label">Email Verified</label>
-                        </div>
-                    </div>
-                    <div class="dropdown-item">
-                        <div class="form-check">
-                            <input class="form-check-input column-toggle" data-column="5" type="checkbox" checked>
                             <label class="form-check-label">Roles</label>
                         </div>
                     </div>
                     <div class="dropdown-item">
                         <div class="form-check">
-                            <input class="form-check-input column-toggle" data-column="6" type="checkbox" checked>
-                            <label class="form-check-label">Class</label>
-                        </div>
-                    </div>
-                    <div class="dropdown-item">
-                        <div class="form-check">
-                            <input class="form-check-input column-toggle" data-column="7" type="checkbox" checked>
+                            <input class="form-check-input column-toggle" data-column="5" type="checkbox" checked>
                             <label class="form-check-label">Created</label>
                         </div>
                     </div>
@@ -113,6 +101,30 @@
             </div>
         </div>
         
+        <!-- Search Bar -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="input-group">
+                    <input type="text" 
+                           class="form-control" 
+                           id="search-input" 
+                           placeholder="Search by name, email, or role..." 
+                           value="{{ request('search') }}"
+                           onkeyup="performSearch(event)">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" onclick="applySearch()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        @if(request('search'))
+                        <button class="btn btn-outline-danger" type="button" onclick="clearSearch()">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="table-responsive">
             <table class=" table table-bordered table-striped table-hover datatable datatable-User">
                 <thead>
@@ -130,16 +142,10 @@
                             {{ trans('cruds.user.fields.email') }}
                         </th>
                         <th>
-                            {{ trans('cruds.user.fields.email_verified_at') }}
-                        </th>
-                        <th>
                             {{ trans('cruds.user.fields.roles') }}
                         </th>
                         <th>
-                            {{ trans('cruds.user.fields.class') }}
-                        </th>
-                        <th>
-                            &nbsp;
+                           Actions
                         </th>
                     </tr>
                 </thead>
@@ -159,15 +165,9 @@
                                 {{ $user->email ?? '' }}
                             </td>
                             <td>
-                                {{ $user->email_verified_at ?? '' }}
-                            </td>
-                            <td>
                                 @foreach($user->roles as $key => $item)
                                     <span class="badge badge-info">{{ $item->title }}</span>
                                 @endforeach
-                            </td>
-                            <td>
-                                {{ $user->class->name ?? '' }}
                             </td>
                             <td>
                                 @can('user_show')
@@ -298,9 +298,7 @@
       { targets: 2, visible: true },
       { targets: 3, visible: true },
       { targets: 4, visible: true },
-      { targets: 5, visible: true },
-      { targets: 6, visible: true },
-      { targets: 7, orderable: false, searchable: false }
+      { targets: 5, orderable: false, searchable: false }
     ]
   })
   
@@ -370,6 +368,33 @@ function changePerPage() {
     const perPage = document.getElementById('per-page-selector').value;
     const url = new URL(window.location);
     url.searchParams.set('per_page', perPage);
+    url.searchParams.delete('page'); // Reset to first page
+    window.location.href = url.toString();
+}
+
+function performSearch(event) {
+    if (event.key === 'Enter') {
+        applySearch();
+    }
+}
+
+function applySearch() {
+    const searchValue = document.getElementById('search-input').value.trim();
+    const url = new URL(window.location);
+    
+    if (searchValue) {
+        url.searchParams.set('search', searchValue);
+    } else {
+        url.searchParams.delete('search');
+    }
+    
+    url.searchParams.delete('page'); // Reset to first page
+    window.location.href = url.toString();
+}
+
+function clearSearch() {
+    const url = new URL(window.location);
+    url.searchParams.delete('search');
     url.searchParams.delete('page'); // Reset to first page
     window.location.href = url.toString();
 }

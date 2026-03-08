@@ -39,7 +39,7 @@
     <div class="row">
         <div class="col-lg-12">
             <!-- Header -->
-            <div class="timetable-container">
+            <div class="timetable-container school-class-timetable">
                 <div class="timetable-header">
                     <div class="text-center mb-3">
                         <h2 class="timetable-title">{{ $schoolClass->name }} - Class Schedule</h2>
@@ -83,9 +83,9 @@
                         <div class="timetable-day-column {{ ($index == 6 || $index == 7) ? 'weekend' : '' }}" data-day="{{ $index }}">
                             @if(isset($calendarData[$index]) && count($calendarData[$index]) > 0)
                                 @foreach($calendarData[$index] as $lesson)
-                                    <div class="class-box lesson-display" 
-                                         title="Lesson: {{ $lesson['subject_name'] }} with {{ $lesson['teacher_name'] }}">
-                                        <div class="class-subject">{{ $lesson['subject_name'] }}</div>
+                                    <div class="class-box school-class-lesson-box" 
+                                         title="Lesson: {{ $lesson['subject_code'] }} with {{ $lesson['teacher_name'] }}">
+                                        <div class="class-subject">{{ $lesson['subject_code'] }}</div>
                                         <div class="class-time">{{ $lesson['start_time'] }} - {{ $lesson['end_time'] }}</div>
                                         <div class="class-instructor">{{ $lesson['teacher_name'] }}</div>
                                         <div class="class-room">{{ $lesson['room_name'] }}</div>
@@ -95,7 +95,7 @@
                                 <div class="not-scheduled-box">
                                     Available
                                 </div>
-                            @endif
+                            @endif                  
                         </div>
                     @endforeach
                 </div>

@@ -63,8 +63,10 @@ return [
             'updated_at_helper'        => '',
             'deleted_at'               => 'Deleted at',
             'deleted_at_helper'        => '',
-            'section'                    => 'Section',
+            'class'                    => 'Class',
             'class_helper'             => '',
+            'section'                  => 'Section',
+            'section_helper'           => '',
         ],
     ],
     'lesson'         => [
