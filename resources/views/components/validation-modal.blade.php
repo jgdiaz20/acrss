@@ -1,4 +1,4 @@
-aaaaaaaaaa{{-- Simple Conflict Notification Modal --}}
+{{-- Simple Conflict Notification Modal --}}
 <div class="modal fade" id="validationModal" tabindex="-1" role="dialog" aria-labelledby="validationModalLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content validation-modal">

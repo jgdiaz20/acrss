@@ -30,7 +30,7 @@
                     </div>
                     
                     @foreach($weekDays as $index => $day)
-                        <div class="timetable-day-column {{ ($index == 6 || $index == 7) ? 'weekend' : '' }}">
+                        <div class="timetable-day-column">
                             @if(isset($calendarData[$index]) && count($calendarData[$index]) > 0)
                                 @foreach($calendarData[$index] as $lesson)
                                     <div class="class-box teacher-timetable-class-box">
@@ -59,6 +59,7 @@
 
 @section('styles')
 <style>
+
 /* Teacher Calendar - Improved Timetable Only */
 .timetable-day-header {
 background: #f8f9fa;
@@ -98,6 +99,16 @@ border-bottom: 1px solid #e1e5e9;
     overflow: hidden;
     box-sizing: border-box;
 }
+/* Enhanced box shadow with better visual hierarchy */
+.timetable-container {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06), 
+                0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: white;
+    overflow: hidden;
+    margin-bottom: 20px; /* Add space below container */
+}
+
 
 .teacher-timetable-class-box .class-subject {
     color: #28a745 !important;
@@ -168,6 +179,15 @@ border-bottom: 1px solid #e1e5e9;
     .timetable-container-fixed {
         min-width: 1000px; /* Maintain fixed width on mobile */
     }
+    .timetable-container {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin: 10px; /* Add margin on mobile */
+    }
+    .content .timetable-container .timetable-header h2 {
+        font-size: 1.2rem !important;
+        line-height: 1.2;
+    }
 }
+
 </style>
 @endsection
