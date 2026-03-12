@@ -11,7 +11,7 @@ class UsersTableSeeder extends Seeder
             [
                 'id'             => 1,
                 'name'           => 'Admin',
-                'email'          => 'admin@admin.com', // Legacy admin account - exempt from .edu.ph validation
+                'email'          => 'admin@asiancollege.edu.ph', // Legacy admin account - exempt from .edu.ph validation
                 'password'       => '$2y$10$HvSDJRBDVWwRd18qj5oaQOF0DBXqnZcyFJ4dJA8hcQGAfmyZ7xkei',
                 'remember_token' => null,
                 'class_id'       => null,
