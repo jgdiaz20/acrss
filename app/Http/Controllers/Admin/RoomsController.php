@@ -8,6 +8,7 @@ use App\Http\Requests\StoreRoomRequest;
 use App\Http\Requests\UpdateRoomRequest;
 use App\Room;
 use App\Services\QRCodeService;
+use App\Services\CacheInvalidationService;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -69,6 +70,9 @@ class RoomsController extends Controller
         
         $room = Room::create($data);
 
+        // Clear cached room dropdown data (e.g., rooms_for_subject_*) so newly created rooms appear immediately
+        CacheInvalidationService::clearRoomAssignmentCaches();
+
         return redirect()->route('admin.room-management.rooms.index')
             ->with('success', 'Room created successfully!');
     }
@@ -89,6 +93,9 @@ class RoomsController extends Controller
         $data['has_equipment'] = false; // Equipment field removed from UI
         
         $room->update($data);
+
+        // Clear cached room dropdown data so updates are reflected immediately
+        CacheInvalidationService::clearRoomAssignmentCaches();
 
         return redirect()->route('admin.room-management.rooms.index')
             ->with('success', 'Room updated successfully!');
@@ -116,6 +123,9 @@ class RoomsController extends Controller
         
         // Hard delete the room - completely remove from database
         $room->forceDelete();
+
+        // Clear cached room dropdown data after deletion
+        CacheInvalidationService::clearRoomAssignmentCaches();
 
         return back()->with('success', "Room '{$roomName}' has been successfully deleted!");
     }
@@ -150,6 +160,9 @@ class RoomsController extends Controller
 
         // Perform hard delete (permanent)
         Room::whereIn('id', $roomIds)->forceDelete();
+
+        // Clear cached room dropdown data after deletion
+        CacheInvalidationService::clearRoomAssignmentCaches();
 
         return response()->json([
             'message' => $roomCount === 1

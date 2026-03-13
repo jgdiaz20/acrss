@@ -523,27 +523,18 @@ class LessonsController extends Controller
     {
         try {
             $subjectId = $request->get('subject_id');
-            
-            // Use caching for better performance
-            $cacheKey = "rooms_for_subject_{$subjectId}";
-            $rooms = \Cache::remember($cacheKey, 300, function() use ($subjectId) {
-                if (!$subjectId) {
-                    return Room::all()->mapWithKeys(function($room) {
-                        return [$room->id => $room->display_name];
-                    })->toArray();
-                }
+            $clearCache = $request->get('clear_cache', false);
 
-                $subject = \App\Subject::find($subjectId);
-                if (!$subject) {
-                    return Room::all()->mapWithKeys(function($room) {
-                        return [$room->id => $room->display_name];
-                    })->toArray();
-                }
-                // Return all rooms regardless of subject requirements (no filtering)
-                return Room::all()->mapWithKeys(function($room) {
-                    return [$room->id => $room->display_name];
-                })->toArray();
-            });
+            // Clear cache if requested (and/or if rooms were recently changed)
+            if ($clearCache) {
+                CacheInvalidationService::clearRoomAssignmentCaches($subjectId);
+            }
+
+            // NOTE: Do NOT cache rooms dropdown results.
+            // Rooms can be created/updated frequently by admins; caching causes stale dropdowns during lesson creation.
+            $rooms = Room::all()->mapWithKeys(function ($room) {
+                return [$room->id => $room->display_name];
+            })->toArray();
 
             return response()->json(['rooms' => $rooms]);
         } catch (\Exception $e) {
