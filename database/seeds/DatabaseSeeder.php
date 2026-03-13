@@ -10,14 +10,8 @@ class DatabaseSeeder extends Seeder
             PermissionsTableSeeder::class,
             RolesTableSeeder::class,
             PermissionRoleTableSeeder::class,
-            AcademicProgramSeeder::class,
-            GradeLevelSeeder::class,
-            SchoolClassesTableSeeder::class,
-            RoomsTableSeeder::class,
-            SubjectSeeder::class,
             UsersTableSeeder::class,
             RoleUserTableSeeder::class,
-            LessonsTableSeeder::class,
         ]);
     }
 }
