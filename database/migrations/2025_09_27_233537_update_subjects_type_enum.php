@@ -7,16 +7,10 @@ use Illuminate\Support\Facades\DB;
 
 class UpdateSubjectsTypeEnum extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
-        // For SQLite compatibility, we need to recreate the table
         if (DB::getDriverName() === 'sqlite') {
-            // Create a new table with the updated structure
+            // SQLite implementation (unchanged)
             Schema::create('subjects_temp', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('name');
@@ -32,22 +26,20 @@ class UpdateSubjectsTypeEnum extends Migration
                 $table->softDeletes();
             });
             
-            // Copy data with type conversion
-            DB::statement("INSERT INTO subjects_temp (id, name, code, description, credits, type, requires_lab, requires_equipment, equipment_requirements, is_active, created_at, updated_at, deleted_at) 
-                SELECT id, name, code, description, credits,
-                    CASE 
-                        WHEN type IN ('core', 'practical', 'theoretical') THEN 'major'
-                        WHEN type = 'elective' THEN 'minor'
-                        ELSE 'major'
-                    END as type,
-                    requires_lab, requires_equipment, equipment_requirements, is_active, created_at, updated_at, deleted_at 
-                FROM subjects");
+            DB::statement("INSERT INTO subjects_temp SELECT id, name, code, description, credits,
+                CASE WHEN type IN ('core', 'practical', 'theoretical') THEN 'major' WHEN type = 'elective' THEN 'minor' ELSE 'major' END,
+                requires_lab, requires_equipment, equipment_requirements, is_active, created_at, updated_at, deleted_at FROM subjects");
             
-            // Drop old table and rename new one
             Schema::drop('subjects');
             Schema::rename('subjects_temp', 'subjects');
+        } elseif (DB::getDriverName() === 'pgsql') {
+            // PostgreSQL specific implementation
+            DB::statement("ALTER TABLE subjects ALTER COLUMN type TYPE VARCHAR(20) USING type::VARCHAR(20)");
+            DB::statement("UPDATE subjects SET type = 'major' WHERE type IN ('core', 'practical', 'theoretical')");
+            DB::statement("UPDATE subjects SET type = 'minor' WHERE type = 'elective'");
+            DB::statement("ALTER TABLE subjects ADD CONSTRAINT subjects_type_check CHECK (type IN ('minor', 'major'))");
         } else {
-            // MySQL/PostgreSQL specific implementation
+            // MySQL implementation (unchanged)
             DB::statement("ALTER TABLE subjects MODIFY COLUMN type ENUM('core', 'elective', 'practical', 'theoretical', 'minor', 'major') DEFAULT 'core'");
             DB::statement("UPDATE subjects SET type = 'major' WHERE type IN ('core', 'practical', 'theoretical')");
             DB::statement("UPDATE subjects SET type = 'minor' WHERE type = 'elective'");
@@ -55,16 +47,10 @@ class UpdateSubjectsTypeEnum extends Migration
         }
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        // For SQLite compatibility, we need to recreate the table
         if (DB::getDriverName() === 'sqlite') {
-            // Create a new table with the original structure
+            // SQLite rollback
             Schema::create('subjects_temp', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('name');
@@ -80,25 +66,24 @@ class UpdateSubjectsTypeEnum extends Migration
                 $table->softDeletes();
             });
             
-            // Copy data with type conversion
-            DB::statement("INSERT INTO subjects_temp (id, name, code, description, credits, type, requires_lab, requires_equipment, equipment_requirements, is_active, created_at, updated_at, deleted_at) 
-                SELECT id, name, code, description, credits,
-                    CASE 
-                        WHEN type = 'major' THEN 'core'
-                        WHEN type = 'minor' THEN 'elective'
-                        ELSE 'core'
-                    END as type,
-                    requires_lab, requires_equipment, equipment_requirements, is_active, created_at, updated_at, deleted_at 
-                FROM subjects");
+            DB::statement("INSERT INTO subjects_temp SELECT id, name, code, description, credits,
+                CASE WHEN type = 'major' THEN 'core' WHEN type = 'minor' THEN 'elective' ELSE 'core' END,
+                requires_lab, requires_equipment, equipment_requirements, is_active, created_at, updated_at, deleted_at FROM subjects");
             
-            // Drop old table and rename new one
             Schema::drop('subjects');
             Schema::rename('subjects_temp', 'subjects');
-        } else {
-            // MySQL/PostgreSQL specific implementation
-            DB::statement("ALTER TABLE subjects MODIFY COLUMN type ENUM('core', 'elective', 'practical', 'theoretical') DEFAULT 'core'");
+        } elseif (DB::getDriverName() === 'pgsql') {
+            // PostgreSQL rollback
+            DB::statement("ALTER TABLE subjects DROP CONSTRAINT subjects_type_check");
             DB::statement("UPDATE subjects SET type = 'core' WHERE type = 'major'");
             DB::statement("UPDATE subjects SET type = 'elective' WHERE type = 'minor'");
+            DB::statement("ALTER TABLE subjects ADD CONSTRAINT subjects_type_check CHECK (type IN ('core', 'elective', 'practical', 'theoretical'))");
+        } else {
+            // MySQL rollback
+            DB::statement("ALTER TABLE subjects MODIFY COLUMN type ENUM('core', 'elective', 'practical', 'theoretical', 'minor', 'major') DEFAULT 'core'");
+            DB::statement("UPDATE subjects SET type = 'core' WHERE type = 'major'");
+            DB::statement("UPDATE subjects SET type = 'elective' WHERE type = 'minor'");
+            DB::statement("ALTER TABLE subjects MODIFY COLUMN type ENUM('core', 'elective', 'practical', 'theoretical') DEFAULT 'core'");
         }
     }
 }
