@@ -33,20 +33,42 @@ class UpdateSubjectsTypeEnum extends Migration
             Schema::drop('subjects');
             Schema::rename('subjects_temp', 'subjects');
         } elseif (DB::getDriverName() === 'pgsql') {
-            // PostgreSQL specific implementation
-            DB::statement("ALTER TABLE subjects ALTER COLUMN type TYPE VARCHAR(20) USING type::VARCHAR(20)");
+            // PostgreSQL: convert enum-like behaviour to simple VARCHAR and enforce minor/major
+
+            // 1) Drop any existing CHECK constraints on subjects (original enum creates an implicit CHECK)
+            DB::statement("
+                DO $$
+                DECLARE
+                    r RECORD;
+                BEGIN
+                    FOR r IN
+                        SELECT conname
+                        FROM pg_constraint
+                        WHERE conrelid = 'subjects'::regclass
+                          AND contype = 'c'
+                    LOOP
+                        EXECUTE format('ALTER TABLE subjects DROP CONSTRAINT %I', r.conname);
+                    END LOOP;
+                END
+                $$;
+            ");
+
+            // 2) Widen the column type
+            DB::statement("ALTER TABLE subjects ALTER COLUMN type TYPE VARCHAR(20)");
+
+            // 3) Normalize any existing values (safe even on a fresh DB)
             DB::statement("UPDATE subjects SET type = 'major' WHERE type IN ('core', 'practical', 'theoretical')");
             DB::statement("UPDATE subjects SET type = 'minor' WHERE type = 'elective'");
 
-            // Only add the constraint if it does not already exist
+            // 4) Add a new CHECK constraint that only allows 'minor' and 'major'
             DB::statement("
                 DO $$
                 BEGIN
                     IF NOT EXISTS (
                         SELECT 1
                         FROM pg_constraint
-                        WHERE conname = 'subjects_type_check'
-                          AND conrelid = 'subjects'::regclass
+                        WHERE conrelid = 'subjects'::regclass
+                          AND conname = 'subjects_type_check'
                     ) THEN
                         ALTER TABLE subjects
                             ADD CONSTRAINT subjects_type_check CHECK (type IN ('minor', 'major'));
