@@ -21,6 +21,8 @@ class AcademicProgramSeeder extends Seeder
                 'duration_years' => 2,
                 'description' => 'STEM strand focuses on science, technology, engineering, and mathematics',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'Accountancy, Business and Management',
@@ -29,6 +31,8 @@ class AcademicProgramSeeder extends Seeder
                 'duration_years' => 2,
                 'description' => 'ABM strand focuses on business, management, and accounting',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'Humanities and Social Sciences',
@@ -37,6 +41,8 @@ class AcademicProgramSeeder extends Seeder
                 'duration_years' => 2,
                 'description' => 'HUMSS strand focuses on humanities and social sciences',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'General Academic Strand',
@@ -45,6 +51,8 @@ class AcademicProgramSeeder extends Seeder
                 'duration_years' => 2,
                 'description' => 'GAS strand provides a general academic track',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             
             // College Programs
@@ -55,6 +63,8 @@ class AcademicProgramSeeder extends Seeder
                 'duration_years' => 4,
                 'description' => 'Bachelor of Science in Computer Engineering',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'Hospitality Management',
@@ -63,6 +73,8 @@ class AcademicProgramSeeder extends Seeder
                 'duration_years' => 4,
                 'description' => 'Bachelor of Science in Hospitality Management',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'Information Technology',
@@ -71,6 +83,8 @@ class AcademicProgramSeeder extends Seeder
                 'duration_years' => 4,
                 'description' => 'Bachelor of Science in Information Technology',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'Business Administration',
@@ -79,6 +93,40 @@ class AcademicProgramSeeder extends Seeder
                 'duration_years' => 4,
                 'description' => 'Bachelor of Science in Business Administration',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            
+            // Diploma Programs
+            [
+                'name' => 'Diploma in Information Technology',
+                'code' => 'DIT',
+                'type' => 'diploma',
+                'duration_years' => 3,
+                'description' => 'Diploma in Information Technology - 3-year TESDA program',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Diploma in Hospitality Technology',
+                'code' => 'DHT',
+                'type' => 'diploma',
+                'duration_years' => 3,
+                'description' => 'Diploma in Hospitality Technology - 3-year TESDA program',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Diploma in Engineering Technology',
+                'code' => 'DET',
+                'type' => 'diploma',
+                'duration_years' => 3,
+                'description' => 'Diploma in Engineering Technology - 3-year TESDA program',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
 
