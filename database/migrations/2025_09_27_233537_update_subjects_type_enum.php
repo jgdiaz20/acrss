@@ -37,7 +37,23 @@ class UpdateSubjectsTypeEnum extends Migration
             DB::statement("ALTER TABLE subjects ALTER COLUMN type TYPE VARCHAR(20) USING type::VARCHAR(20)");
             DB::statement("UPDATE subjects SET type = 'major' WHERE type IN ('core', 'practical', 'theoretical')");
             DB::statement("UPDATE subjects SET type = 'minor' WHERE type = 'elective'");
-            DB::statement("ALTER TABLE subjects ADD CONSTRAINT subjects_type_check CHECK (type IN ('minor', 'major'))");
+
+            // Only add the constraint if it does not already exist
+            DB::statement("
+                DO $$
+                BEGIN
+                    IF NOT EXISTS (
+                        SELECT 1
+                        FROM pg_constraint
+                        WHERE conname = 'subjects_type_check'
+                          AND conrelid = 'subjects'::regclass
+                    ) THEN
+                        ALTER TABLE subjects
+                            ADD CONSTRAINT subjects_type_check CHECK (type IN ('minor', 'major'));
+                    END IF;
+                END
+                $$;
+            ");
         } else {
             // MySQL implementation (unchanged)
             DB::statement("ALTER TABLE subjects MODIFY COLUMN type ENUM('core', 'elective', 'practical', 'theoretical', 'minor', 'major') DEFAULT 'core'");
