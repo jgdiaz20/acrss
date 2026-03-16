@@ -585,7 +585,7 @@ function changePerPage() {
 }
 
 </script>
+@include('partials.qr-code-modal-scripts')
 @endsection
-
 @include('partials.qr-code-modal')
 

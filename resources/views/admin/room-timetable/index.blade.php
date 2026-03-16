@@ -132,9 +132,10 @@
 
 @include('partials.qr-code-modal')
 
+
 @section('scripts')
 @parent
-
+@include('partials.qr-code-modal-scripts')
 <style>
 /* Room Header with QR Button */
 .room-header {

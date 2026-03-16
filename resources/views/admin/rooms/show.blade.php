@@ -119,3 +119,8 @@
 @endsection
 
 @include('partials.qr-code-modal')
+
+@section('scripts')
+@parent
+@include('partials.qr-code-modal-scripts')
+@endsection
