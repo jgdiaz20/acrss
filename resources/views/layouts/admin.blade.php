@@ -43,6 +43,15 @@
     @yield('styles')
 </head>
 <body class="app header-fixed sidebar-fixed aside-menu-fixed pace-done sidebar-lg-show">
+    <!-- Preloader -->
+<div id="preloader" class="preloader">
+    <div class="preloader-content">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <div class="mt-3 text-muted">Loading application...</div>
+    </div>
+</div>
     <header class="app-header navbar">
         <button class="navbar-toggler sidebar-toggler d-lg-none mr-auto" type="button" data-toggle="sidebar-show">
             <span class="navbar-toggler-icon"></span>
@@ -89,7 +98,7 @@
 
         </ul>
     </header>
-
+<div id="app-content">
     <div class="app-body">
         @include('partials.menu')
         <main class="main">
@@ -146,6 +155,7 @@
             @csrf
         </form>
     </div>
+</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
@@ -271,6 +281,34 @@
 });
 
     </script>
+    <script>
+(function() {
+    // Preloader control script
+    document.addEventListener('DOMContentLoaded', function() {
+        const preloader = document.getElementById('preloader');
+        const appContent = document.getElementById('app-content');
+        
+        // Show content when page is fully loaded
+        window.addEventListener('load', function() {
+            preloader.classList.add('fade-out');
+            appContent.classList.add('visible');
+            
+            // Remove preloader from DOM after transition
+            setTimeout(function() {
+                preloader.classList.add('hidden');
+            }, 300);
+        });
+        
+        // Fallback: show content after 5 seconds max (prevents infinite loading)
+        setTimeout(function() {
+            if (!preloader.classList.contains('hidden')) {
+                preloader.classList.add('fade-out', 'hidden');
+                appContent.classList.add('visible');
+            }
+        }, 5000);
+    });
+})();
+</script>
     @yield('scripts')
 </body>
 
