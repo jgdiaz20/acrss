@@ -732,4 +732,7 @@ function editLesson(lessonId) {
     }
 }
 </script>
+@include('components.validation-modal')
+<script src="{{ asset('js/enhanced-validation-modal.js') }}"></script>
 @endsection
+
