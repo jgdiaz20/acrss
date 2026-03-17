@@ -410,32 +410,33 @@ document.addEventListener('keydown', function(e) {
 });
 
 // Add modal event listeners for better UX
+// Replace the $(document).ready() section with:
 $(document).ready(function() {
-    $('#qrCodeModal').on('shown.bs.modal', function() {
-        // Focus on the QR code image for accessibility
-        $('#qrCodeImage').focus();
-    });
-    
-    $('#qrCodeModal').on('hidden.bs.modal', function() {
-        // Reset modal state
-        $('#qrLoadingState').show();
-        $('#qrCodeContent').hide();
-        $('#qrErrorState').hide();
-    });
-    
-    // Ensure modal works with Bootstrap 4
-    $('#qrCodeModal').modal({
-        backdrop: true,
-        keyboard: true,
-        focus: true,
-        show: false
-    });
-    
-    $('#allQRCodesModal').modal({
-        backdrop: true,
-        keyboard: true,
-        focus: true,
-        show: false
-    });
+    // Wait for Bootstrap to be fully loaded
+    setTimeout(function() {
+        $('#qrCodeModal').on('shown.bs.modal', function() {
+            $('#qrCodeImage').focus();
+        });
+        
+        $('#qrCodeModal').on('hidden.bs.modal', function() {
+            $('#qrLoadingState').show();
+            $('#qrCodeContent').hide();
+            $('#qrErrorState').hide();
+        });
+        
+        $('#qrCodeModal').modal({
+            backdrop: true,
+            keyboard: true,
+            focus: true,
+            show: false
+        });
+        
+        $('#allQRCodesModal').modal({
+            backdrop: true,
+            keyboard: true,
+            focus: true,
+            show: false
+        });
+    }, 100); // Small delay to ensure Bootstrap is ready
 });
 </script>
