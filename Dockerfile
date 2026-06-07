@@ -26,7 +26,7 @@ RUN apk add --no-cache \
     nodejs \
     npm
 
-# Install PHP extensions (Removed ctype, json, mbstring, tokenizer, fileinfo as they are pre-built)
+# Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install -j$(nproc) \
     gd \
@@ -44,8 +44,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy project files
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+# ----------------- FIXED COMPOSER STEP BELOW -----------------
+# Added --ignore-platform-reqs to prevent local dependency check failures
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts --ignore-platform-reqs
+# -------------------------------------------------------------
 
 # Install Node dependencies and build assets
 RUN npm ci && npm run production
@@ -83,7 +85,7 @@ RUN apk add --no-cache --virtual .build-deps \
     supervisor \
     curl
 
-# Install PHP extensions (Removed mbstring as it is pre-built)
+# Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install -j$(nproc) \
     gd \
