@@ -8,6 +8,7 @@ WORKDIR /app
 RUN apk add --no-cache \
     build-base \
     curl \
+    curl-dev \
     git \
     zip \
     unzip \
@@ -15,9 +16,11 @@ RUN apk add --no-cache \
     libjpeg-turbo-dev \
     freetype-dev \
     libxml2-dev \
+    mariadb-dev \
     postgresql-dev \
     sqlite-dev \
     zlib-dev \
+    oniguruma-dev \
     nodejs \
     npm
 
@@ -56,13 +59,16 @@ FROM php:8.2-fpm-alpine
 # Install runtime and build dependencies needed for compiling PHP extensions
 RUN apk add --no-cache --virtual .build-deps \
     build-base \
+    curl-dev \
     freetype-dev \
     libpng-dev \
     libjpeg-turbo-dev \
     libxml2-dev \
+    mariadb-dev \
     postgresql-dev \
     sqlite-dev \
     zlib-dev \
+    oniguruma-dev \
     pkgconf \
     curl \
     && apk add --no-cache \
@@ -70,6 +76,7 @@ RUN apk add --no-cache --virtual .build-deps \
     libjpeg-turbo \
     freetype \
     libxml2 \
+    mariadb-connector-c \
     postgresql-libs \
     sqlite-libs \
     zlib \
