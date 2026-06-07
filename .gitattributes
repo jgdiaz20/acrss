@@ -2,4 +2,16 @@
 *.css linguist-vendored
 *.scss linguist-vendored
 *.js linguist-vendored
+
+# Shell scripts - always use LF
+*.sh text eol=lf
+docker/** text eol=lf
+
+# Dockerfile
+Dockerfile text eol=lf
+
+# YAML
+*.yaml text eol=lf
+*.yml text eol=lf
+
 CHANGELOG.md export-ignore

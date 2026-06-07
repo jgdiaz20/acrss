@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: laravel-timetable
+    env: docker
+    region: oregon
+    plan: starter
+    branch: main
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: CACHE_DRIVER
+        value: redis
+      - key: SESSION_DRIVER
+        value: redis
+      - key: QUEUE_CONNECTION
+        value: redis
+      - key: FILESYSTEM_DRIVER
+        value: s3
+
+  - type: worker
+    name: laravel-timetable-worker
+    env: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    startCommand: php /app/artisan queue:work --sleep=3 --tries=3 --timeout=90
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: CACHE_DRIVER
+        value: redis
+      - key: SESSION_DRIVER
+        value: redis
+      - key: QUEUE_CONNECTION
+        value: redis
+      - key: FILESYSTEM_DRIVER
+        value: s3
+
+cronJobs:
+  - id: scheduler
+    name: Laravel Scheduler
+    schedule: "* * * * *"
+    command: sh -c 'php /app/artisan schedule:run'
