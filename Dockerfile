@@ -17,6 +17,7 @@ RUN apk add --no-cache \
     freetype-dev \
     libxml2-dev \
     mariadb-dev \
+    openssl-dev \
     postgresql-dev \
     sqlite-dev \
     zlib-dev \
@@ -65,6 +66,7 @@ RUN apk add --no-cache --virtual .build-deps \
     libjpeg-turbo-dev \
     libxml2-dev \
     mariadb-dev \
+    openssl-dev \
     postgresql-dev \
     sqlite-dev \
     zlib-dev \
@@ -77,9 +79,11 @@ RUN apk add --no-cache --virtual .build-deps \
     freetype \
     libxml2 \
     mariadb-connector-c \
+    openssl \
     postgresql-libs \
     sqlite-libs \
     zlib \
+    file \
     nginx \
     supervisor \
     curl
@@ -95,11 +99,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     xml \
     curl \
     bcmath \
-    ctype \
-    json \
-    mbstring \
-    tokenizer \
-    fileinfo && \
+    mbstring && \
     apk del .build-deps
 
 # Set working directory
