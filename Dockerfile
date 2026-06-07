@@ -7,6 +7,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apk add --no-cache \
     build-base \
+    pkgconf \
     curl \
     curl-dev \
     git \
@@ -25,7 +26,7 @@ RUN apk add --no-cache \
     nodejs \
     npm
 
-# Install PHP extensions
+# Install PHP extensions (Removed ctype, json, mbstring, tokenizer, fileinfo as they are pre-built)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install -j$(nproc) \
     gd \
@@ -35,12 +36,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     pdo_sqlite \
     xml \
     curl \
-    bcmath \
-    ctype \
-    json \
-    mbstring \
-    tokenizer \
-    fileinfo
+    bcmath
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -60,6 +56,7 @@ FROM php:8.2-fpm-alpine
 # Install runtime and build dependencies needed for compiling PHP extensions
 RUN apk add --no-cache --virtual .build-deps \
     build-base \
+    pkgconf \
     curl-dev \
     freetype-dev \
     libpng-dev \
@@ -71,8 +68,6 @@ RUN apk add --no-cache --virtual .build-deps \
     sqlite-dev \
     zlib-dev \
     oniguruma-dev \
-    pkgconf \
-    curl \
     && apk add --no-cache \
     libpng \
     libjpeg-turbo \
@@ -88,7 +83,7 @@ RUN apk add --no-cache --virtual .build-deps \
     supervisor \
     curl
 
-# Install PHP extensions
+# Install PHP extensions (Removed mbstring as it is pre-built)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install -j$(nproc) \
     gd \
@@ -98,8 +93,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     pdo_sqlite \
     xml \
     curl \
-    bcmath \
-    mbstring && \
+    bcmath && \
     apk del .build-deps
 
 # Set working directory
