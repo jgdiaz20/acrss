@@ -17,6 +17,7 @@ RUN apk add --no-cache \
     libxml2-dev \
     postgresql-dev \
     sqlite-dev \
+    zlib-dev \
     nodejs \
     npm
 
@@ -52,13 +53,26 @@ RUN npm ci && npm run production
 # Final stage
 FROM php:8.2-fpm-alpine
 
-# Install runtime dependencies only
-RUN apk add --no-cache \
+# Install runtime and build dependencies needed for compiling PHP extensions
+RUN apk add --no-cache --virtual .build-deps \
+    build-base \
+    freetype-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    libxml2-dev \
+    postgresql-dev \
+    sqlite-dev \
+    zlib-dev \
+    pkgconf \
+    curl \
+    && apk add --no-cache \
     libpng \
     libjpeg-turbo \
     freetype \
     libxml2 \
     postgresql-libs \
+    sqlite-libs \
+    zlib \
     nginx \
     supervisor \
     curl
@@ -78,7 +92,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     json \
     mbstring \
     tokenizer \
-    fileinfo
+    fileinfo && \
+    apk del .build-deps
 
 # Set working directory
 WORKDIR /app
