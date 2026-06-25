@@ -96,6 +96,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     xml \
     curl \
     bcmath && \
+    pecl install redis && \
+    docker-php-ext-enable redis && \
     apk del .build-deps
 
 # Set working directory

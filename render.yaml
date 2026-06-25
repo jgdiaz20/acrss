@@ -19,7 +19,11 @@ services:
         value: redis
       - key: QUEUE_CONNECTION
         value: redis
+      - key: REDIS_CLIENT
+        value: phpredis
       - key: FILESYSTEM_DRIVER
+        value: s3
+      - key: FILESYSTEM_CLOUD
         value: s3
 
   - type: worker
@@ -41,7 +45,11 @@ services:
         value: redis
       - key: QUEUE_CONNECTION
         value: redis
+      - key: REDIS_CLIENT
+        value: phpredis
       - key: FILESYSTEM_DRIVER
+        value: s3
+      - key: FILESYSTEM_CLOUD
         value: s3
 
 cronJobs:

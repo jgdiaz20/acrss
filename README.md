@@ -73,6 +73,10 @@ The Laravel School Timetable Management System is built on Laravel 10 and implem
 5. Run `php artisan migrate --seed` (includes sample data)
 6. Launch the application URL
 
+## Deploying to Render
+
+This application includes a Docker deployment configuration and a Render guide in `RENDER_DEPLOYMENT.md`. Use that file for step-by-step production deployment instructions.
+
 ## Default Credentials
 
 - **Administrator**: admin@admin.com / password

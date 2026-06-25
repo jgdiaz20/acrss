@@ -42,6 +42,31 @@ wait_for_db() {
     done
 }
 
+wait_for_redis() {
+    if [ "$CACHE_DRIVER" != "redis" ] && [ "$SESSION_DRIVER" != "redis" ] && [ "$QUEUE_CONNECTION" != "redis" ]; then
+        return 0
+    fi
+
+    if [ -z "$REDIS_HOST" ]; then
+        echo "Redis is configured for cache/session/queue, but REDIS_HOST is not set. Skipping Redis wait."
+        return 0
+    fi
+
+    REDIS_PORT=${REDIS_PORT:-6379}
+
+    echo "Waiting for Redis connection..."
+    until php -r '
+        $host = getenv("REDIS_HOST");
+        $port = getenv("REDIS_PORT") ?: 6379;
+        $fp = @fsockopen($host, $port, $errno, $errstr, 1);
+        exit($fp ? 0 : 1);
+    '
+    do
+        echo "Waiting for Redis at ${REDIS_HOST}:${REDIS_PORT}..."
+        sleep 5
+    done
+}
+
 # Generate APP_KEY if not set
 if [ -z "$APP_KEY" ]; then
     echo "Generating APP_KEY..."
@@ -49,6 +74,7 @@ if [ -z "$APP_KEY" ]; then
 fi
 
 wait_for_db
+wait_for_redis
 
 # Run migrations
 echo "Running migrations..."

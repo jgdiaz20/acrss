@@ -1,6 +1,9 @@
 <?php
 
-Route::redirect('/', '/login');
+// Public homepage (no authentication required)
+Route::get('/', 'PublicHomeController@index')->name('home.public');
+
+// Authenticated home dispatcher
 Route::get('/home', function () {
     $user = auth()->user();
 
@@ -18,7 +21,7 @@ Route::get('/home', function () {
         // No valid role assigned
         abort(403, 'Access denied. No valid role assigned.');
     }
-    
+
     if (session('status')) {
         return redirect()->route($routeName)->with('status', session('status'));
     }
@@ -26,20 +29,22 @@ Route::get('/home', function () {
     return redirect()->route($routeName);
 });
 
-// Authentication routes (register, reset, verify, confirm disabled)
+// Authentication routes (register, reset, verify, confirm, login/logout disabled)
 Auth::routes([
     'register' => false,
     'reset' => false,      // Disable password reset
     'verify' => false,     // Disable email verification
-    'confirm' => false     // Disable password confirmation
+    'confirm' => false,    // Disable password confirmation
+    'login' => false,
+    'logout' => false
 ]);
 
-// Override login route with rate limiting (5 attempts per minute)
+// Login routes with rate limiting
+Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login')
-    ->middleware('throttle:5,1')
-    ->name('login');
+    ->middleware('throttle:5,1');
 
-// Override logout route to handle expired sessions gracefully
+// Logout route to handle expired sessions gracefully
 Route::post('logout', 'Auth\LoginController@logout')
     ->name('logout')
     ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
