@@ -112,7 +112,9 @@ RUN mkdir -p /app/storage/logs && \
     mkdir -p /app/storage/framework/sessions && \
     mkdir -p /app/storage/framework/views && \
     mkdir -p /app/storage/framework/cache && \
-    mkdir -p /app/bootstrap/cache
+    mkdir -p /app/bootstrap/cache && \
+    mkdir -p /var/log/supervisor && \
+    mkdir -p /var/run
 
 # Set permissions
 RUN chown -R www-data:www-data /app && \
