@@ -58,6 +58,7 @@ FROM php:8.2-fpm-alpine
 # Install runtime and build dependencies needed for compiling PHP extensions
 RUN apk add --no-cache --virtual .build-deps \
     build-base \
+    autoconf \
     pkgconf \
     curl-dev \
     freetype-dev \

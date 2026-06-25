@@ -168,15 +168,16 @@ For PlanetScale specifically:
 
 ### Collect your credentials:
 
-From the Redis dashboard page:
+From the Redis dashboard page under the **Connections** section:
 
 | Variable | Where to find it |
 |---|---|
-| `REDIS_HOST` | "Host" field under "Connection" |
-| `REDIS_PORT` | "Port" field (usually `6379`) |
-| `REDIS_PASSWORD` | "Password" field (click the eye icon) |
+| `REDIS_HOST` | Extract from the **Internal Key Value URL** (e.g. in `redis://red-xxxxxxxxxx:6379`, the host is `red-xxxxxxxxxx`) |
+| `REDIS_PORT` | The port at the end of the URL (always `6379`) |
+| `REDIS_PASSWORD` | Left empty by default. If you click **"Enable Internal Authentication"**, Render will generate a password (click the eye icon to copy it). |
 
-> **Note:** Render Redis instances **always have a password**. Never set `REDIS_PASSWORD` to the literal string `null` — leave it unset only if there truly is no password (which won't be the case on Render's managed Redis).
+> **Note:** If you do not click **"Enable Internal Authentication"**, you must leave `REDIS_PASSWORD` completely blank (empty) in your environment variables. Never set `REDIS_PASSWORD` to the literal string `null`.
+
 
 ---
 
